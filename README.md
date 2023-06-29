@@ -1,5 +1,7 @@
 # checkov-vscode-v2 README
 
+
+
 This is the README for your extension "checkov-vscode-v2". After writing up a brief description, we recommend including the following sections.
 
 ## Features
