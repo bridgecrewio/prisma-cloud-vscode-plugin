@@ -2,9 +2,9 @@ import { spawn } from 'child_process';
 
 import * as vscode from 'vscode';
 
-import { CONFIG, USER_CONFIG } from '../../../config';
+import { CONFIG } from '../../../config';
 import { AbstractExecutor } from './abstractExecutor';
-import { CheckovInstallation, CheckovOutput } from '../../../types';
+import { CheckovInstallation } from '../../../types';
 
 export class DockerExecutor extends AbstractExecutor {
     public static execute(installation: CheckovInstallation, filePath?: string) {
@@ -18,6 +18,9 @@ export class DockerExecutor extends AbstractExecutor {
             ...DockerExecutor.getImage(),
             ...DockerExecutor.getCheckovCliParams(installation, filePath),
         ];
+
+
+        console.log(installation.entrypoint, args.join(' '));
 
         const process = spawn(installation.entrypoint, args, { shell: true });
 
@@ -38,7 +41,7 @@ export class DockerExecutor extends AbstractExecutor {
         const envs = [
             '--env', 'BC_SOURCE=vscode',
             '--env', `BC_SOURCE_VERSION=${vscode.extensions.getExtension(CONFIG.extensionId)?.packageJSON.version}`,
-            '--env', `PRISMA_API_URL=${USER_CONFIG.prismaURL}`,
+            '--env', `PRISMA_API_URL=${CONFIG.userConfig.prismaURL}`,
         ];
 
         return envs;
@@ -49,8 +52,8 @@ export class DockerExecutor extends AbstractExecutor {
             '--volume', `${DockerExecutor.projectPath}:${CONFIG.checkov.docker.sourceMountPath}`,
         ];
 
-        if (USER_CONFIG.certificate) {
-            volumeMounts.push('--volume', `${USER_CONFIG.certificate}:${CONFIG.checkov.docker.certificateMountPath}`);
+        if (CONFIG.userConfig.certificate) {
+            volumeMounts.push('--volume', `${CONFIG.userConfig.certificate}:${CONFIG.checkov.docker.certificateMountPath}`);
         }
 
         return volumeMounts;

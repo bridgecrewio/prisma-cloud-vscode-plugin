@@ -18,6 +18,7 @@ export enum USER_CONFIGURATION_PARAM {
     SECRET_KEY = 'secretKey',
     PRISMA_URL = 'prismaURL',
     CERTIFICATE = 'certificate',
+    USE_ENFORCEMENT_RULES = 'useEnforcementRules',
 };
 
 export enum CHECKOV_RESULT_CATEGORY { IAC, SCA, SECRETS, LICENSES };

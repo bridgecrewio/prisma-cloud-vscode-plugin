@@ -2,7 +2,7 @@ import { ChildProcessWithoutNullStreams } from 'child_process';
 
 import * as vscode from 'vscode';
 
-import { CONFIG, USER_CONFIG } from '../../../config';
+import { CONFIG } from '../../../config';
 import { CHECKOV_INSTALLATION_TYPE } from '../../../constants';
 import { CheckovInstallation, CheckovOutput } from '../../../types';
 
@@ -18,36 +18,40 @@ export abstract class AbstractExecutor {
     }
 
     protected static getCheckovCliParams(installation: CheckovInstallation, filePath?: string) {
-        const checkovParams = [
+        const checkovCliParams = [
             '--quiet',
             '--soft-fail',
             '--output', 'json',
-            '--bc-api-key', `${USER_CONFIG.accessKey}::${USER_CONFIG.secretKey}`,
+            '--bc-api-key', `${CONFIG.userConfig.accessKey}::${CONFIG.userConfig.secretKey}`,
         ];
 
-        if (USER_CONFIG.certificate) {
+        if (filePath) {
+            checkovCliParams.push('--file', `"${filePath}"`);
+        } else {
             if (installation.type === CHECKOV_INSTALLATION_TYPE.DOCKER) {
-                checkovParams.push('--ca-certificate', `"${CONFIG.checkov.docker.certificateMountPath}"`);
+                checkovCliParams.push('--directory', CONFIG.checkov.docker.sourceMountPath);
             } else {
-                checkovParams.push('--ca-certificate', `"${USER_CONFIG.certificate}"`);
+                checkovCliParams.push('--directory', AbstractExecutor.projectPath!);
             }
         }
 
         if (CONFIG.checkov.skipChecks) {
-            checkovParams.push('--skip-check', `"${CONFIG.checkov.skipChecks}"`);
+            checkovCliParams.push('--skip-check', `"${CONFIG.checkov.skipChecks}"`);
         }
 
-        if (filePath) {
-            checkovParams.push('-f', `"${filePath}"`);
-        } else {
+        if (CONFIG.userConfig.certificate) {
             if (installation.type === CHECKOV_INSTALLATION_TYPE.DOCKER) {
-                checkovParams.push('-d', CONFIG.checkov.docker.sourceMountPath);
+                checkovCliParams.push('--ca-certificate', `"${CONFIG.checkov.docker.certificateMountPath}"`);
             } else {
-                checkovParams.push('-d', AbstractExecutor.projectPath!);
+                checkovCliParams.push('--ca-certificate', `"${CONFIG.userConfig.certificate}"`);
             }
         }
 
-        return checkovParams;
+        if (CONFIG.userConfig.useEnforcementRules) {
+            checkovCliParams.push('--use-enforcement-rules');
+        }
+
+        return checkovCliParams;
     }
 
     protected static async handleProcessOutput(process: ChildProcessWithoutNullStreams): Promise<CheckovOutput> {

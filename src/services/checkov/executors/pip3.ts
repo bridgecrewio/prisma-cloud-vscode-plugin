@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 
-import { USER_CONFIG } from '../../../config';
+import { CONFIG } from '../../../config';
 import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
 
@@ -13,7 +13,7 @@ export class Pip3Executor extends AbstractExecutor {
         const process = spawn(installation.entrypoint, args, {
             shell: true,
             env: {
-                PRISMA_API_URL: USER_CONFIG.prismaURL,
+                PRISMA_API_URL: CONFIG.userConfig.prismaURL,
             },
         });
 

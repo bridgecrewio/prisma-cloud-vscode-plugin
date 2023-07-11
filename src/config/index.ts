@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import { workspace, WorkspaceConfiguration } from 'vscode';
 
 import { UserConfiguration } from '../types';
 
@@ -17,6 +17,7 @@ export const CONFIG = Object.freeze({
     storage: {
         resultsKey: 'results',
     },
+    get userConfig(): WorkspaceConfiguration & UserConfiguration {
+        return workspace.getConfiguration(CONFIG.userConfigurationKey) as WorkspaceConfiguration & UserConfiguration;
+    },
 });
-
-export const USER_CONFIG = vscode.workspace.getConfiguration(CONFIG.userConfigurationKey) as vscode.WorkspaceConfiguration & UserConfiguration;
