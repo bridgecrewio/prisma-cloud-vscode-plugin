@@ -1,32 +1,33 @@
 import * as vscode from 'vscode';
-import { Check, TreeService } from '../services/treeService';
+
+import { TreeService } from '../services/treeService';
+import { CheckovResult } from '../../../../types';
 
 export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
-  private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
-  readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+  private readonly _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
+  public readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
-  private data: TreeItem[];
+  private data: TreeItem[] = [];
   private treeService: TreeService;
 
   constructor() {
     this.treeService = new TreeService();
-    const checkovOutput = this.getCheckovDataByType();
-    this.data = this.treeService.getTreeData(checkovOutput);
   }
 
+  abstract getCheckovResults(): CheckovResult[];
+
   public refresh() {
-    const checkovOutput = this.getCheckovDataByType();
-    this.data = this.treeService.getTreeData(checkovOutput);
+    const checkovResults = this.getCheckovResults();
+
+    this.data = this.treeService.getTreeData(checkovResults);
     this._onDidChangeTreeData.fire();
   }
 
-  abstract getCheckovDataByType(): Array<Check>;
-
-  getTreeItem(element: TreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
+  public getTreeItem(element: TreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
     return element;
   }
 
-  getChildren(element?: TreeItem|undefined): vscode.ProviderResult<TreeItem[]> {
+  public getChildren(element?: TreeItem): vscode.ProviderResult<TreeItem[]> {
     if (element === undefined) {
       const a = vscode.ThemeIcon.Folder;
       return this.data;
@@ -34,10 +35,10 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
     return element.children;
   }
 
-  getItemsAmount(): number {
+  public getItemsAmount(): number {
     return this.data.length;
   }
-}
+};
 
 export class TreeItem extends vscode.TreeItem {
   children: TreeItem[]|undefined;
@@ -52,4 +53,4 @@ export class TreeItem extends vscode.TreeItem {
     this.children = children;
     this.iconPath = iconPath;
   }
-}
+};

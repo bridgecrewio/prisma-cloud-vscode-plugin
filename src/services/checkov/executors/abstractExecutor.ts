@@ -35,10 +35,6 @@ export abstract class AbstractExecutor {
             }
         }
 
-        if (CONFIG.checkov.skipChecks) {
-            checkovCliParams.push('--skip-check', `"${CONFIG.checkov.skipChecks}"`);
-        }
-
         if (CONFIG.userConfig.certificate) {
             if (installation.type === CHECKOV_INSTALLATION_TYPE.DOCKER) {
                 checkovCliParams.push('--ca-certificate', `"${CONFIG.checkov.docker.certificateMountPath}"`);

@@ -1,10 +1,9 @@
-import { Check } from "../services/treeService";
-import { TreeDataProvider } from "./abstractTreeDataProvider";
-import { checkovOutput } from "../views/checkovOutput";
+import { TreeDataProvider } from './abstractTreeDataProvider';
+import { ResultsService } from '../../../../services';
+import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
 
 export class SecretsTreeDataProvider extends TreeDataProvider {
-    getCheckovDataByType(): Array<Check> {
-        // TODO implement getting secrets data from ResultsService
-        return checkovOutput.filter(check => check.check_type === 'secrets');
+    public getCheckovResults() {
+        return ResultsService.getByCategory(CHECKOV_RESULT_CATEGORY.SECRETS);
     }
-}
+};
