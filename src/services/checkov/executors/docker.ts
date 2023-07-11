@@ -19,9 +19,6 @@ export class DockerExecutor extends AbstractExecutor {
             ...DockerExecutor.getCheckovCliParams(installation, filePath),
         ];
 
-
-        console.log(installation.entrypoint, args.join(' '));
-
         const process = spawn(installation.entrypoint, args, { shell: true });
 
         return DockerExecutor.handleProcessOutput(process);
