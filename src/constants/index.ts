@@ -19,5 +19,3 @@ export enum USER_CONFIGURATION_PARAM {
     PRISMA_URL = 'prismaURL',
     CERTIFICATE = 'certificate',
 };
-
-export enum CHECKOV_RESULT_CATEGORY { IAC, SCA, SECRETS, LICENSES };

@@ -1,12 +1,5 @@
-import { USER_CONFIGURATION_PARAM, CHECKOV_INSTALLATION_TYPE } from '../constants';
-
-export * from './checkov';
+import { USER_CONFIGURATION_PARAM } from '../constants';
 
 export type UserConfiguration = {
     [key in USER_CONFIGURATION_PARAM]: string;
-};
-
-export type CheckovInstallation = {
-    type: CHECKOV_INSTALLATION_TYPE;
-    entrypoint: string;
 };
