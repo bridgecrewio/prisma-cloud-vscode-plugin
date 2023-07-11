@@ -15,35 +15,6 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-          {
-              "id": "prisma-cloud",
-              "title": "Prisma Cloud",
-              "icon": "$(star-full)"
-          }
-      ]
-    },
-    "views": {
-      "prisma-cloud": [
-          {
-              "id": "iac-misconfiguration",
-              "name": "IaC Misconfiguration"
-          },
-          {
-              "id": "secrets",
-              "name": "Secrets"
-          },
-          {
-              "id": "vulnerabilities",
-              "name": "Vulnerabilities"
-          },
-          {
-              "id": "licenses",
-              "name": "Licenses"
-          }
-      ]
-    },
     "commands": [
       {
         "command": "checkov.install",
