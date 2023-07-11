@@ -13,7 +13,10 @@ export const CONFIG = Object.freeze({
             certificateMountPath: '/checkovCert/cacert.pem',
         },
         skipChecks: 'BC_LIC*',
-    }
+    },
+    storage: {
+        resultsKey: 'results',
+    },
 });
 
 export const USER_CONFIG = vscode.workspace.getConfiguration(CONFIG.userConfigurationKey) as vscode.WorkspaceConfiguration & UserConfiguration;

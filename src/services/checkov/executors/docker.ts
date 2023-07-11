@@ -4,25 +4,24 @@ import * as vscode from 'vscode';
 
 import { CONFIG, USER_CONFIG } from '../../../config';
 import { AbstractExecutor } from './abstractExecutor';
+import { CheckovInstallation, CheckovOutput } from '../../../types';
 
 export class DockerExecutor extends AbstractExecutor {
-    public static async execute(filePath?: string) {
-        const command = 'docker run';
+    public static execute(installation: CheckovInstallation, filePath?: string) {
         const args = [
+            'run',
             ...DockerExecutor.getDockerParams(),
             ...DockerExecutor.getConainerName(),
             ...DockerExecutor.getEnvs(),
             ...DockerExecutor.getVolumeMounts(),
             ...DockerExecutor.getWorkdir(),
             ...DockerExecutor.getImage(),
-            ...DockerExecutor.getCheckovParams(filePath),
+            ...DockerExecutor.getCheckovCliParams(installation, filePath),
         ];
 
-        const child = spawn(command, args, { shell: true });
+        const process = spawn(installation.entrypoint, args, { shell: true });
 
-        child.stdout.on('data', (data) => {
-            console.log(data.toString());
-        });
+        return DockerExecutor.handleProcessOutput(process);
     }
 
     private static getDockerParams() {
@@ -66,9 +65,3 @@ export class DockerExecutor extends AbstractExecutor {
     }
 };
 
-
-// docker run --rm --tty --name vscode-checkov-1687860740078 --env PRISMA_API_URL=https://api0.prismacloud.io --env LOG_LEVEL=DEBUG 
-// --env BC_SOURCE=vscode --env BC_SOURCE_VERSION=1.0.95 -v "/Users/vtrofymenko/Projects/vscode-extension-test:/checkovScan" 
-// -v "/Users/vtrofymenko/Documents/cacert.pem:/checkovCert/cacert.pem" -w /checkovScan bridgecrew/checkov:2.3.293 
-// --ca-certificate "/checkovCert/cacert.pem" -f "Dockerfile" -s --bc-api-key 89fad78e-2b69-47b9-97e0-5c3d5fdb942f::OnOdzlnru2KtDI3yyqlOY4qo438= 
-// --skip-check "BC_LIC*" -o json
