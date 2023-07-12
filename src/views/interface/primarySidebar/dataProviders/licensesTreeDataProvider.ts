@@ -1,11 +1,9 @@
-import { Check } from "../services/treeService";
-import { TreeDataProvider } from "./abstractTreeDataProvider";
-import { checkovOutput } from "../views/checkovOutput";
+import { TreeDataProvider } from './abstractTreeDataProvider';
+import { ResultsService } from '../../../../services';
+import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
 
 export class LicensesTreeDataProvider extends TreeDataProvider {
-    getCheckovDataByType(): Array<Check> {
-        // TODO implement getting licenses data from ResultsService
-        const iacCheckTypes = ["sca_package", "sca_image"];
-        return checkovOutput.filter(check => iacCheckTypes.indexOf(check.check_type) !== -1);
+    public getCheckovResults() {
+        return ResultsService.getByCategory(CHECKOV_RESULT_CATEGORY.LICENSES);
     }
-}
+};

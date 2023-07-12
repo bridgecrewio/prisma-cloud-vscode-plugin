@@ -1,10 +1,12 @@
 import * as path from 'path';
-import { FormattedCheck } from "./treeService";
+
+import { FormattedCheck } from './treeService';
 
 export class IconsService {
     public getIconPath(treeItemName: string, formattedCheck: FormattedCheck) {
         const splitPath = formattedCheck.originalFilePath.split('/');
         const treeItemPathIndex = splitPath.indexOf(treeItemName);
+
         if (treeItemPathIndex !== -1) {
             if (treeItemPathIndex === splitPath.length - 1) {
                 // it's file
@@ -58,4 +60,4 @@ export class IconsService {
             light: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', 'risk.svg'),
         };
     }
-}
+};

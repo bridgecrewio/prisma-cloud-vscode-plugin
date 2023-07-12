@@ -1,25 +1,12 @@
-import * as path from 'path';
-import { TreeItem } from "../dataProviders/abstractTreeDataProvider";
+import { TreeItem } from '../dataProviders/abstractTreeDataProvider';
 import { IconsService } from './iconsService';
+import { CheckovResult } from '../../../../types';
 
 export type FormattedCheck = {
     originalFilePath: string;
     filePath: string;
     checkClass: string;
     checkName: string;
-};
-
-type CheckData = {
-    repo_file_path: string;
-    check_class: string;
-    check_name: string;
-};
-
-export type Check = {
-    check_type: string;
-    results: {
-        failed_checks: Array<CheckData>
-    };
 };
 
 export class TreeService {
@@ -29,9 +16,9 @@ export class TreeService {
         this.iconService = new IconsService();
     }
 
-    public getTreeData(checkovOutput: Array<Check>): Array<TreeItem> {
+    public getTreeData(checkovOutput: CheckovResult[]): Array<TreeItem> {
         const formattedData = this.formatCheckData(checkovOutput);
-        console.log('formattedData', formattedData);
+
         return this.formTreeData(formattedData);
     }
 
@@ -56,20 +43,13 @@ export class TreeService {
         return formTreeData;
     }
 
-    private formatCheckData(data: Array<Check>): Array<FormattedCheck> {
-        const formattedData: Array<FormattedCheck> = [];
-        data.map(record => {
-            return record?.results?.failed_checks.map(({ repo_file_path, check_class, check_name }) => {
-                formattedData.push({
-                    originalFilePath: this.escapeRedundantChars(repo_file_path),
-                    filePath: this.escapeRedundantChars(`${repo_file_path}/${check_class}/${check_name}`),
-                    checkClass: check_class,
-                    checkName: check_name,
-                });
-            });
-        });
-
-        return formattedData;
+    private formatCheckData(data: CheckovResult[]): Array<FormattedCheck> {
+        return data.map(({ repo_file_path, check_class, check_name }) => ({
+            originalFilePath: this.escapeRedundantChars(repo_file_path),
+            filePath: this.escapeRedundantChars(`${repo_file_path}/${check_class}/${check_name}`),
+            checkClass: check_class,
+            checkName: check_name,
+        }));
     }
 
     private escapeRedundantChars(filePath: string): string {

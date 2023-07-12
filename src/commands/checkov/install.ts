@@ -25,7 +25,7 @@ export class CheckovInstall {
 
             if (installationResult) {
                 console.log(installationResult);
-                // set executable path
+                // TODO: Set installation to global state
                 return installationResult;
             }
         }

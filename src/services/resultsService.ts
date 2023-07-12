@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../config';
 import { CHECKOV_RESULT_CATEGORY } from '../constants';
 import { CheckovResult } from '../types';
+import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 
 export class ResultsService {
     private static context: vscode.ExtensionContext;
@@ -12,7 +13,7 @@ export class ResultsService {
     }
 
     public static get(): CheckovResult[] {
-        return ResultsService.context.workspaceState.get(CONFIG.storage.resultsKey) as CheckovResult[];
+        return ResultsService.context.workspaceState.get(CONFIG.storage.resultsKey) ?? [];
     }
 
     public static getByCategory(category: CHECKOV_RESULT_CATEGORY) {
@@ -31,7 +32,8 @@ export class ResultsService {
     }
 
     public static store(results: CheckovResult[]) {
-        return ResultsService.context.workspaceState.update(CONFIG.storage.resultsKey, results);
+        ResultsService.context.workspaceState.update(CONFIG.storage.resultsKey, results);
+        TreeDataProvidersContainer.refresh();
     }
 
     public static updateByFilePath(filePath: string, results: CheckovResult[]) {

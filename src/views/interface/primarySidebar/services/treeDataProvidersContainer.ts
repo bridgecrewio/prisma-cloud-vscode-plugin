@@ -1,8 +1,8 @@
-import { TreeDataProvider } from "../dataProviders/abstractTreeDataProvider";
-import { IaCTreeDataProvider } from "../dataProviders/iacTreeDataProvider";
-import { SecretsTreeDataProvider } from "../dataProviders/secretsTreeDataProvider";
-import { VulnerabilitiesTreeDataProvider } from "../dataProviders/vulnerabilitiesTreeDataProvider";
-import { LicensesTreeDataProvider } from "../dataProviders/licensesTreeDataProvider";
+import { TreeDataProvider } from '../dataProviders/abstractTreeDataProvider';
+import { IaCTreeDataProvider } from '../dataProviders/iacTreeDataProvider';
+import { SecretsTreeDataProvider } from '../dataProviders/secretsTreeDataProvider';
+import { VulnerabilitiesTreeDataProvider } from '../dataProviders/vulnerabilitiesTreeDataProvider';
+import { LicensesTreeDataProvider } from '../dataProviders/licensesTreeDataProvider';
 
 export class TreeDataProvidersContainer {
     public static iacTreeDataProvider: TreeDataProvider;
@@ -23,4 +23,4 @@ export class TreeDataProvidersContainer {
         TreeDataProvidersContainer.vulnerabilitiesTreeDataProvider.refresh();
         TreeDataProvidersContainer.licensesTreeDataProvider.refresh();
     }
-}
+};

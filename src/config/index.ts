@@ -3,6 +3,9 @@ import { workspace, WorkspaceConfiguration } from 'vscode';
 import { UserConfiguration } from '../types';
 
 export const CONFIG = Object.freeze({
+    get userConfig(): WorkspaceConfiguration & UserConfiguration {
+        return workspace.getConfiguration(CONFIG.userConfigurationKey) as WorkspaceConfiguration & UserConfiguration;
+    },
     extensionId: 'prisma-cloud.prisma-cloud-vscode-plugin',
     userConfigurationKey: 'prismaCloud',
     minRequiredPythonVersion: '3.7.0',
@@ -12,12 +15,11 @@ export const CONFIG = Object.freeze({
             sourceMountPath: '/checkovScan',
             certificateMountPath: '/checkovCert/cacert.pem',
         },
-        skipChecks: 'BC_LIC*',
     },
     storage: {
         resultsKey: 'results',
     },
-    get userConfig(): WorkspaceConfiguration & UserConfiguration {
-        return workspace.getConfiguration(CONFIG.userConfigurationKey) as WorkspaceConfiguration & UserConfiguration;
+    userInterface: {
+        statusBarText: 'Prisma Cloud',
     },
 });
