@@ -41,10 +41,12 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
 };
 
 export class TreeItem extends vscode.TreeItem {
-  children: TreeItem[]|undefined;
+  public readonly children: TreeItem[] | undefined;
+  public readonly result: CheckovResult | null;
 
-  constructor(options: { label: string, iconPath: vscode.ThemeIcon | { light: string, dark: string } }, children?: TreeItem[]) {
-    const { label, iconPath } = options;
+  constructor(options: { label: string, iconPath: vscode.ThemeIcon | { light: string, dark: string }, result?: CheckovResult }, children?: TreeItem[]) {
+    const { label, iconPath, result } = options;
+
     super(
         label,
         children === undefined ? vscode.TreeItemCollapsibleState.None :
@@ -52,5 +54,6 @@ export class TreeItem extends vscode.TreeItem {
                                  );
     this.children = children;
     this.iconPath = iconPath;
+    this.result = result ?? null;
   }
 };
