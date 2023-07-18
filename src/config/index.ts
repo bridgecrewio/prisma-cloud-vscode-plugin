@@ -20,6 +20,7 @@ export const CONFIG = Object.freeze({
         resultsKey: 'results',
     },
     userInterface: {
+        resultPanelTitle: 'Prisma Issue',
         statusBarText: 'Prisma Cloud',
     },
 });

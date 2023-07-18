@@ -7,6 +7,7 @@ export type FormattedCheck = {
     filePath: string;
     checkClass: string;
     checkName: string;
+    result: CheckovResult;
 };
 
 export class TreeService {
@@ -30,7 +31,7 @@ export class TreeService {
             formattedCheck.filePath.split('/').reduce((r, name, i, a) => {
               const iconPath = this.iconService.getIconPath(name, formattedCheck);
               if (i === a.length - 1) {
-                r.formTreeData.push(new TreeItem({ label: name, iconPath }));
+                r.formTreeData.push(new TreeItem({ label: name, iconPath, result: formattedCheck.result }));
               } else if(!r[name]) {
                 r[name] = {formTreeData: []};
                 r.formTreeData.push(new TreeItem({ label: name, iconPath }, r[name].formTreeData));
@@ -43,12 +44,13 @@ export class TreeService {
         return formTreeData;
     }
 
-    private formatCheckData(data: CheckovResult[]): Array<FormattedCheck> {
-        return data.map(({ repo_file_path, check_class, check_name }) => ({
-            originalFilePath: this.escapeRedundantChars(repo_file_path),
-            filePath: this.escapeRedundantChars(`${repo_file_path}/${check_class}/${check_name}`),
-            checkClass: check_class,
-            checkName: check_name,
+    private formatCheckData(results: CheckovResult[]): Array<FormattedCheck> {
+        return results.map((result) => ({
+            originalFilePath: this.escapeRedundantChars(result.repo_file_path),
+            filePath: this.escapeRedundantChars(`${result.repo_file_path}/${result.check_class}/${result.check_name}`),
+            checkClass: result.check_class,
+            checkName: result.check_name,
+            result: result,
         }));
     }
 
