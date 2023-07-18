@@ -31,7 +31,7 @@ export class CheckovResultWebviewPanel {
         CheckovResultWebviewPanel.webviewPanel.onDidDispose(
             () => CheckovResultWebviewPanel.webviewPanel = undefined,
             null,
-            CheckovResultWebviewPanel.context.subscriptions
+            CheckovResultWebviewPanel.context.subscriptions,
         );
     }
 
