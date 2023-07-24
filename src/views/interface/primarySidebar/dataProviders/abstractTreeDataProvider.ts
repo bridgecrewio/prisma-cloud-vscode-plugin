@@ -2,8 +2,13 @@ import * as vscode from 'vscode';
 
 import { TreeService } from '../services/treeService';
 import { CheckovResult } from '../../../../types';
+import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
+import { FilesService } from '../../../../services';
+import { CheckovResultWebviewPanel } from '../../checkovResult';
 
 export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
+  abstract readonly category: string;
+
   private readonly _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
   public readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
@@ -38,6 +43,19 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
   public getItemsAmount(): number {
     return this.data.length;
   }
+
+  public async onDidChangeSelection(event: vscode.TreeViewSelectionChangeEvent<TreeItem>) {
+    const result = event.selection[0].result;
+
+    console.log(result);
+
+    if (!result) {
+        return;
+    }
+
+    await FilesService.openFile(result.repo_file_path, result.file_line_range[0]);
+    CheckovResultWebviewPanel.show(this.category, result);
+  } 
 };
 
 export class TreeItem extends vscode.TreeItem {

@@ -1,1 +1,38 @@
-<h4>{{name}}</h4>
+<header class="header">
+    <img src="{{severityIconUri}}" alt="critical">
+    <h2>{{check_name}}</h2>
+</header>
+<section>
+    <p class="description">{{description}}</p>
+</section>
+<section>
+    <table class="code">
+        <thead>
+            <tr>
+                <th colspan="2" class="resource">
+                    <!-- <img src="{{resourceIconUri}}" alt="resource"> -->
+                    <span>{{resource}}</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{codeBlock}}
+        </tbody>
+    </table>
+</section>
+<section>
+    <div class="actions">
+        <div class="action {{fixActionState}}">
+            <img src="{{fixIconUri}}" alt="fix">
+            <span>Fix All</span>
+        </div>
+        <div class="action {{suppressActionState}}">
+            <img src="{{suppressIconUri}}" alt="suppress ">
+            <span>Suppress</span>
+        </div>
+        <a href="{{guideline}}" target="_blank" class="action {{guidelineActionState}}">
+            <img src="{{guidelineIconUri}}" alt="suppress">
+            <span>Guideline</span>
+        </div>
+    </div>
+</section>

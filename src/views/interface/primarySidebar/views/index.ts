@@ -19,9 +19,18 @@ export function registerSidebar() {
         treeDataProvider: TreeDataProvidersContainer.licensesTreeDataProvider,
     });
 
-    TreeDataProvidersContainer.refresh();
-
-    [iacTreeView, secretsTreeView, vulnerabilitiesTreeView, licensesTreeView].forEach(
-        (treeView) => treeView.onDidChangeSelection(TreeDataProvidersContainer.onDidChangeSelection),
+    iacTreeView.onDidChangeSelection(
+        TreeDataProvidersContainer.iacTreeDataProvider.onDidChangeSelection.bind(TreeDataProvidersContainer.iacTreeDataProvider)
     );
+    secretsTreeView.onDidChangeSelection(
+        TreeDataProvidersContainer.secretsTreeDataProvicer.onDidChangeSelection.bind(TreeDataProvidersContainer.secretsTreeDataProvicer)
+    );
+    vulnerabilitiesTreeView.onDidChangeSelection(
+        TreeDataProvidersContainer.vulnerabilitiesTreeDataProvider.onDidChangeSelection.bind(TreeDataProvidersContainer.vulnerabilitiesTreeDataProvider)
+    );
+    licensesTreeView.onDidChangeSelection(
+        TreeDataProvidersContainer.licensesTreeDataProvider.onDidChangeSelection.bind(TreeDataProvidersContainer.licensesTreeDataProvider)
+    );
+
+    TreeDataProvidersContainer.refresh();
 };
