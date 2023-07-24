@@ -76,8 +76,9 @@ export class CheckovResultWebviewPanel {
             codeBlock: CheckovResultWebviewPanel.renderCodeBlock(result.code_block),
             fixActionState: result.fixed_definition ? 'available' : 'unavailable',
             guidelineActionState: result.guideline ? 'available' : 'unavailable',
+            vulnerabilityDetailsId: result.vulnerability_details.id,
         };
-
+        // TODO: Improve to work with dots prop access
         for (const htmlParam of htmlParams) {
             htmlTemplate = htmlTemplate.replace(htmlParam[0], customValues[htmlParam[1]] || result[htmlParam[1] as keyof CheckovResult] || '');
         }
