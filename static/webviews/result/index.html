@@ -2,16 +2,107 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prisma Issue</title>
   <style>
+    * {
+      padding: 0;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .content {
+      padding: 12px;
+    }
+    .header {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+    .header img {
+      width: 16px;
+    }
+    h2 {
+      font-size: 13px;
+      line-height: 18px;
+    }
+    .description {
+      font-size: 13px;
+      line-height: 18px;
+      margin-bottom: 8px;
+    }
+    .details {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      font-size: 12px;
+      line-height: 17px;
+      margin-bottom: 2px;
+    }
+    .details span {
+      display: inline-block;
+      margin-right: 8px;
+    }
+    .code {
+      margin: 15px 0;
+      font-size: 11px;
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #393939;
+    }
+    .code th,
+    .code td {
+      border: none;
+      padding: 5px 9px;
+    }
+    .code thead {
+      border: 1px solid #393939;
+    }
+    .code .resource {
+      text-align: left;
+    }
+    .code .resource img {
+      display: inline-block;
+      vertical-align: baseline;
+      width: 14px;
+      margin-right: 4px;
+    }
+    .code .original {
+      background-color: #342727;
+    }
+    .code .fixed {
+      background-color: #243429;
+    }
+    .code td:first-child {
+      width: 50px;
+      text-align: center;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .action {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .action.unavailable {
+      display: none;
+    }
+    .action img {
+      width: 16px;
+    }
+    a.action {
+      text-decoration: none;
+      color: inherit;
+    }
   </style>
 </head>
 <body>
-  <section>
+  <div class="content">
     {{resultTemplate}}
-  </section>
+  </div>
   <script>
     const vscode = acquireVsCodeApi();
   </script>

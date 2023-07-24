@@ -7,6 +7,7 @@ export type CheckovResult = {
     file_abs_path: string;
     file_line_range: number[];
     file_path: string;
+    fixed_definition: string;
     guideline: string;
     repo_file_path: string;
     resource: string;
