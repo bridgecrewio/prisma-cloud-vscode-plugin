@@ -12,6 +12,9 @@ export type CheckovResult = {
     repo_file_path: string;
     resource: string;
     severity: string;
+    vulnerability_details: {
+        id: string;
+    };
 };
 
 export type CheckovOutput = [{
