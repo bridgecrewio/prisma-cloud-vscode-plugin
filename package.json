@@ -53,6 +53,10 @@
       {
         "command": "checkov.execute",
         "title": "Checkov: Execute"
+      },
+      {
+        "command": "extension.openPromptModal",
+        "title": "TEST"
       }
     ],
     "configuration": {
