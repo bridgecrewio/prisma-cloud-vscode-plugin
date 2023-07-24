@@ -2,6 +2,7 @@
   "name": "prisma-cloud-vscode-plugin",
   "displayName": "prisma-cloud-vscode-plugin",
   "publisher": "prisma-cloud",
+  "icon": "static/icons/svg/prisma.png",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -20,7 +21,7 @@
         {
           "id": "prisma-cloud",
           "title": "Prisma Cloud",
-          "icon": "$(star-full)"
+          "icon": "static/icons/svg/prisma.svg"
         }
       ]
     },
