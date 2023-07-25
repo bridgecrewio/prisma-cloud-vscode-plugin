@@ -2,18 +2,17 @@ import * as vscode from 'vscode';
 
 import { CONFIG } from '../../../config';
 import { CheckovResult } from '../../../types';
+import { MessageHandlersFactory } from './messages';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
     private static webviewPanel?: vscode.WebviewPanel;
-    private static icons: Record<string, vscode.Uri|undefined>;
 
     public static initialize(context: vscode.ExtensionContext) {
         CheckovResultWebviewPanel.context = context;
     }
 
     public static async show(category: string, result: CheckovResult) {
-        console.log(result);
         const html = await CheckovResultWebviewPanel.getHtmlTemplate(category);
 
         if (CheckovResultWebviewPanel.webviewPanel) {
@@ -34,6 +33,8 @@ export class CheckovResultWebviewPanel {
             },
         );
         CheckovResultWebviewPanel.webviewPanel.webview.html = CheckovResultWebviewPanel.render(html, result);
+
+        CheckovResultWebviewPanel.webviewPanel.webview.onDidReceiveMessage(MessageHandlersFactory.handle);
         CheckovResultWebviewPanel.webviewPanel.onDidDispose(
             () => CheckovResultWebviewPanel.webviewPanel = undefined,
             null,
@@ -59,7 +60,7 @@ export class CheckovResultWebviewPanel {
         const htmlParams = htmlTemplate.matchAll(new RegExp('{{(.*?)}}', 'g'));
         const customValues: Record<string, any> = {
             severityIconUri: CheckovResultWebviewPanel.webviewPanel?.webview.asWebviewUri(
-                vscode.Uri.joinPath(CheckovResultWebviewPanel.context.extensionUri, 'static/icons/svg/severities', 'critical.svg'),
+                vscode.Uri.joinPath(CheckovResultWebviewPanel.context.extensionUri, 'static/icons/svg/severities', `${result.severity.toLowerCase()}.svg`),
             ),
             resourceIconUri: CheckovResultWebviewPanel.webviewPanel?.webview.asWebviewUri(
                 vscode.Uri.joinPath(CheckovResultWebviewPanel.context.extensionUri, 'static/icons/svg', 'resource.svg'),

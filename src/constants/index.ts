@@ -22,3 +22,7 @@ export enum USER_CONFIGURATION_PARAM {
 };
 
 export enum CHECKOV_RESULT_CATEGORY { IAC, SCA, SECRETS, LICENSES };
+
+export enum CHECKOV_RESULT_VIEW_MESSAGE_TYPE {
+    SUPPRESS = 'suppress',
+};

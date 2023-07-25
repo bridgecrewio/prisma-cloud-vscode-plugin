@@ -105,6 +105,10 @@
   </div>
   <script>
     const vscode = acquireVsCodeApi();
+
+    function onSuppress() {
+        vscode.postMessage({ type: 'suppress' });
+    }
   </script>
 </body>
 </html>

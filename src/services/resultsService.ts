@@ -19,6 +19,8 @@ export class ResultsService {
     public static getByCategory(category: CHECKOV_RESULT_CATEGORY) {
         const results = ResultsService.get();
 
+        console.log(results.length);
+
         switch (category) {
             case CHECKOV_RESULT_CATEGORY.IAC:
                 return results.filter((result) => ['BC_VUL', 'CKV_SECRET', 'BC_LIC'].every((prefix) => !result.check_id.startsWith(prefix)));

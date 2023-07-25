@@ -47,11 +47,11 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
   public async onDidChangeSelection(event: vscode.TreeViewSelectionChangeEvent<TreeItem>) {
     const result = event.selection[0].result;
 
-    console.log(result);
-
     if (!result) {
         return;
     }
+
+    console.log(result);
 
     await FilesService.openFile(result.repo_file_path, result.file_line_range[0]);
     CheckovResultWebviewPanel.show(this.category, result);
