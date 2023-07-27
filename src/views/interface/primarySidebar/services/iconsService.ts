@@ -21,7 +21,7 @@ export class IconsService {
                 return this.getRiskGroupIconPath();
             }
 
-            if (treeItemName === formattedCheck.checkName) {
+            if (treeItemName === formattedCheck.checkName || treeItemName === formattedCheck.vulnerabilityDetailsId) {
                 // it's risk
                 return this.getRiskIconPath();
             }

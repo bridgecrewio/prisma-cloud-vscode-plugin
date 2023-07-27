@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../../../config';
 import { CheckovResult } from '../../../types';
 import { MessageHandlersFactory } from './messages';
+import { CHECKOV_RESULT_CATEGORY } from '../../../constants';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
@@ -12,7 +13,7 @@ export class CheckovResultWebviewPanel {
         CheckovResultWebviewPanel.context = context;
     }
 
-    public static async show(category: string, result: CheckovResult) {
+    public static async show(category: CHECKOV_RESULT_CATEGORY, result: CheckovResult) {
         const html = await CheckovResultWebviewPanel.getHtmlTemplate(category);
 
         if (CheckovResultWebviewPanel.webviewPanel) {
@@ -42,7 +43,7 @@ export class CheckovResultWebviewPanel {
         );
     }
 
-    private static async getHtmlTemplate(category: string) {
+    private static async getHtmlTemplate(category: CHECKOV_RESULT_CATEGORY) {
         const { extensionUri } = CheckovResultWebviewPanel.context;
         const [rootTemplate, resultTempalte] = await Promise.all([
             vscode.workspace.fs.readFile(

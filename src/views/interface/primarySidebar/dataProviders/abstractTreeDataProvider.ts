@@ -7,7 +7,7 @@ import { FilesService } from '../../../../services';
 import { CheckovResultWebviewPanel } from '../../checkovResult';
 
 export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
-  abstract readonly category: string;
+  abstract readonly category: CHECKOV_RESULT_CATEGORY;
 
   private readonly _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
   public readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
@@ -24,7 +24,7 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
   public refresh() {
     const checkovResults = this.getCheckovResults();
 
-    this.data = this.treeService.getTreeData(checkovResults);
+    this.data = this.treeService.getTreeData(this.category, checkovResults);
     this._onDidChangeTreeData.fire();
   }
 
