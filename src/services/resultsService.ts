@@ -21,8 +21,6 @@ export class ResultsService {
     public static getByCategory(category: CHECKOV_RESULT_CATEGORY) {
         const results = ResultsService.get();
 
-        console.log(results.length);
-
         switch (category) {
             case CHECKOV_RESULT_CATEGORY.IAC:
                 return results.filter((result) => CategoriesService.isIaCRisk(result.check_id));
@@ -37,7 +35,12 @@ export class ResultsService {
 
     public static getByFilePath(filePath: string) {
         const results = ResultsService.get();
-        return results.filter(result => result.file_abs_path === filePath);
+
+        if (vscode.workspace.workspaceFolders) {
+            filePath = filePath.replace(vscode.workspace.workspaceFolders[0].uri.path, '');
+        }
+
+        return results.filter(result => result.repo_file_path === filePath);
     }
 
     public static store(results: CheckovResult[]) {
