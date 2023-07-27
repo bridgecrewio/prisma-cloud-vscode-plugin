@@ -1,13 +1,15 @@
 import { TreeItem } from '../dataProviders/abstractTreeDataProvider';
 import { IconsService } from './iconsService';
 import { CheckovResult } from '../../../../types';
+import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
 
 export type FormattedCheck = {
     originalFilePath: string;
-    filePath: string;
+    filePath: string[];
     checkClass: string;
     checkName: string;
     result: CheckovResult;
+    vulnerabilityDetailsId: string;
 };
 
 export class TreeService {
@@ -17,9 +19,8 @@ export class TreeService {
         this.iconService = new IconsService();
     }
 
-    public getTreeData(checkovOutput: CheckovResult[]): Array<TreeItem> {
-        const formattedData = this.formatCheckData(checkovOutput);
-
+    public getTreeData(category: CHECKOV_RESULT_CATEGORY, checkovOutput: CheckovResult[]): Array<TreeItem> {
+        const formattedData = this.formatCheckData(category, checkovOutput);
         return this.formTreeData(formattedData);
     }
 
@@ -28,7 +29,7 @@ export class TreeService {
         let level: any = { formTreeData };
 
         formattedData.forEach(formattedCheck => {
-            formattedCheck.filePath.split('/').reduce((r, name, i, a) => {
+            formattedCheck.filePath.reduce((r, name, i, a) => {
               const iconPath = this.iconService.getIconPath(name, formattedCheck);
               if (i === a.length - 1) {
                 r.formTreeData.push(new TreeItem({ label: name, iconPath, result: formattedCheck.result }));
@@ -44,14 +45,52 @@ export class TreeService {
         return formTreeData;
     }
 
-    private formatCheckData(results: CheckovResult[]): Array<FormattedCheck> {
+    private formatCheckData(category: CHECKOV_RESULT_CATEGORY, results: CheckovResult[]): Array<FormattedCheck> {
         return results.map((result) => ({
             originalFilePath: this.escapeRedundantChars(result.repo_file_path),
-            filePath: this.escapeRedundantChars(`${result.repo_file_path}/${result.check_class}/${result.check_name}`),
+            filePath: this.getFilePathByCategory(result, category),
             checkClass: result.check_class,
             checkName: result.check_name,
             result: result,
+            vulnerabilityDetailsId: result.vulnerability_details?.id,
+            severity: result.severity,
         }));
+    }
+
+    private getFilePathByCategory(result: CheckovResult, category: CHECKOV_RESULT_CATEGORY): string[] {
+        const { vulnerability_details, file_line_range, resource } = result;
+        const { root_package_name, root_package_version, package_name, id, license, package_version } = vulnerability_details || {};
+        const repoFilePathArr = this.escapeRedundantChars(result.repo_file_path).split('/');
+
+        if (category === CHECKOV_RESULT_CATEGORY.SCA) {
+            return [
+                ...repoFilePathArr, 
+                root_package_name ? `${root_package_name}/${root_package_version}` : this.extractPackage(resource), 
+                `${package_name}:${package_version} (${id})`
+            ];
+        }
+        if (category === CHECKOV_RESULT_CATEGORY.IAC) {
+            return [
+                ...repoFilePathArr, 
+                result.resource, 
+                `${result.check_name} (${file_line_range[0]} - ${file_line_range[1]})`
+            ];
+        }
+        if (category === CHECKOV_RESULT_CATEGORY.SECRETS) {
+            return [''];
+        }
+        if (category === CHECKOV_RESULT_CATEGORY.LICENSES) {
+            return [
+                ...repoFilePathArr, 
+                package_name, 
+                license
+            ];
+        }    
+        return [''];
+    }
+
+    extractPackage(resource: string): string {
+        return resource.split(' ').find(elem => elem[0] === '(')?.replace('(', '') || '';
     }
 
     private escapeRedundantChars(filePath: string): string {

@@ -14,7 +14,14 @@ export type CheckovResult = {
     severity: string;
     vulnerability_details: {
         id: string;
+        description: string;
+        root_package_name: string;
+        root_package_version: string;
+        package_name: string;
+        package_version: string;
+        license: string;
     };
+    description: string;
 };
 
 export type CheckovOutput = [{

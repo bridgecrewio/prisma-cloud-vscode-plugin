@@ -3,7 +3,9 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../config';
 import { CHECKOV_RESULT_CATEGORY } from '../constants';
 import { CheckovResult } from '../types';
+import { DiagnosticsService } from './index';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
+import { CategoriesService } from './categoriesService';
 
 export class ResultsService {
     private static context: vscode.ExtensionContext;
@@ -23,19 +25,25 @@ export class ResultsService {
 
         switch (category) {
             case CHECKOV_RESULT_CATEGORY.IAC:
-                return results.filter((result) => ['BC_VUL', 'CKV_SECRET', 'BC_LIC'].every((prefix) => !result.check_id.startsWith(prefix)));
+                return results.filter((result) => CategoriesService.isIaCRisk(result.check_id));
             case CHECKOV_RESULT_CATEGORY.SCA:
-                return results.filter((result) => result.check_id.startsWith('BC_VUL'));
+                return results.filter((result) => CategoriesService.isSCARisk(result.check_id));
             case CHECKOV_RESULT_CATEGORY.SECRETS:
-                return results.filter((result) => result.check_id.startsWith('CKV_SECRET'));
+                return results.filter((result) => CategoriesService.isSecretsRisk(result.check_id));
             case CHECKOV_RESULT_CATEGORY.LICENSES:
-                return results.filter((result) => result.check_id.startsWith('BC_LIC'));
+                return results.filter((result) => CategoriesService.isLicensesRisk(result.check_id));
         }
+    }
+
+    public static getByFilePath(filePath: string) {
+        const results = ResultsService.get();
+        return results.filter(result => result.file_abs_path === filePath);
     }
 
     public static store(results: CheckovResult[]) {
         ResultsService.context.workspaceState.update(CONFIG.storage.resultsKey, results);
         TreeDataProvidersContainer.refresh();
+        DiagnosticsService.calculateAndApply();
     }
 
     public static updateByFilePath(filePath: string, results: CheckovResult[]) {

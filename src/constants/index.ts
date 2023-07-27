@@ -3,8 +3,12 @@ export enum COMMAND {
     CHECKOV_EXECUTE = 'checkov.execute',
 };
 
-export enum EVENT {
+export enum WORKSPACE_EVENTS {
     SAVE_FILE = 'onDidSaveTextDocument',
+};
+
+export enum WINDOW_EVENTS {
+    CHANGE_ACTIVE_TEXT_EDITOR = 'onDidChangeActiveTextEditor',
 };
 
 export enum CHECKOV_INSTALLATION_TYPE {
@@ -21,7 +25,12 @@ export enum USER_CONFIGURATION_PARAM {
     USE_ENFORCEMENT_RULES = 'useEnforcementRules',
 };
 
-export enum CHECKOV_RESULT_CATEGORY { IAC, SCA, SECRETS, LICENSES };
+export enum CHECKOV_RESULT_CATEGORY { 
+    IAC = 'iac', 
+    SCA = 'sca', 
+    SECRETS = 'secrets', 
+    LICENSES = 'licenses' 
+};
 
 export enum CHECKOV_RESULT_VIEW_MESSAGE_TYPE {
     SUPPRESS = 'suppress',

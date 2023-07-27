@@ -1,5 +1,3 @@
-import * as vscode from 'vscode';
-
 import { IaCTreeDataProvider } from '../dataProviders/iacTreeDataProvider';
 import { SecretsTreeDataProvider } from '../dataProviders/secretsTreeDataProvider';
 import { VulnerabilitiesTreeDataProvider } from '../dataProviders/vulnerabilitiesTreeDataProvider';
