@@ -7,7 +7,8 @@ import { CHECKOV_RESULT_CATEGORY } from '../../../constants';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
-    private static webviewPanel?: vscode.WebviewPanel;
+    public static webviewPanel?: vscode.WebviewPanel;
+    public static checkovResult?: CheckovResult;
 
     public static initialize(context: vscode.ExtensionContext) {
         CheckovResultWebviewPanel.context = context;
@@ -16,8 +17,11 @@ export class CheckovResultWebviewPanel {
     public static async show(category: CHECKOV_RESULT_CATEGORY, result: CheckovResult) {
         const html = await CheckovResultWebviewPanel.getHtmlTemplate(category);
 
+        CheckovResultWebviewPanel.checkovResult = result;
+
         if (CheckovResultWebviewPanel.webviewPanel) {
             CheckovResultWebviewPanel.webviewPanel.webview.html = CheckovResultWebviewPanel.render(html, result);
+
             return CheckovResultWebviewPanel.webviewPanel.reveal(vscode.ViewColumn.Beside, true);
         }
 
@@ -37,7 +41,10 @@ export class CheckovResultWebviewPanel {
 
         CheckovResultWebviewPanel.webviewPanel.webview.onDidReceiveMessage(MessageHandlersFactory.handle);
         CheckovResultWebviewPanel.webviewPanel.onDidDispose(
-            () => CheckovResultWebviewPanel.webviewPanel = undefined,
+            () => {
+                CheckovResultWebviewPanel.webviewPanel = undefined;
+                CheckovResultWebviewPanel.checkovResult = undefined;
+            },
             null,
             CheckovResultWebviewPanel.context.subscriptions,
         );
