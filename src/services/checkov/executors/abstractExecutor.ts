@@ -55,7 +55,9 @@ export abstract class AbstractExecutor {
             const outputBuffers: string[] = [];
 
             process.stdout.on('data', (data) => {
-                outputBuffers.push(data);
+                if (outputBuffers.length || data.toString().startsWith('{') || data.toString().startsWith('[')) {
+                    outputBuffers.push(data);
+                }
             });
 
             process.on('error', (error) => {
