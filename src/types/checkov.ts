@@ -1,3 +1,5 @@
+import { SEVERITY } from "../constants";
+
 export type CheckovResult = {
     bc_check_id: string;
     check_id: string;
@@ -11,7 +13,7 @@ export type CheckovResult = {
     guideline: string;
     repo_file_path: string;
     resource: string;
-    severity: string;
+    severity: SEVERITY;
     vulnerability_details: {
         id: string;
         description: string;

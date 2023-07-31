@@ -1,39 +1,37 @@
 import * as path from 'path';
-
-import { FormattedCheck } from './treeService';
+import { SEVERITY, PATH_TYPE } from '../../../../constants';
 
 export class IconsService {
-    public getIconPath(treeItemName: string, formattedCheck: FormattedCheck) {
-        const splitPath = formattedCheck.originalFilePath.split('/');
-        const treeItemPathIndex = splitPath.indexOf(treeItemName);
-
-        if (treeItemPathIndex !== -1) {
-            if (treeItemPathIndex === splitPath.length - 1) {
-                // it's file
-                return this.getFileIconPath(treeItemName);
-            }
-
-            // it's folder
-            return this.getFolderIconPath();
-        } else {
-            if (treeItemName === formattedCheck.checkClass) {
-                // it's risk group
-                return this.getRiskGroupIconPath();
-            }
-
-            if (treeItemName === formattedCheck.checkName || treeItemName === formattedCheck.vulnerabilityDetailsId) {
-                // it's risk
-                return this.getRiskIconPath();
-            }
+    public getIconPath(pathType: PATH_TYPE, severity?: SEVERITY) {
+        switch(pathType) {
+            case PATH_TYPE.FILE:
+                return this.getFileIconPath();
+            case PATH_TYPE.FOLDER:
+                return this.getFolderIconPath();
+            case PATH_TYPE.PACKAGE:
+                return this.getPackageIconPath();
+            case PATH_TYPE.RISK:
+                return this.getRiskIconPath(severity || SEVERITY.INFO);
+            default:
+                return this.getEmptyIconPath();
         }
+    }
 
+    private getEmptyIconPath() {
         return {
-            dark: path.join(__dirname, 'svg', 'file1.svg'),
-            light: path.join(__dirname, 'svg', 'file1.svg'),
+            dark: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', 'empty.svg'),
+            light: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', 'empty.svg'),
         };
     }
 
-    private getFileIconPath(fileName: string) {
+    private getPackageIconPath() {
+        return {
+            dark: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', 'package.svg'),
+            light: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', 'package.svg'),
+        };
+    }
+
+    private getFileIconPath() {
         return {
             dark: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', 'file.svg'),
             light: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', 'file.svg'),
@@ -54,10 +52,10 @@ export class IconsService {
         };
     }
 
-    private getRiskIconPath() {
+    private getRiskIconPath(severity: SEVERITY) {
         return {
-            dark: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', 'risk.svg'),
-            light: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', 'risk.svg'),
+            dark: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', `severities/${severity.toLowerCase()}.svg`),
+            light: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', `severities/${severity.toLowerCase()}.svg`),
         };
     }
 };

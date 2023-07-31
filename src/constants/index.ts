@@ -25,6 +25,23 @@ export enum USER_CONFIGURATION_PARAM {
     USE_ENFORCEMENT_RULES = 'useEnforcementRules',
 };
 
+export enum PATH_TYPE {
+    FOLDER = 'FOLDER',
+    FILE = 'FILE',
+    RISK = 'RISK',
+    EMPTY = 'EMPTY',
+    PACKAGE = 'PACKAGE',
+}
+
+export enum SEVERITY {
+    INFO = 'INFO',
+    LOW = 'LOW',
+    MEDIUM = 'MEDIUM',
+    HIGH = 'HIGH',
+    CRITICAL = 'CRITICAL',
+    UNKNOWN = 'UNKNOWN',
+}
+
 export enum CHECKOV_RESULT_CATEGORY { 
     IAC = 'iac', 
     SCA = 'sca', 
