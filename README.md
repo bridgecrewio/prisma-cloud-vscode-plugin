@@ -1,6 +1,6 @@
-# checkov-vscode-v2 README
+# Prisma Cloud
 
-This is the README for your extension "checkov-vscode-v2". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "prisma-cloud-vscode-plugin". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 
