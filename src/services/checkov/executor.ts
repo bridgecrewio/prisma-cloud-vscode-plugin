@@ -4,14 +4,15 @@ import { DockerExecutor, Pip3Executor } from './executors';
 import { ResultsService } from '../resultsService';
 
 export class CheckovExecutor {
-    private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, (installation: CheckovInstallation, filePath?: string) => Promise<CheckovOutput>>([
-        [CHECKOV_INSTALLATION_TYPE.DOCKER, DockerExecutor.execute],
-        [CHECKOV_INSTALLATION_TYPE.PIP3, Pip3Executor.execute],
-    ]);
+    private static installation: CheckovInstallation;
+
+    public static setInstallation(installation: CheckovInstallation) {
+        CheckovExecutor.installation = installation;
+    }
 
     public static async execute(filePath?: string) {
-        const installation = CheckovExecutor.getInstallation();
-        const executor = CheckovExecutor.executors.get(installation.type);
+        const installation = CheckovExecutor.installation;
+        const executor = CheckovExecutor.executors.get(installation?.type);
 
         if (!executor) {
             return;
@@ -24,8 +25,8 @@ export class CheckovExecutor {
         ResultsService.store(results);
     }
 
-    private static getInstallation() {
-        // return { type: CHECKOV_INSTALLATION_TYPE.PIP3, entrypoint: '/Users/vtrofymenko/Library/Python/3.11/bin/checkov' };
-        return { type: CHECKOV_INSTALLATION_TYPE.DOCKER, entrypoint: 'docker' };
-    }
+    private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, (installation: CheckovInstallation, filePath?: string) => Promise<CheckovOutput>>([
+        [CHECKOV_INSTALLATION_TYPE.DOCKER, DockerExecutor.execute],
+        [CHECKOV_INSTALLATION_TYPE.PIP3, Pip3Executor.execute],
+    ]);
 };

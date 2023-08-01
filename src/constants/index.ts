@@ -1,3 +1,5 @@
+export const dockerfileName = 'Dockerfile';
+
 export enum COMMAND {
     CHECKOV_INSTALL = 'checkov.install',
     CHECKOV_EXECUTE = 'checkov.execute',
@@ -28,6 +30,10 @@ export enum USER_CONFIGURATION_PARAM {
 export enum PATH_TYPE {
     FOLDER = 'FOLDER',
     FILE = 'FILE',
+    DOCKERFILE = 'DOCKER',
+    KOTLIN = 'KOTLIN',
+    PYTHON = 'PYTHON',
+    TERRAFORM = 'TERRAFORM',
     RISK = 'RISK',
     EMPTY = 'EMPTY',
     PACKAGE = 'PACKAGE',

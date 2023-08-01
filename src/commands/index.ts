@@ -14,6 +14,4 @@ export function registerCommands(context: vscode.ExtensionContext): void {
             vscode.commands.registerCommand(command, () => executor(context)),
         );
     }
-
-    // vscode.commands.executeCommand(COMMAND.checkovInstall);
 };
