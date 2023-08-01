@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+
 import { CheckovResult } from '../types';
 import { diagnosticsCollection } from '../constants/diagnosticsCollection';
 import { ResultsService } from './resultsService';
@@ -27,14 +28,17 @@ export class DiagnosticsService {
 
     static getFailedCheckForDiagnostic(checkKey: string) {
         const diagnosticsMap: Record<string, CheckovResult> = DiagnosticsService.context.workspaceState.get(DIAGNOSTICS_MAP) as Record<string, CheckovResult>;
+
         return  diagnosticsMap[checkKey];
     }
 
     static calculateAndApply() {
         const document = vscode.window.activeTextEditor?.document;
+
         if (document) {
             const failedChecks = ResultsService.getByFilePath(document.fileName);
             const foundDiagnostics: vscode.Diagnostic[] = [];
+
             for (const failedCheck of failedChecks) {
                 const startLine = document.lineAt(failedCheck.file_line_range[0] > 0 ? failedCheck.file_line_range[0] - 1 : 0);
                 const endLine = document.lineAt(failedCheck.file_line_range[1] > 0 ? failedCheck.file_line_range[1] - 1 : 0);
@@ -60,8 +64,9 @@ export class DiagnosticsService {
                         message: this.getMessageByCategory(failedCheck, CategoriesService.getCategoryByCheckId(failedCheck.check_id)),
                     }],
                 };
-                foundDiagnostics.push(diagnostic);
                 const diagnosticsMap = DiagnosticsService.context.workspaceState.get(DIAGNOSTICS_MAP) as object;
+
+                foundDiagnostics.push(diagnostic);
                 DiagnosticsService.context.workspaceState.update(DIAGNOSTICS_MAP, {...diagnosticsMap, [createDiagnosticKey(diagnostic)]: failedCheck});
             }
             diagnosticsCollection.set(vscode.Uri.file(document.fileName), foundDiagnostics);
@@ -80,4 +85,4 @@ export class DiagnosticsService {
                 return this.noDescription;
         }
     }
-}
+};
