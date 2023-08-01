@@ -1,7 +1,8 @@
+import * as path from 'path';
 import { TreeItem } from '../dataProviders/abstractTreeDataProvider';
 import { IconsService } from './iconsService';
 import { CheckovResult } from '../../../../types';
-import { CHECKOV_RESULT_CATEGORY, PATH_TYPE, SEVERITY } from '../../../../constants';
+import { CHECKOV_RESULT_CATEGORY, PATH_TYPE, SEVERITY, dockerfileName } from '../../../../constants';
 
 export type FormattedCheck = {
     originalFilePath: string;
@@ -67,20 +68,18 @@ export class TreeService {
         const { vulnerability_details, file_line_range, resource, severity } = result;
         const { root_package_name, root_package_version, package_name, id, license, package_version } = vulnerability_details || {};
         const repoFilePathArr = this.escapeRedundantChars(result.repo_file_path).split('/');
-        const repoPathCells: PathCell[] = repoFilePathArr.map((path, i) => ({
-            path,
-            pathType: i === repoFilePathArr.length - 1 ? PATH_TYPE.FILE : PATH_TYPE.FOLDER
-        }));
+        const filePathType = this.getFilePathTypeByFilename(repoFilePathArr[repoFilePathArr.length - 1]);
+        const repoPathCells: PathCell[] = repoFilePathArr.map((path, i) => ({ path, pathType: i === repoFilePathArr.length - 1 ? filePathType : PATH_TYPE.FOLDER }));
 
         if (category === CHECKOV_RESULT_CATEGORY.SCA) {
             return [
                 ...repoPathCells, 
                 root_package_name ? { 
                     path: `${root_package_name}/${root_package_version}`,
-                    pathType: PATH_TYPE.FILE,
+                    pathType: filePathType,
                 } : {
                     path: this.extractPackage(resource),
-                    pathType: PATH_TYPE.FILE
+                    pathType: filePathType
                 }, 
                 { path: `${package_name}:${package_version} (${id})`, pathType: PATH_TYPE.RISK, severity }
             ];
@@ -88,12 +87,15 @@ export class TreeService {
         if (category === CHECKOV_RESULT_CATEGORY.IAC) {
             return [
                 ...repoPathCells, 
-                { path: result.resource, pathType: PATH_TYPE.FILE }, 
+                { path: result.resource, pathType: filePathType }, 
                 { path: `${result.check_name} (${file_line_range[0]} - ${file_line_range[1]})`, pathType: PATH_TYPE.RISK, severity }
             ];
         }
         if (category === CHECKOV_RESULT_CATEGORY.SECRETS) {
-            return [{ path: '', pathType: PATH_TYPE.EMPTY }];
+            return [
+                ...repoPathCells, 
+                { path: `${result.check_name} (${file_line_range[0]} - ${file_line_range[1]})`, pathType: PATH_TYPE.RISK, severity }
+            ];
         }
         if (category === CHECKOV_RESULT_CATEGORY.LICENSES) {
             return [
@@ -105,8 +107,19 @@ export class TreeService {
         return [{ path: '', pathType: PATH_TYPE.EMPTY }];
     }
 
-    private getPathTypeBySeverity(severity: string) {
+    private getFilePathTypeByFilename(filename: string): PATH_TYPE {
+        if (filename.includes(dockerfileName)) {
+            return PATH_TYPE.DOCKERFILE;
+        }
 
+        const extension = path.extname(filename);
+        const extensionMap: Record<string, PATH_TYPE> = {
+            '.tf': PATH_TYPE.TERRAFORM,
+            '.py': PATH_TYPE.PYTHON,
+            '.kt': PATH_TYPE.KOTLIN,
+        };
+        
+        return extensionMap[extension] || PATH_TYPE.FILE;
     }
 
     private extractPackage(resource: string): string {

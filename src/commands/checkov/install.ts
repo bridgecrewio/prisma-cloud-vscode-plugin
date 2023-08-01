@@ -9,6 +9,7 @@ import { CONFIG } from '../../config';
 import { CHECKOV_INSTALLATION_TYPE } from '../../constants';
 import { StatusBar } from '../../views';
 import { asyncExec } from '../../utils';
+import { CheckovExecutor } from '../../services';
 
 export class CheckovInstall {
     private static readonly installations = [
@@ -25,7 +26,8 @@ export class CheckovInstall {
 
             if (installationResult) {
                 console.log(installationResult);
-                // TODO: Set installation to global state
+                CheckovExecutor.setInstallation(installationResult);
+
                 return installationResult;
             }
         }
