@@ -49,7 +49,7 @@ export class ResultsService {
         DiagnosticsService.calculateAndApply();
     }
 
-    public static updateByFilePath(filePath: string, results: CheckovResult[]) {
+    public static storeByFilePath(filePath: string, results: CheckovResult[]) {
         const storedResults = ResultsService.get();
         const updatedResults = [
             ...storedResults.filter((result) => result.repo_file_path !== filePath),
@@ -57,5 +57,28 @@ export class ResultsService {
         ];
 
         return ResultsService.store(updatedResults);
+    }
+
+    public static clear() {
+        ResultsService.context.workspaceState.update(CONFIG.storage.resultsKey, undefined);
+    }
+
+    public static suppressResult(targetResult: CheckovResult) {
+        const results = ResultsService.get();
+        const targetResultIndex = results.findIndex(({ check_id, repo_file_path, file_line_range }) => {
+            return repo_file_path === targetResult.repo_file_path && check_id === targetResult.check_id && file_line_range[0] === targetResult.file_line_range[0];
+        });
+
+        results.splice(targetResultIndex, 1);
+
+        for (const result of results) {
+            if (result.repo_file_path !== targetResult.repo_file_path || result.file_line_range[0] < targetResult.file_line_range[0]) {
+                continue;
+            }
+            result.file_line_range[0] = result.file_line_range[0] + 1;
+            result.file_line_range[1] = result.file_line_range[1] + 1;
+        }
+
+        ResultsService.store(results);
     }
 };
