@@ -9,6 +9,9 @@ export function initializeServices(context: vscode.ExtensionContext) {
 };
 
 export * from './checkov';
+export * from './categoriesService';
 export * from './resultsService';
 export * from './filesService';
 export * from './diagnosticsService';
+export * from './suppresService';
+export * from './fixService';
