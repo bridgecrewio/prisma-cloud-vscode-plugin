@@ -82,20 +82,31 @@ export class CheckovResultWebviewPanel {
             guidelineIconUri: CheckovResultWebviewPanel.webviewPanel?.webview.asWebviewUri(
                 vscode.Uri.joinPath(CheckovResultWebviewPanel.context.extensionUri, 'static/icons/svg', 'guideline.svg'),
             ),
-            codeBlock: CheckovResultWebviewPanel.renderCodeBlock(result.code_block),
+            codeBlock: CheckovResultWebviewPanel.renderCodeBlock(result),
             fixActionState: result.fixed_definition ? 'available' : 'unavailable',
             guidelineActionState: result.guideline ? 'available' : 'unavailable',
             vulnerabilityDetailsId: result.vulnerability_details?.id,
+            approvedSPDX: result.check_id === 'BC_LIC_1' ? 'true' : 'false',
         };
-        // TODO: Improve to work with dots prop access
+
         for (const htmlParam of htmlParams) {
+            if (htmlParam[1].includes('.')) {
+                htmlTemplate = htmlTemplate.replace(htmlParam[0], htmlParam[1].split('.').reduce((acc: any, key) => acc[key], result) || '');
+                continue;
+            }
             htmlTemplate = htmlTemplate.replace(htmlParam[0], customValues[htmlParam[1]] || result[htmlParam[1] as keyof CheckovResult] || '');
         }
 
         return htmlTemplate;
     }
 
-    private static renderCodeBlock(codeBlock: [number, string][]) {
-        return codeBlock.map(([ line, code ]) => `<tr class="original"><td>${line}</td><td>${code}</td></tr>`).join('');
+    private static renderCodeBlock(result: CheckovResult) {
+        const codeBlock = result.code_block.map(([ line, code ]) => `<tr class="original"><td>${line}</td><td>${code}</td></tr>`);
+
+        if (result.fixed_definition) {
+            codeBlock.push(`<tr class="fixed"><td>${result.file_line_range[0]}</td><td>${result.fixed_definition}</td></tr>`);
+        }
+
+        return codeBlock.join('');
     }
 };

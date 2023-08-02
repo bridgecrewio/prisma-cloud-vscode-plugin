@@ -23,11 +23,21 @@
     </table>
 </section>
 <section>
+    <div class="details">
+        <span>License Type:</span>
+        <p>{{vulnerability_details.license}}</p>
+    </div>
+    <div class="details">
+        <span>Approved SPDX:</span>
+        <p>{{approvedSPDX}}</p>
+    </div>
+    <div class="details">
+        <span>Description:</span>
+        <p>{{short_description}}</p>
+    </div>
+</section>
+<section>
     <div class="actions">
-        <div class="action {{fixActionState}}" onclick="onFix()">
-            <img src="{{fixIconUri}}" alt="fix">
-            <span>Fix All</span>
-        </div>
         <div class="action {{suppressActionState}}" onclick="onSuppress()">
             <img src="{{suppressIconUri}}" alt="suppress">
             <span>Suppress</span>
