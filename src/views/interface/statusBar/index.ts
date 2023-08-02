@@ -7,12 +7,12 @@ export class StatusBar {
 
     static {
         StatusBar.instance = vscode.window.createStatusBarItem();
-        StatusBar.instance.text = CONFIG.userInterface.statusBarText;
+        StatusBar.instance.text = CONFIG.userInterface.extensionTitle;
         StatusBar.instance.show();
     }
 
     public static setProgressState() {
-        StatusBar.instance.text = StatusBar.getText(CONFIG.userInterface.statusBarText, 'sync~spin');
+        StatusBar.instance.text = StatusBar.getText(CONFIG.userInterface.extensionTitle, 'sync~spin');
     }
 
     public static setText(text: string, icon?: string) {
@@ -20,7 +20,7 @@ export class StatusBar {
     }
 
     public static reset() {
-        StatusBar.instance.text = CONFIG.userInterface.statusBarText;
+        StatusBar.instance.text = CONFIG.userInterface.extensionTitle;
     }
 
     protected static getText(text = 'Prisma Cloud', icon?: string) {

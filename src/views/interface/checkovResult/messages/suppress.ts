@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { CheckovResultWebviewPanel } from '../webviewPanel';
-import { SuppressService } from '../../../../services/suppresService';
+import { SuppressService } from '../../../../services';
 
 export class SuppressMessage {
     public static async handle() {

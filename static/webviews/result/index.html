@@ -109,6 +109,9 @@
     function onSuppress() {
         vscode.postMessage({ type: 'suppress' });
     }
+    function onFix() {
+        vscode.postMessage({ type: 'fix' });
+    }
   </script>
 </body>
 </html>
