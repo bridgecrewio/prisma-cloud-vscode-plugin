@@ -7,7 +7,7 @@ export class CheckovExecute {
     public static async execute() {
         StatusBar.setText('Running Scanning', 'sync~spin');
 
-        vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, }, async (progress) => {
+        vscode.window.withProgress({ location: vscode.ProgressLocation.Notification }, async (progress) => {
             progress.report({
                 message: 'Prisma Cloud is scanning your repository',
             });
