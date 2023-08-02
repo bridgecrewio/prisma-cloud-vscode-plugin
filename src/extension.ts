@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
 	registerDiagnostics(context);
 	registerSidebar();
   	registerCheckovResultView(context);
-	// vscode.commands.executeCommand(COMMAND.CHECKOV_INSTALL);
+	vscode.commands.executeCommand(COMMAND.CHECKOV_INSTALL);
 }
 
 export function deactivate() {}
