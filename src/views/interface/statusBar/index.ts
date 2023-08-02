@@ -11,6 +11,10 @@ export class StatusBar {
         StatusBar.instance.show();
     }
 
+    public static setProgressState() {
+        StatusBar.instance.text = StatusBar.getText(CONFIG.userInterface.statusBarText, 'sync~spin');
+    }
+
     public static setText(text: string, icon?: string) {
         StatusBar.instance.text = StatusBar.getText(text, icon);
     }

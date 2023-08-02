@@ -19,20 +19,23 @@ export class CheckovInstall {
     ];
 
     public static async execute(context: vscode.ExtensionContext) {
-        StatusBar.setText('Installing Checkov', 'sync~spin');
+        StatusBar.setProgressState();
 
-        for (const installation of CheckovInstall.installations) {
-            const installationResult = await installation(context);
-
-            if (installationResult) {
-                console.log(installationResult);
-                CheckovExecutor.setInstallation(installationResult);
-
-                return installationResult;
+        try {
+            for (const installation of CheckovInstall.installations) {
+                const installationResult = await installation(context);
+    
+                if (installationResult) {
+                    CheckovExecutor.setInstallation(installationResult);
+                }
             }
-        }
 
-        throw new Error('The Checkov can not be installed');
+            throw new Error('The Checkov can not be installed');
+        } catch (error) {
+            throw error;
+        } finally {
+            StatusBar.reset();
+        }
     }
 
     private static async withDocker() {
