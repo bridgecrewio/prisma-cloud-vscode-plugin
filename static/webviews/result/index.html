@@ -32,7 +32,7 @@
     }
     .details {
       display: grid;
-      grid-template-columns: 100px 1fr;
+      grid-template-columns: 170px 1fr;
       font-size: 12px;
       line-height: 17px;
       margin-bottom: 2px;
@@ -108,6 +108,9 @@
 
     function onSuppress() {
         vscode.postMessage({ type: 'suppress' });
+    }
+    function onFix() {
+        vscode.postMessage({ type: 'fix' });
     }
   </script>
 </body>

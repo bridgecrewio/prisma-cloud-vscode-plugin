@@ -57,4 +57,5 @@ export enum CHECKOV_RESULT_CATEGORY {
 
 export enum CHECKOV_RESULT_VIEW_MESSAGE_TYPE {
     SUPPRESS = 'suppress',
+    FIX = 'fix',
 };

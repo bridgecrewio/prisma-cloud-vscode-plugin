@@ -22,6 +22,11 @@ export type CheckovResult = {
         package_name: string;
         package_version: string;
         license: string;
+        fix_command: {
+            cmds: string[];
+            manualCodeFix: boolean;
+            msg: string;
+        }
     };
     description: string;
 };

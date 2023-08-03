@@ -10,7 +10,6 @@
         <thead>
             <tr>
                 <th colspan="2" class="resource">
-                    <!-- <img src="{{resourceIconUri}}" alt="resource"> -->
                     <span>{{resource}}</span>
                 </th>
             </tr>
@@ -23,10 +22,56 @@
     </table>
 </section>
 <section>
+    <div class="details">
+        <span>Vulnerable Package:</span>
+        <p>{{vulnerability_details.package_name}}</p>
+      </div>
+      <div class="details">
+        <span>Vulnerable Package Version:</span>
+        <p>{{vulnerability_details.package_version}}</p>
+      </div>
+      <div class="details">
+        <span>Fixed Version:</span>
+        <p>{{vulnerability_details.lowest_fixed_version}}</p>
+      </div>
+      <div class="details">
+        <span>Root Package:</span>
+        <p>{{vulnerability_details.root_package_name}}</p>
+      </div>
+      <div class="details">
+        <span>Root Package Version:</span>
+        <p>{{vulnerability_details.root_package_version}}</p>
+      </div>
+      <div class="details">
+        <span>Root Package Fix Version:</span>
+        <p>{{vulnerability_details.root_package_fix_version}}</p>
+      </div>
+      <div class="details">
+        <span>CVE ID:</span>
+        <p>{{vulnerability_details.id}}</p>
+      </div>
+      <div class="details">
+        <span>CVSS:</span>
+        <p>{{vulnerability_details.cvss}}</p>
+      </div>
+      <div class="details">
+        <span>Published:</span>
+        <p>{{vulnerability_details.published_date}}</p>
+      </div>
+      <div class="details">
+        <span>Vector:</span>
+        <p>{{vulnerability_details.vector}}</p>
+      </div>
+      <div class="details">
+        <span>Description:</span>
+        <p>{{short_description}}</p>
+      </div>
+</section>
+<section>
     <div class="actions">
-        <div class="action {{fixActionState}}">
+        <div class="action {{fixActionState}}" onclick="onFix()">
             <img src="{{fixIconUri}}" alt="fix">
-            <span>Fix All</span>
+            <span>Fix</span>
         </div>
         <div class="action {{suppressActionState}}" onclick="onSuppress()">
             <img src="{{suppressIconUri}}" alt="suppress">
