@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 
 import { TreeDataProvidersContainer } from '../services/treeDataProvidersContainer';
+import { FiltersViewProvider } from './filtersWebviewPanel';
 
-export function registerSidebar() {
+export function registerSidebar(context: vscode.ExtensionContext) {
     const iacTreeView = vscode.window.createTreeView('iac-misconfiguration', {
         treeDataProvider: TreeDataProvidersContainer.iacTreeDataProvider,
     });
@@ -30,6 +31,11 @@ export function registerSidebar() {
     );
     licensesTreeView.onDidChangeSelection(
         TreeDataProvidersContainer.licensesTreeDataProvider.onDidChangeSelection.bind(TreeDataProvidersContainer.licensesTreeDataProvider)
+    );
+
+    const provider = new FiltersViewProvider(context.extensionUri);
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider("filters", provider)
     );
 
     TreeDataProvidersContainer.refresh();

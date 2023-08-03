@@ -7,15 +7,37 @@ import { DiagnosticsService } from './index';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 import { CategoriesService } from './categoriesService';
 
+type Filter = {
+    filterName: keyof CheckovResult;
+    filterValue: string;
+};
+
 export class ResultsService {
     private static context: vscode.ExtensionContext;
+    private static filters: Filter[] = [];
 
     public static initialize(context: vscode.ExtensionContext) {
         ResultsService.context = context;
     }
 
+    public static addFilter(newFilter: Filter) {
+        const { filterName, filterValue } = newFilter;
+
+        const existingFilter = ResultsService.filters.find(filter => filter.filterName === filterName && filter.filterValue === filterValue);
+
+        if (existingFilter) {
+            ResultsService.filters = ResultsService.filters.filter(filter => filter.filterName === filterName && filter.filterValue !== filterValue);
+            ResultsService.updatePluginState();
+            return;
+        }
+        
+        ResultsService.filters.push(newFilter);
+        ResultsService.updatePluginState();
+    }
+
     public static get(): CheckovResult[] {
-        return ResultsService.context.workspaceState.get(CONFIG.storage.resultsKey) ?? [];
+        const currentState = ResultsService.context.workspaceState.get(CONFIG.storage.resultsKey) as CheckovResult[] ?? [];
+        return ResultsService.applyFilters(currentState);
     }
 
     public static getByCategory(category: CHECKOV_RESULT_CATEGORY) {
@@ -80,5 +102,24 @@ export class ResultsService {
         }
 
         ResultsService.store(results);
+    }
+
+    private static applyFilters(currentState: CheckovResult[]): CheckovResult[] {
+        let filteredResult: CheckovResult[] = [];
+
+        if (!ResultsService.filters.length) {
+            return currentState;
+        }
+
+        for (const { filterName, filterValue } of ResultsService.filters) {
+            filteredResult = [...filteredResult, ...currentState.filter(check => check[filterName] === filterValue)];
+        }
+
+        return filteredResult;
+    }
+
+    private static updatePluginState() {
+        TreeDataProvidersContainer.refresh();
+        DiagnosticsService.calculateAndApply();
     }
 };

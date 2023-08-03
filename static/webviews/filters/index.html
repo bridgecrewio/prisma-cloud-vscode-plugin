@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Filters</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .resetButtonStyles {
+        background: none;
+        color: inherit;
+        border: none;
+        padding: 2px;
+        font: inherit;
+        cursor: pointer;
+        outline: inherit;
+        margin-left: 1px;
+        margin-right: 1px;
+    }
+
+    .active {
+        background-color: #264F78;
+    }
+
+    .runScan {
+        background-image: url('{{playIconPath}}');
+        width: 13.23px;
+        height: 19px;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin-left: 5px;
+    }
+
+    .buttonContainer {
+        display: flex;
+        align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="buttonContainer" class="content">
+    <b>SEVERITIES: </b>
+    <button class="filterButton resetButtonStyles" data-severity="{{severityInfo}}">I</button>
+    <button class="filterButton resetButtonStyles" data-severity="{{severityLow}}">L</button>
+    <button class="filterButton resetButtonStyles" data-severity="{{severityMedium}}">M</button>
+    <button class="filterButton resetButtonStyles" data-severity="{{severityHigh}}">H</button>
+    <button class="filterButton resetButtonStyles" data-severity="{{severityCritical}}">C</button>
+    <button id="runScan" class="runScan resetButtonStyles"></button>
+  </div>
+  <script>
+    const vscode = acquireVsCodeApi();
+
+    const filterButtons = document.getElementsByClassName('filterButton');
+    const runScanButton = document.getElementById('runScan');
+
+    for (const filterButton of filterButtons) {
+        filterButton.addEventListener('click', () => {
+            vscode.postMessage({ command: 'applyFilter', payload: { 
+                filterName: 'severity', 
+                filterValue: filterButton.getAttribute('data-severity') 
+            }});
+            filterButton.classList.toggle('active');
+        });
+    }
+
+    runScanButton.addEventListener('click', () => {
+        vscode.postMessage({ command: 'runScan' });
+    });
+  </script>
+</body>
+</html>
