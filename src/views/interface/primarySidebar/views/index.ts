@@ -35,7 +35,7 @@ export function registerSidebar(context: vscode.ExtensionContext) {
 
     const provider = new FiltersViewProvider(context.extensionUri);
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider("filters", provider)
+        vscode.window.registerWebviewViewProvider('filters', provider)
     );
 
     TreeDataProvidersContainer.refresh();
