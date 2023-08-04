@@ -27,7 +27,8 @@ export class CheckovInstall {
     
                 if (installationResult) {
                     CheckovExecutor.setInstallation(installationResult);
-                    return;
+
+                    return installationResult;
                 }
             }
 

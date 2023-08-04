@@ -45,7 +45,7 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
   }
 
   public async onDidChangeSelection(event: vscode.TreeViewSelectionChangeEvent<TreeItem>) {
-    const result = event.selection[0].result;
+    const result = event.selection[0]?.result;
 
     if (!result) {
         return;

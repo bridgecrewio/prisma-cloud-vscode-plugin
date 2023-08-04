@@ -28,6 +28,11 @@
     "views": {
       "prisma-cloud": [
         {
+          "type": "webview",
+          "id": "filters",
+          "name": "Filters"
+        },
+        {
           "id": "iac-misconfiguration",
           "name": "IaC Misconfiguration"
         },
