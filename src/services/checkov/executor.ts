@@ -47,12 +47,10 @@ export class CheckovExecutor {
     }
 
     private static processOutput(output: CheckovOutput) {
-        console.log(output);
         if (Array.isArray(output)) {
             return output.reduce((acc: CheckovResult[], checkType) => acc.concat(checkType?.results.failed_checks ?? []), []);
         }
-        console.log(output?.results);
-        console.log(output?.results.failed_checks);
+
         return output.results?.failed_checks ?? [];
     }
 };
