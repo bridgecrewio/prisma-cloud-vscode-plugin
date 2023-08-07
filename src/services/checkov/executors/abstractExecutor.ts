@@ -17,7 +17,7 @@ export abstract class AbstractExecutor {
         return workspaceFolders[0].uri.fsPath;
     }
 
-    protected static getCheckovCliParams(installation: CheckovInstallation, filePath?: string) {
+    protected static getCheckovCliParams(installation: CheckovInstallation, files?: string[]) {
         const checkovCliParams = [
             '--quiet',
             '--soft-fail',
@@ -25,14 +25,10 @@ export abstract class AbstractExecutor {
             '--bc-api-key', `${CONFIG.userConfig.accessKey}::${CONFIG.userConfig.secretKey}`,
         ];
 
-        if (filePath) {
-            checkovCliParams.push('--file', `"${filePath}"`);
+        if (files) {
+            files.forEach((file) => checkovCliParams.push('--file', file));
         } else {
-            if (installation.type === CHECKOV_INSTALLATION_TYPE.DOCKER) {
-                checkovCliParams.push('--directory', CONFIG.checkov.docker.sourceMountPath);
-            } else {
-                checkovCliParams.push('--directory', AbstractExecutor.projectPath!);
-            }
+            checkovCliParams.push('--directory', AbstractExecutor.projectPath!);
         }
 
         if (CONFIG.userConfig.certificate) {

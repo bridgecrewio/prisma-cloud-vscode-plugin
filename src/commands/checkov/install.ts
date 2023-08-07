@@ -19,16 +19,16 @@ export class CheckovInstall {
     ];
 
     public static async execute(context: vscode.ExtensionContext) {
-        StatusBar.setProgressState();
-
         try {
+            StatusBar.progress();
+
             for (const installation of CheckovInstall.installations) {
                 const installationResult = await installation(context);
     
                 if (installationResult) {
-                    CheckovExecutor.setInstallation(installationResult);
-
-                    return installationResult;
+                    CheckovExecutor.initialize(installationResult);
+                    console.log('Checkov installation was succeed', installationResult);
+                    return;
                 }
             }
 
@@ -107,7 +107,7 @@ export class CheckovInstall {
         try {
             const pythonVersion = (await asyncExec(extractionCommand)).stdout.split(' ')[1];
             
-            return !semver.lt(pythonVersion, CONFIG.minRequiredPythonVersion);
+            return !semver.lt(pythonVersion, CONFIG.requirenments.minPythonVersion);
         } catch (error) {
             console.error('Checking the Python version was failed', { error });
             return false;
