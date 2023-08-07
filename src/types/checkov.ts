@@ -31,7 +31,7 @@ export type CheckovResult = {
     description: string;
 };
 
-export type CheckovOutput = [{
+export type CheckovCheckTypeOutput = {
     check_type: string;
     results: {
         failed_checks: CheckovResult[];
@@ -44,4 +44,6 @@ export type CheckovOutput = [{
         resource_count: number;
         skipped: number;
     };
-}];
+};
+
+export type CheckovOutput = CheckovCheckTypeOutput[] | CheckovCheckTypeOutput;

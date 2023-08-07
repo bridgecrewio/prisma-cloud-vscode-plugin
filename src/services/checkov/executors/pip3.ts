@@ -5,9 +5,9 @@ import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
 
 export class Pip3Executor extends AbstractExecutor {
-    public static execute(installation: CheckovInstallation, filePath?: string) {
+    public static execute(installation: CheckovInstallation, files?: string[]) {
         const args = [
-            ...Pip3Executor.getCheckovCliParams(installation, filePath),
+            ...Pip3Executor.getCheckovCliParams(installation, files),
         ];
 
         const process = spawn(installation.entrypoint, args, {

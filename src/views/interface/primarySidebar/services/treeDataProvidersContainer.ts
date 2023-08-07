@@ -2,6 +2,7 @@ import { IaCTreeDataProvider } from '../dataProviders/iacTreeDataProvider';
 import { SecretsTreeDataProvider } from '../dataProviders/secretsTreeDataProvider';
 import { VulnerabilitiesTreeDataProvider } from '../dataProviders/vulnerabilitiesTreeDataProvider';
 import { LicensesTreeDataProvider } from '../dataProviders/licensesTreeDataProvider';
+import { PrimarySidebar } from '../../primarySidebar';
 
 export class TreeDataProvidersContainer {
     public static iacTreeDataProvider: IaCTreeDataProvider;
@@ -21,5 +22,6 @@ export class TreeDataProvidersContainer {
         TreeDataProvidersContainer.secretsTreeDataProvicer.refresh();
         TreeDataProvidersContainer.vulnerabilitiesTreeDataProvider.refresh();
         TreeDataProvidersContainer.licensesTreeDataProvider.refresh();
+        PrimarySidebar.refreshBadgeCount();
     }
 };

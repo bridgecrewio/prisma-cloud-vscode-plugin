@@ -7,7 +7,7 @@ import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
 
 export class DockerExecutor extends AbstractExecutor {
-    public static execute(installation: CheckovInstallation, filePath?: string) {
+    public static execute(installation: CheckovInstallation, files?: string[]) {
         const args = [
             'run',
             ...DockerExecutor.getDockerParams(),
@@ -16,9 +16,8 @@ export class DockerExecutor extends AbstractExecutor {
             ...DockerExecutor.getVolumeMounts(),
             ...DockerExecutor.getWorkdir(),
             ...DockerExecutor.getImage(),
-            ...DockerExecutor.getCheckovCliParams(installation, filePath),
+            ...DockerExecutor.getCheckovCliParams(installation, files),
         ];
-        console.log(installation.entrypoint, args.join(' '));
         const process = spawn(installation.entrypoint, args, { shell: true });
 
         return DockerExecutor.handleProcessOutput(process);
@@ -46,7 +45,7 @@ export class DockerExecutor extends AbstractExecutor {
 
     private static getVolumeMounts() {
         const volumeMounts = [
-            '--volume', `${DockerExecutor.projectPath}:${CONFIG.checkov.docker.sourceMountPath}`,
+            '--volume', `${DockerExecutor.projectPath}:${DockerExecutor.projectPath}`,
         ];
 
         if (CONFIG.userConfig.certificate) {
@@ -57,7 +56,7 @@ export class DockerExecutor extends AbstractExecutor {
     }
 
     private static getWorkdir() {
-        return ['--workdir', `${CONFIG.checkov.docker.sourceMountPath}`];
+        return ['--workdir', DockerExecutor.projectPath!];
     }
 
     private static getImage() {

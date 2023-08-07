@@ -8,14 +8,16 @@ export const CONFIG = Object.freeze({
     },
     extensionId: 'prisma-cloud.prisma-cloud-vscode-plugin',
     userConfigurationKey: 'prismaCloud',
-    minRequiredPythonVersion: '3.7.0',
+    requirenments: {
+        minPythonVersion: '3.7.0',
+    },
     checkov: {
         version: 'latest',
         docker: {
-            sourceMountPath: '/checkovScan',
             certificateMountPath: '/checkovCert/cacert.pem',
         },
     },
+    filesSyncInterval: 5000,
     storage: {
         resultsKey: 'results',
     },

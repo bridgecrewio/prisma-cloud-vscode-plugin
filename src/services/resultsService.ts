@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../config';
 import { CHECKOV_RESULT_CATEGORY } from '../constants';
 import { CheckovResult } from '../types';
-import { DiagnosticsService } from './index';
+import { DiagnosticsService } from '../services';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 import { CategoriesService } from './categoriesService';
 
@@ -37,7 +37,12 @@ export class ResultsService {
 
     public static get(): CheckovResult[] {
         const currentState = ResultsService.context.workspaceState.get(CONFIG.storage.resultsKey) as CheckovResult[] ?? [];
+
         return ResultsService.applyFilters(currentState);
+    }
+
+    public static getCount() {
+        return ResultsService.get().length;
     }
 
     public static getByCategory(category: CHECKOV_RESULT_CATEGORY) {
@@ -67,14 +72,13 @@ export class ResultsService {
 
     public static store(results: CheckovResult[]) {
         ResultsService.context.workspaceState.update(CONFIG.storage.resultsKey, results);
-        TreeDataProvidersContainer.refresh();
-        DiagnosticsService.calculateAndApply();
+        ResultsService.updatePluginState();
     }
 
-    public static storeByFilePath(filePath: string, results: CheckovResult[]) {
+    public static storeByFiles(files: string[], results: CheckovResult[]) {
         const storedResults = ResultsService.get();
         const updatedResults = [
-            ...storedResults.filter((result) => result.repo_file_path !== filePath),
+            ...storedResults.filter((result) => !files.includes(result.file_abs_path)),
             ...results,
         ];
 
