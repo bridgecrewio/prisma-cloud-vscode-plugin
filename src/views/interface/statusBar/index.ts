@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import { CONFIG } from '../../../config';
+import { COMMAND } from '../../../constants';
 
 export class StatusBar {
     private static instance: vscode.StatusBarItem;
@@ -8,6 +9,7 @@ export class StatusBar {
     static {
         StatusBar.instance = vscode.window.createStatusBarItem();
         StatusBar.instance.text = CONFIG.userInterface.extensionTitle;
+        StatusBar.instance.command = COMMAND.SHOW_PLUGIN_SETTINGS;
         StatusBar.instance.show();
     }
 

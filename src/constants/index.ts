@@ -3,6 +3,7 @@ export const dockerfileName = 'Dockerfile';
 export enum COMMAND {
     CHECKOV_INSTALL = 'checkov.install',
     CHECKOV_EXECUTE = 'checkov.execute',
+    SHOW_PLUGIN_SETTINGS = 'checkov.showPluginSettings',
 };
 
 export enum WORKSPACE_EVENTS {

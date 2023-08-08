@@ -6,34 +6,38 @@ import { ResultsService } from '../../../../services';
 export class FiltersViewProvider implements vscode.WebviewViewProvider {
 
 	public static readonly viewType = 'calicoColors.colorsView';
-    public static webviewView: vscode.WebviewView;
+    public static filtersWebview: vscode.WebviewView;
 
 	constructor(
 		private readonly _extensionUri: vscode.Uri,
 	) { }
 
 	public async resolveWebviewView(
-		webviewView: vscode.WebviewView,
+		filtersWebview: vscode.WebviewView,
 		context: vscode.WebviewViewResolveContext,
 	) {
-        FiltersViewProvider.webviewView = webviewView;
+        FiltersViewProvider.filtersWebview = filtersWebview;
 
-		webviewView.webview.options = {
+		filtersWebview.webview.options = {
 			enableScripts: true,
 			localResourceRoots: [
 				this._extensionUri,
 			]
 		};
 
-		webviewView.webview.html = await this._getHtmlForWebview();
+		filtersWebview.webview.html = await this._getHtmlForWebview();
 
-		webviewView.webview.onDidReceiveMessage(data => {
+		filtersWebview.webview.onDidReceiveMessage(data => {
 			switch (data.command) {
 				case 'applyFilter':
 					ResultsService.addFilter(data.payload);
                     return;
                 case 'runScan':
                     vscode.commands.executeCommand(COMMAND.CHECKOV_EXECUTE);
+                    return;
+                case 'stopScan':
+                    // TODO implement stop scan logic call here
+                    return;
 			}
 		});
 	}
@@ -49,8 +53,11 @@ export class FiltersViewProvider implements vscode.WebviewViewProvider {
             'severityMedium': SEVERITY.MEDIUM,
             'severityHigh': SEVERITY.HIGH,
             'severityCritical': SEVERITY.CRITICAL,
-            'playIconPath': FiltersViewProvider.webviewView?.webview.asWebviewUri(
+            'playIconPath': FiltersViewProvider.filtersWebview?.webview.asWebviewUri(
                 vscode.Uri.joinPath(this._extensionUri, 'static/icons/svg', 'play.svg')
+            ),
+            'stopIconPath': FiltersViewProvider.filtersWebview?.webview.asWebviewUri(
+                vscode.Uri.joinPath(this._extensionUri, 'static/icons/svg', 'stop.svg')
             )
         };
 

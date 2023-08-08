@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 
 import { COMMAND } from '../constants';
-import { CheckovInstall, CheckovExecute } from './checkov';
+import { CheckovInstall, CheckovExecute, ShowSettings } from './checkov';
 
 const commands = new Map<COMMAND, (context: vscode.ExtensionContext) => void>([
     [COMMAND.CHECKOV_INSTALL, CheckovInstall.execute],
     [COMMAND.CHECKOV_EXECUTE, CheckovExecute.execute],
+    [COMMAND.SHOW_PLUGIN_SETTINGS, ShowSettings.execute],
 ]);
 
 export function registerCommands(context: vscode.ExtensionContext): void {
