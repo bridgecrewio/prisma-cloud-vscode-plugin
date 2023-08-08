@@ -49,8 +49,6 @@ export class CheckovExecutor {
     
                 StatusBar.reset();
             });
-
-            return;
         }
 
         ShowSettings.execute();
