@@ -23,7 +23,7 @@ export class ResultsService {
     public static addFilter(newFilter: Filter) {
         const { filterName, filterValue } = newFilter;
 
-        const existingFilter = ResultsService.filters.find(filter => filter.filterName === filterName && filter.filterValue === filterValue);
+        const existingFilter = ResultsService.isFilterActive(newFilter);
 
         if (existingFilter) {
             ResultsService.filters = ResultsService.filters.filter(filter => filter.filterName === filterName && filter.filterValue !== filterValue);
@@ -33,6 +33,11 @@ export class ResultsService {
         
         ResultsService.filters.push(newFilter);
         ResultsService.updatePluginState();
+    }
+
+    public static isFilterActive(filterToCheck: Filter): boolean {
+        const { filterName, filterValue } = filterToCheck;
+        return Boolean(ResultsService.filters.find(filter => filter.filterName === filterName && filter.filterValue === filterValue));
     }
 
     public static get(): CheckovResult[] {

@@ -7,6 +7,8 @@ import { CHECKOV_INSTALLATION_TYPE } from '../../../constants';
 import { CheckovInstallation, CheckovOutput } from '../../../types';
 
 export abstract class AbstractExecutor {
+    public static isScanInProgress: boolean = false;
+
     protected static get projectPath() {
         const workspaceFolders = vscode.workspace.workspaceFolders;
 
