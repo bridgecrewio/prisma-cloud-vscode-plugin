@@ -27,8 +27,15 @@
         background-color: #264F78;
     }
 
-    .runScan {
+    .runScanIcon {
         background-image: url('{{playIconPath}}');
+    }
+
+    .stopScanIcon {
+        background-image: url('{{stopIconPath}}');
+    }
+
+    .runScan {
         width: 13.23px;
         height: 19px;
         background-position: center;
@@ -50,13 +57,23 @@
     <button class="filterButton resetButtonStyles" data-severity="{{severityMedium}}">M</button>
     <button class="filterButton resetButtonStyles" data-severity="{{severityHigh}}">H</button>
     <button class="filterButton resetButtonStyles" data-severity="{{severityCritical}}">C</button>
-    <button id="runScan" class="runScan resetButtonStyles" title="Scan Project"></button>
+    <button id="runScan" class="runScan runScanIcon resetButtonStyles" title="Scan Project"></button>
   </div>
   <script>
     const vscode = acquireVsCodeApi();
-
     const filterButtons = document.getElementsByClassName('filterButton');
     const runScanButton = document.getElementById('runScan');
+    let scanInProgress = false;
+
+    function swithScanIcons(element, scanInProgress) {
+        if (scanInProgress) {
+          element.classList.remove('runScanIcon');
+          element.classList.add('stopScanIcon');
+        } else {
+            element.classList.remove('stopScanIcon');
+            element.classList.add('runScanIcon');
+        }
+    }
 
     for (const filterButton of filterButtons) {
         filterButton.addEventListener('click', () => {
@@ -68,8 +85,16 @@
         });
     }
 
-    runScanButton.addEventListener('click', () => {
-        vscode.postMessage({ command: 'runScan' });
+    const runScanEventListener = runScanButton.addEventListener('click', () => {
+        if (!scanInProgress) {
+            vscode.postMessage({ command: 'runScan' });
+            scanInProgress = true;
+            swithScanIcons(runScanButton, scanInProgress);
+        } else {
+            vscode.postMessage({ command: 'stopScan' });
+            scanInProgress = false;
+            swithScanIcons(runScanButton, scanInProgress);
+        }
     });
   </script>
 </body>
