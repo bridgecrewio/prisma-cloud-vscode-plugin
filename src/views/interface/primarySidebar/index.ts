@@ -5,6 +5,8 @@ import { TreeDataProvidersContainer } from './services/treeDataProvidersContaine
 import { FiltersViewProvider } from './views/filtersWebviewPanel';
 import { ResultsService } from '../../../services';
 
+export let filtersViewProvider: FiltersViewProvider;
+
 export class PrimarySidebar {
     public static iacTreeView: vscode.TreeView<TreeItem>;
     public static secretsTreeView: vscode.TreeView<TreeItem>;
@@ -25,8 +27,10 @@ export class PrimarySidebar {
             treeDataProvider: TreeDataProvidersContainer.licensesTreeDataProvider,
         });
 
+        filtersViewProvider = new FiltersViewProvider(context.extensionUri);
+
         context.subscriptions.push(
-            vscode.window.registerWebviewViewProvider('filters', new FiltersViewProvider(context.extensionUri)),
+            vscode.window.registerWebviewViewProvider('filters', filtersViewProvider),
         );
 
         PrimarySidebar.iacTreeView.onDidChangeSelection(

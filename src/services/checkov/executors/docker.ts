@@ -1,26 +1,54 @@
-import { spawn } from 'child_process';
+import { ChildProcessWithoutNullStreams, spawn, exec } from 'child_process';
 
 import * as vscode from 'vscode';
 
 import { CONFIG } from '../../../config';
 import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
+import { filtersViewProvider } from '../../../views/interface/primarySidebar';
 
 export class DockerExecutor extends AbstractExecutor {
-    public static execute(installation: CheckovInstallation, files?: string[]) {
+    private static containerName: string;
+    private static activeProcess: ChildProcessWithoutNullStreams;
+
+    public static async execute(installation: CheckovInstallation, files?: string[]) {
+        AbstractExecutor.isScanInProgress = true;
+        await filtersViewProvider.reRenderHtml();
+        const containerName = DockerExecutor.getConainerName();
+        DockerExecutor.containerName = containerName[1];
+
         const args = [
             'run',
             ...DockerExecutor.getDockerParams(),
-            ...DockerExecutor.getConainerName(),
+            ...containerName,
             ...DockerExecutor.getEnvs(),
             ...DockerExecutor.getVolumeMounts(),
             ...DockerExecutor.getWorkdir(),
             ...DockerExecutor.getImage(),
             ...DockerExecutor.getCheckovCliParams(installation, files),
         ];
-        const process = spawn(installation.entrypoint, args, { shell: true });
+        DockerExecutor.activeProcess = spawn(installation.entrypoint, args, { shell: true });
+        const executionResult = await DockerExecutor.handleProcessOutput(DockerExecutor.activeProcess);
+        AbstractExecutor.isScanInProgress = false;
+        await filtersViewProvider.reRenderHtml();
 
-        return DockerExecutor.handleProcessOutput(process);
+        return executionResult;
+    }
+
+    public static async stopExecution() {
+        if (DockerExecutor.containerName) {
+            try {
+                const process = exec(`docker kill ${DockerExecutor.containerName}`);
+                AbstractExecutor.isScanInProgress = false;
+                await filtersViewProvider.reRenderHtml();
+
+                if (process.stderr) {
+                    process.stderr.on('data', (data) => console.log('error' + data.toString()));
+                }
+            } catch(e) {
+                console.log(e);
+            }
+        }
     }
 
     private static getDockerParams() {

@@ -7,12 +7,15 @@ import { ResultsService } from '../resultsService';
 import { StatusBar } from '../../views';
 import { CONFIG } from '../../config';
 import { ShowSettings } from '../../commands/checkov';
+import { filtersViewProvider } from '../../views/interface/primarySidebar';
+import { AbstractExecutor } from './executors/abstractExecutor';
 
 export class CheckovExecutor {
-    private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, (installation: CheckovInstallation, files?: string[]) => Promise<CheckovOutput>>([
-        [CHECKOV_INSTALLATION_TYPE.DOCKER, DockerExecutor.execute],
-        [CHECKOV_INSTALLATION_TYPE.PIP3, Pip3Executor.execute],
+    private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, typeof DockerExecutor | typeof Pip3Executor>([
+        [CHECKOV_INSTALLATION_TYPE.DOCKER, DockerExecutor],
+        [CHECKOV_INSTALLATION_TYPE.PIP3, Pip3Executor],
     ]);
+
     private static installation: CheckovInstallation;
 
     public static initialize(installation: CheckovInstallation) {
@@ -31,12 +34,20 @@ export class CheckovExecutor {
 
         if (!emptyPrismaSettings.length) {
             vscode.window.withProgress({ location: vscode.ProgressLocation.Notification }, async (progress) => {
+                let checkovOutput: CheckovOutput;
                 StatusBar.progress();
                 progress.report({
                     message: `Prisma Cloud is scanning your ${targetFiles ? 'files: ' + targetFiles.join(',') : 'project'}`,
                 });
-    
-                const checkovOutput = await executor(installation, targetFiles);
+
+                try {
+                    checkovOutput = await executor.execute(installation, targetFiles);
+                } catch (e) {
+                    AbstractExecutor.isScanInProgress = false;
+                    await filtersViewProvider.reRenderHtml();
+                    StatusBar.reset();
+                    return;
+                }
     
                 const results = CheckovExecutor.processOutput(checkovOutput);
     
@@ -46,7 +57,7 @@ export class CheckovExecutor {
                     vscode.window.showInformationMessage(`Prisma Cloud has detected ${results.length} code security issues in your project`);
                     ResultsService.store(results);
                 }
-    
+                
                 StatusBar.reset();
             });
 
@@ -55,6 +66,15 @@ export class CheckovExecutor {
 
         ShowSettings.execute();
         vscode.window.showErrorMessage(`Fill following Prisma Cloud settings: ${emptyPrismaSettings.join(', ')}`);
+    }
+
+    public static stopExecution() {
+        const installation = CheckovExecutor.installation;
+        const executor = CheckovExecutor.executors.get(installation?.type);
+        if (executor?.stopExecution) {
+            executor.stopExecution();
+            StatusBar.reset();
+        }
     }
 
     private static processOutput(output: CheckovOutput) {

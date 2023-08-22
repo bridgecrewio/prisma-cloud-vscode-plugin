@@ -52,28 +52,17 @@
 <body>
   <div class="buttonContainer" class="content">
     <b>SEVERITIES: </b>
-    <button class="filterButton resetButtonStyles" data-severity="{{severityInfo}}">I</button>
-    <button class="filterButton resetButtonStyles" data-severity="{{severityLow}}">L</button>
-    <button class="filterButton resetButtonStyles" data-severity="{{severityMedium}}">M</button>
-    <button class="filterButton resetButtonStyles" data-severity="{{severityHigh}}">H</button>
-    <button class="filterButton resetButtonStyles" data-severity="{{severityCritical}}">C</button>
-    <button id="runScan" class="runScan runScanIcon resetButtonStyles" title="Scan Project"></button>
+    <button class="filterButton resetButtonStyles {{infoFilterActive}}" data-severity="{{severityInfo}}">I</button>
+    <button class="filterButton resetButtonStyles {{lowFilterActive}}" data-severity="{{severityLow}}">L</button>
+    <button class="filterButton resetButtonStyles {{mediumFilterActive}}" data-severity="{{severityMedium}}">M</button>
+    <button class="filterButton resetButtonStyles {{highFilterActive}}" data-severity="{{severityHigh}}">H</button>
+    <button class="filterButton resetButtonStyles {{criticalFilterActive}}" data-severity="{{severityCritical}}">C</button>
+    <button id="runScan" class="runScan resetButtonStyles {{scanButtonClass}}" title="Scan Project"></button>
   </div>
   <script>
     const vscode = acquireVsCodeApi();
     const filterButtons = document.getElementsByClassName('filterButton');
     const runScanButton = document.getElementById('runScan');
-    let scanInProgress = false;
-
-    function swithScanIcons(element, scanInProgress) {
-        if (scanInProgress) {
-          element.classList.remove('runScanIcon');
-          element.classList.add('stopScanIcon');
-        } else {
-            element.classList.remove('stopScanIcon');
-            element.classList.add('runScanIcon');
-        }
-    }
 
     for (const filterButton of filterButtons) {
         filterButton.addEventListener('click', () => {
@@ -81,20 +70,11 @@
                 filterName: 'severity', 
                 filterValue: filterButton.getAttribute('data-severity') 
             }});
-            filterButton.classList.toggle('active');
         });
     }
 
     const runScanEventListener = runScanButton.addEventListener('click', () => {
-        if (!scanInProgress) {
-            vscode.postMessage({ command: 'runScan' });
-            scanInProgress = true;
-            swithScanIcons(runScanButton, scanInProgress);
-        } else {
-            vscode.postMessage({ command: 'stopScan' });
-            scanInProgress = false;
-            swithScanIcons(runScanButton, scanInProgress);
-        }
+        vscode.postMessage({ command: 'clickScanButton' });
     });
   </script>
 </body>

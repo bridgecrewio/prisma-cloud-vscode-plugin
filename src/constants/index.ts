@@ -4,6 +4,7 @@ export enum COMMAND {
     CHECKOV_INSTALL = 'checkov.install',
     CHECKOV_EXECUTE = 'checkov.execute',
     SHOW_PLUGIN_SETTINGS = 'checkov.showPluginSettings',
+    CHECKOV_STOP_EXECUTE = 'checkov.stop.execute',
 };
 
 export enum WORKSPACE_EVENTS {

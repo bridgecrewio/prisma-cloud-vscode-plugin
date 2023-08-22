@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { COMMAND, SEVERITY } from '../../../../constants';
 import { ResultsService } from '../../../../services';
+import { AbstractExecutor } from '../../../../services/checkov/executors/abstractExecutor';
 
 export class FiltersViewProvider implements vscode.WebviewViewProvider {
 
@@ -25,22 +25,28 @@ export class FiltersViewProvider implements vscode.WebviewViewProvider {
 			]
 		};
 
-		filtersWebview.webview.html = await this._getHtmlForWebview();
+		await this.reRenderHtml();
 
 		filtersWebview.webview.onDidReceiveMessage(data => {
 			switch (data.command) {
 				case 'applyFilter':
 					ResultsService.addFilter(data.payload);
+                    this.reRenderHtml();
                     return;
-                case 'runScan':
-                    vscode.commands.executeCommand(COMMAND.CHECKOV_EXECUTE);
-                    return;
-                case 'stopScan':
-                    // TODO implement stop scan logic call here
+                case 'clickScanButton':
+                    if (AbstractExecutor.isScanInProgress) {
+                        vscode.commands.executeCommand(COMMAND.CHECKOV_STOP_EXECUTE);
+                    } else {
+                        vscode.commands.executeCommand(COMMAND.CHECKOV_EXECUTE);
+                    }
                     return;
 			}
 		});
 	}
+
+    public async reRenderHtml() {
+        FiltersViewProvider.filtersWebview.webview.html = await this._getHtmlForWebview();
+    }
 
 	private async _getHtmlForWebview() {
         let htmlTemplate = (await vscode.workspace.fs.readFile(
@@ -58,7 +64,13 @@ export class FiltersViewProvider implements vscode.WebviewViewProvider {
             ),
             'stopIconPath': FiltersViewProvider.filtersWebview?.webview.asWebviewUri(
                 vscode.Uri.joinPath(this._extensionUri, 'static/icons/svg', 'stop.svg')
-            )
+            ),
+            'scanButtonClass': AbstractExecutor.isScanInProgress ? 'stopScanIcon' : 'runScanIcon',
+            'infoFilterActive': ResultsService.isFilterActive({ filterName: 'severity', filterValue: SEVERITY.INFO }) ? 'active' : '',
+            'lowFilterActive': ResultsService.isFilterActive({ filterName: 'severity', filterValue: SEVERITY.LOW }) ? 'active' : '',
+            'mediumFilterActive': ResultsService.isFilterActive({ filterName: 'severity', filterValue: SEVERITY.MEDIUM }) ? 'active' : '',
+            'highFilterActive': ResultsService.isFilterActive({ filterName: 'severity', filterValue: SEVERITY.HIGH }) ? 'active' : '',
+            'criticalFilterActive': ResultsService.isFilterActive({ filterName: 'severity', filterValue: SEVERITY.CRITICAL }) ? 'active' : '',
         };
 
         const htmlParams = htmlTemplate.matchAll(new RegExp('{{(.*?)}}', 'g'));
@@ -68,5 +80,4 @@ export class FiltersViewProvider implements vscode.WebviewViewProvider {
 
         return htmlTemplate;
     };
-		
 }
