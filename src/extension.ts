@@ -6,16 +6,16 @@ import { registerWindowEvents, registerWorkspaceEvents } from './events';
 import { initializeServices } from './services';
 import { registerSidebar } from './views/interface/primarySidebar';
 import { registerCheckovResultView } from './views/interface/checkovResult';
-import { registerDiagnostics } from './services/diagnosticsService';
+import { registerCustomHighlight } from './services/customPopupService';
 
 export function activate(context: vscode.ExtensionContext) {	
 	registerCommands(context);
 	initializeServices(context);
 	registerWindowEvents();
 	registerWorkspaceEvents();
-	registerDiagnostics(context);
 	registerSidebar(context);
   	registerCheckovResultView(context);
+	registerCustomHighlight(context);
 	vscode.commands.executeCommand(COMMAND.CHECKOV_INSTALL);
 }
 

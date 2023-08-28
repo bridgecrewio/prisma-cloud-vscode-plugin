@@ -53,8 +53,8 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
 
     console.log(result);
 
-    await FilesService.openFile(result.repo_file_path, result.file_line_range[0]);
-    CheckovResultWebviewPanel.show(this.category, result);
+    const openedTextEditor = await FilesService.openFile(result.repo_file_path, result.file_line_range[0]);
+    CheckovResultWebviewPanel.show(this.category, result, openedTextEditor);
   } 
 };
 
@@ -62,7 +62,7 @@ export class TreeItem extends vscode.TreeItem {
   public readonly children: TreeItem[] | undefined;
   public readonly result: CheckovResult | null;
 
-  constructor(options: { label: string, iconPath: vscode.ThemeIcon | { light: string, dark: string }, result?: CheckovResult }, children?: TreeItem[]) {
+  constructor(options: { label: string, iconPath?: vscode.ThemeIcon | { light: string, dark: string }, result?: CheckovResult }, children?: TreeItem[]) {
     const { label, iconPath, result } = options;
 
     super(

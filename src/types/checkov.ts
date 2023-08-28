@@ -29,6 +29,7 @@ export type CheckovResult = {
         }
     };
     description: string;
+    short_description: string;
 };
 
 export type CheckovCheckTypeOutput = {
