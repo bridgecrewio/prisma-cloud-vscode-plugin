@@ -5,7 +5,7 @@ import { Position } from 'vscode';
 // looking for property "//":[]
 const COMMENTS_SECTION_REGEXP = /^(\s*|\t*)"\/\/"(\s*|\t*):(\s*|\t*)\[/m;
 
-export class SuppressServicePackageJson{
+export class SuppressPackageJsonService {
     private resultPosition?: Position;
     private isCommentsSectionExist: boolean = false;
 

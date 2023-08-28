@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 
 import { CheckovResult } from '../types';
 import { ResultsService } from '.';
-import { SuppressServicePackageJson } from './suppresServicePackageJson';
+import { SuppressPackageJsonService } from './suppresServicePackageJson';
 
 export class SuppressService {
     public static async suppress(result: CheckovResult, justification?: string) {
@@ -15,9 +15,9 @@ export class SuppressService {
         let resultPosition = SuppressService.resolveResultPosition(result);
 
         if (resultFileName === 'package.json')  {
-            const suppressServicePackageJson = new SuppressServicePackageJson(resultFileUri.path);
-            suppressionComment = await suppressServicePackageJson.wrapWithSuppressionCommentsSection(suppressionComment);
-            resultPosition = await suppressServicePackageJson.resolveResultPosition();
+            const suppressPackageJsonService = new SuppressPackageJsonService(resultFileUri.path);
+            suppressionComment = await suppressPackageJsonService.wrapWithSuppressionCommentsSection(suppressionComment);
+            resultPosition = await suppressPackageJsonService.resolveResultPosition();
         }
 
         workspaceEdit.insert(resultFileUri, resultPosition, suppressionComment);
