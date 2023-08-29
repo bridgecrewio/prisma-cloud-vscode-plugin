@@ -5,17 +5,24 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../config';
 import { CHECKOV_RESULT_CATEGORY } from '../constants';
 import { CheckovResult } from '../types';
-import { CategoriesService } from '../services';
+import { CategoriesService, CheckovExecutor, ResultsService } from '../services';
+import { CheckovResultWebviewPanel } from '../views/interface/checkovResult';
+import { CustomPopupService } from './customPopupService';
+import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 
 export class FixService {
     public static async fix(result: CheckovResult) {
-        if (!result.fixed_definition) {
+        if (!result.fixed_definition || !CheckovExecutor.getExecutor()) {
             return;
         }
         const resultCategory = CategoriesService.getCategoryByCheckId(result.check_id);
         
         if (resultCategory === CHECKOV_RESULT_CATEGORY.SCA) {
             await FixService.applyScaFix(result);
+        }
+
+        if (resultCategory === CHECKOV_RESULT_CATEGORY.IAC) {
+            await FixService.applyIaCFix(result);
         }
     }
 
@@ -44,5 +51,28 @@ export class FixService {
                 vscode.env.clipboard.writeText(command);   
             }
         }
+    }
+
+    private static async applyIaCFix(targetResult: CheckovResult) {
+        const activeEditor = CheckovResultWebviewPanel.fileEditorMap.get(targetResult.file_abs_path) || vscode.window.activeTextEditor;
+        if (activeEditor) {
+            const { repo_file_path, file_line_range, fixed_definition } = targetResult;
+            const workspaceEdit = new vscode.WorkspaceEdit();
+            const workspaceFolders = vscode.workspace.workspaceFolders;
+            const resultFileUri = vscode.Uri.joinPath(workspaceFolders![0].uri, repo_file_path);
+            const blockRange = new vscode.Range(
+                activeEditor.document.lineAt(file_line_range[0] === 0 ? 0 : file_line_range[0] - 1).range.start,
+                activeEditor.document.lineAt(file_line_range[1] - 1).range.end
+            );
+            workspaceEdit.replace(resultFileUri, blockRange, fixed_definition);
+            await vscode.workspace.applyEdit(workspaceEdit);
+            await activeEditor.document.save();
+            await CheckovExecutor.execute([targetResult.file_abs_path]);
+            CustomPopupService.highlightLines();
+            TreeDataProvidersContainer.refresh();
+            return;
+        }
+
+        throw new Error('There is no active text editor to aplly fix for');
     }
 };

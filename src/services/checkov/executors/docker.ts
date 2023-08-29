@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../../../config';
 import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
-import { filtersViewProvider } from '../../../views/interface/primarySidebar';
+import { reRenderViews } from '../../../views/interface/utils';
 
 export class DockerExecutor extends AbstractExecutor {
     private static containerName: string;
@@ -13,7 +13,7 @@ export class DockerExecutor extends AbstractExecutor {
 
     public static async execute(installation: CheckovInstallation, files?: string[]) {
         AbstractExecutor.isScanInProgress = true;
-        await filtersViewProvider.reRenderHtml();
+        await reRenderViews();
         const containerName = DockerExecutor.getConainerName();
         DockerExecutor.containerName = containerName[1];
 
@@ -30,7 +30,7 @@ export class DockerExecutor extends AbstractExecutor {
         DockerExecutor.activeProcess = spawn(installation.entrypoint, args, { shell: true });
         const executionResult = await DockerExecutor.handleProcessOutput(DockerExecutor.activeProcess);
         AbstractExecutor.isScanInProgress = false;
-        await filtersViewProvider.reRenderHtml();
+        await reRenderViews();
 
         return executionResult;
     }
@@ -40,7 +40,7 @@ export class DockerExecutor extends AbstractExecutor {
             try {
                 const process = exec(`docker kill ${DockerExecutor.containerName}`);
                 AbstractExecutor.isScanInProgress = false;
-                await filtersViewProvider.reRenderHtml();
+                await reRenderViews();
 
                 if (process.stderr) {
                     process.stderr.on('data', (data) => console.log('error' + data.toString()));

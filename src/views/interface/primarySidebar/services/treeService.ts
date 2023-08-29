@@ -4,6 +4,15 @@ import { IconsService } from './iconsService';
 import { CheckovResult } from '../../../../types';
 import { CHECKOV_RESULT_CATEGORY, PATH_TYPE, SEVERITY, dockerfileName } from '../../../../constants';
 
+const severityPriorityMap: Record<SEVERITY, number> = {
+    [SEVERITY.UNKNOWN]: 0,
+    [SEVERITY.INFO]: 1,
+    [SEVERITY.LOW]: 2,
+    [SEVERITY.MEDIUM]: 3,
+    [SEVERITY.HIGH]: 4,
+    [SEVERITY.CRITICAL]: 5,
+};
+
 export type FormattedCheck = {
     originalFilePath: string;
     filePath: PathCell[];
@@ -26,20 +35,48 @@ export class TreeService {
         this.iconService = new IconsService();
     }
 
-    public getTreeData(category: CHECKOV_RESULT_CATEGORY, checkovOutput: CheckovResult[]): Array<TreeItem> {
+    public getTreeData(category: CHECKOV_RESULT_CATEGORY, checkovOutput: CheckovResult[]): TreeItem[] {
         const formattedData = this.formatCheckData(category, checkovOutput);
-        return this.formTreeData(formattedData);
+        const treeData = this.formTreeData(formattedData);
+        if (treeData.length === 1) {
+            return treeData;
+        }
+        this.sortTreeData(treeData[1]);
+        return treeData;
     }
 
-    private formTreeData(formattedData: Array<FormattedCheck>): Array<TreeItem> {
+    private sortTreeData(treeData: TreeItem) {
+        if (treeData.children) {
+            if (treeData.children[0].result) {
+                treeData.children.sort((a, b) => {
+                    return severityPriorityMap[b.result?.severity || SEVERITY.UNKNOWN] - severityPriorityMap[a.result?.severity || SEVERITY.UNKNOWN];
+                });
+                return;
+            }
+            treeData.children.sort((a, b) => {
+                if ((a.label && typeof a.label === 'string') && (b.label && typeof b.label === 'string')) {
+                    return a?.label.localeCompare(b.label);
+                }
+                return 0;
+            });
+            
+            for (const child of treeData.children) {
+                this.sortTreeData(child);
+            }
+        }
+    }
+
+    private formTreeData(formattedData: Array<FormattedCheck>): TreeItem[] {
         let formTreeData: any = [];
         let level: any = { formTreeData };
+        let counter: number = 0;
 
         formattedData.forEach(formattedCheck => {
             formattedCheck.filePath.reduce((r, { path, pathType, severity }, i, a) => {
               const iconPath = this.iconService.getIconPath(pathType, severity);
               if (i === a.length - 1) {
                 r.formTreeData.push(new TreeItem({ label: path, iconPath, result: formattedCheck.result }));
+                counter++;
               } else if(!r[path]) {
                 r[path] = {formTreeData: []};
                 r.formTreeData.push(new TreeItem({ label: path, iconPath }, r[path].formTreeData));
@@ -48,6 +85,8 @@ export class TreeService {
               return r[path];
             }, level);
         });
+
+        formTreeData.unshift(new TreeItem({ label: `Found issues: ${counter}` }));
 
         return formTreeData;
     }

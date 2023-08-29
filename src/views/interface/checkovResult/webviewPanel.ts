@@ -4,17 +4,22 @@ import { CONFIG } from '../../../config';
 import { CheckovResult } from '../../../types';
 import { MessageHandlersFactory } from './messages';
 import { CHECKOV_RESULT_CATEGORY } from '../../../constants';
+import { AbstractExecutor } from '../../../services/checkov/executors/abstractExecutor';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
+    public static currentCategory: CHECKOV_RESULT_CATEGORY;
     public static webviewPanel?: vscode.WebviewPanel;
     public static checkovResult?: CheckovResult;
+    public static fileEditorMap: Map<string, typeof vscode.window.activeTextEditor> = new Map();
 
     public static initialize(context: vscode.ExtensionContext) {
         CheckovResultWebviewPanel.context = context;
     }
 
-    public static async show(category: CHECKOV_RESULT_CATEGORY, result: CheckovResult) {
+    public static async show(category: CHECKOV_RESULT_CATEGORY, result: CheckovResult, activeEditor: typeof vscode.window.activeTextEditor) {
+        CheckovResultWebviewPanel.fileEditorMap.set(result.file_abs_path, activeEditor);     
+        CheckovResultWebviewPanel.currentCategory = category;   
         const html = await CheckovResultWebviewPanel.getHtmlTemplate(category);
 
         CheckovResultWebviewPanel.checkovResult = result;
@@ -48,6 +53,13 @@ export class CheckovResultWebviewPanel {
             null,
             CheckovResultWebviewPanel.context.subscriptions,
         );
+    }
+
+    public static async reRenderHtml() {
+        if (CheckovResultWebviewPanel.webviewPanel && CheckovResultWebviewPanel.checkovResult) {
+            const newHtml = await CheckovResultWebviewPanel.getHtmlTemplate(CheckovResultWebviewPanel.currentCategory);
+            CheckovResultWebviewPanel.webviewPanel.webview.html = CheckovResultWebviewPanel.render(newHtml, CheckovResultWebviewPanel.checkovResult);
+        }
     }
 
     private static async getHtmlTemplate(category: CHECKOV_RESULT_CATEGORY) {
@@ -87,6 +99,7 @@ export class CheckovResultWebviewPanel {
             guidelineActionState: result.guideline ? 'available' : 'unavailable',
             vulnerabilityDetailsId: result.vulnerability_details?.id,
             approvedSPDX: result.check_id === 'BC_LIC_1' ? 'true' : 'false',
+            disabledClass: AbstractExecutor.isScanInProgress ? 'disabledDiv' : '',
         };
 
         for (const htmlParam of htmlParams) {

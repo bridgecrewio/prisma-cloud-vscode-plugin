@@ -3,9 +3,9 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../config';
 import { CHECKOV_RESULT_CATEGORY } from '../constants';
 import { CheckovResult } from '../types';
-import { DiagnosticsService } from '../services';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 import { CategoriesService } from './categoriesService';
+import { CustomPopupService } from './customPopupService';
 
 type Filter = {
     filterName: keyof CheckovResult;
@@ -96,9 +96,7 @@ export class ResultsService {
 
     public static suppressResult(targetResult: CheckovResult) {
         const results = ResultsService.get();
-        const targetResultIndex = results.findIndex(({ check_id, repo_file_path, file_line_range }) => {
-            return repo_file_path === targetResult.repo_file_path && check_id === targetResult.check_id && file_line_range[0] === targetResult.file_line_range[0];
-        });
+        const targetResultIndex = ResultsService.getTargetResultIndex(targetResult);
 
         results.splice(targetResultIndex, 1);
 
@@ -111,6 +109,13 @@ export class ResultsService {
         }
 
         ResultsService.store(results);
+    }
+
+    private static getTargetResultIndex(targetResult: CheckovResult): number {
+        const results = ResultsService.get();
+        return results.findIndex(({ check_id, repo_file_path, file_line_range }) => {
+            return repo_file_path === targetResult.repo_file_path && check_id === targetResult.check_id && file_line_range[0] === targetResult.file_line_range[0];
+        });
     }
 
     private static applyFilters(currentState: CheckovResult[]): CheckovResult[] {
@@ -129,6 +134,6 @@ export class ResultsService {
 
     private static updatePluginState() {
         TreeDataProvidersContainer.refresh();
-        DiagnosticsService.calculateAndApply();
+        CustomPopupService.highlightLines();
     }
 };

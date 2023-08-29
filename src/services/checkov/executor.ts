@@ -7,8 +7,8 @@ import { ResultsService } from '../resultsService';
 import { StatusBar } from '../../views';
 import { CONFIG } from '../../config';
 import { ShowSettings } from '../../commands/checkov';
-import { filtersViewProvider } from '../../views/interface/primarySidebar';
 import { AbstractExecutor } from './executors/abstractExecutor';
+import { reRenderViews } from '../../views/interface/utils';
 
 export class CheckovExecutor {
     private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, typeof DockerExecutor | typeof Pip3Executor>([
@@ -22,11 +22,16 @@ export class CheckovExecutor {
         CheckovExecutor.installation = installation;
     }
 
+    public static getExecutor() {
+        const installation = CheckovExecutor.installation;
+        return CheckovExecutor.executors.get(installation?.type);
+    }
+
     public static async execute(targetFiles?: string[]) {
         const installation = CheckovExecutor.installation;
-        const executor = CheckovExecutor.executors.get(installation?.type);
+        const executor = CheckovExecutor.getExecutor();
 
-        if (!executor) {
+        if (!executor || AbstractExecutor.isScanInProgress) {
             return;
         }
 
@@ -44,7 +49,7 @@ export class CheckovExecutor {
                     checkovOutput = await executor.execute(installation, targetFiles);
                 } catch (e) {
                     AbstractExecutor.isScanInProgress = false;
-                    await filtersViewProvider.reRenderHtml();
+                    await reRenderViews();
                     StatusBar.reset();
                     return;
                 }

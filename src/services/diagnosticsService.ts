@@ -52,7 +52,7 @@ export class DiagnosticsService {
                             value: 'Learn more'
                         } : `${failedCheck.guideline ? `: ${failedCheck.guideline}` : ''}`;
                 const diagnostic: vscode.Diagnostic = {
-                    message: `${failedCheck.severity ? (failedCheck.severity + ': ') : ''}${failedCheck.check_name}`,
+                    message: `${failedCheck.severity ? (failedCheck.severity + ': ') : ''}${failedCheck.short_description || failedCheck.check_name}`,
                     range,
                     severity: vscode.DiagnosticSeverity.Error,
                     code,

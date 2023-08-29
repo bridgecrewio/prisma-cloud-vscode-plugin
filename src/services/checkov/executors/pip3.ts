@@ -3,14 +3,14 @@ import { spawn } from 'child_process';
 import { CONFIG } from '../../../config';
 import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
-import { filtersViewProvider } from '../../../views/interface/primarySidebar';
+import { reRenderViews } from '../../../views/interface/utils';
 
 export class Pip3Executor extends AbstractExecutor {
     private static pid: any;
 
     public static async execute(installation: CheckovInstallation, files?: string[]) {
         AbstractExecutor.isScanInProgress = true;
-        await filtersViewProvider.reRenderHtml();
+        await reRenderViews();
         const args = [
             ...Pip3Executor.getCheckovCliParams(installation, files),
         ];
@@ -26,7 +26,7 @@ export class Pip3Executor extends AbstractExecutor {
         Pip3Executor.pid = process.pid;
         const processOutput = await Pip3Executor.handleProcessOutput(process);
         AbstractExecutor.isScanInProgress = false;
-        await filtersViewProvider.reRenderHtml();
+        await reRenderViews();
 
         return processOutput;
     }
@@ -35,7 +35,7 @@ export class Pip3Executor extends AbstractExecutor {
         if (Pip3Executor.pid) {
             process.kill(-Pip3Executor.pid);
             AbstractExecutor.isScanInProgress = false;
-            await filtersViewProvider.reRenderHtml();
+            await reRenderViews();
         }
     }
 };
