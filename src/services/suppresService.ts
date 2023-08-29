@@ -1,26 +1,26 @@
 import { EOL } from 'os';
-import { extname } from 'path';
-
+import { extname, basename } from 'path';
 import * as vscode from 'vscode';
 
 import { CheckovResult } from '../types';
 import { ResultsService } from '.';
+import { SuppressPackageJsonService } from './suppresServicePackageJson';
 
 export class SuppressService {
     public static async suppress(result: CheckovResult, justification?: string) {
         const workspaceEdit = new vscode.WorkspaceEdit();
-        const suppressionComment = SuppressService.generateSuppressionComment(result, justification);
-        const resultFileExtension = extname(result.repo_file_path);
+        let suppressionComment = SuppressService.generateSuppressionComment(result, justification);
+        const resultFileName = basename(result.repo_file_path);
         const resultFileUri = SuppressService.resolveResultFileUri(result);
-        const resultPosition = SuppressService.resolveResultPosition(result);
+        let resultPosition = SuppressService.resolveResultPosition(result);
 
-        // TODO: SCA (json) suppression implementation
-        if (resultFileExtension === '.json') {
-            vscode.window.showInformationMessage('The SCA suppression is not available yet');
-            return;
+        if (resultFileName === 'package.json')  {
+            const suppressPackageJsonService = new SuppressPackageJsonService(resultFileUri.path);
+            suppressionComment = await suppressPackageJsonService.wrapWithSuppressionCommentsSection(suppressionComment);
+            resultPosition = await suppressPackageJsonService.resolveResultPosition();
         }
 
-        workspaceEdit.insert(resultFileUri, resultPosition, `${suppressionComment}${EOL}`);
+        workspaceEdit.insert(resultFileUri, resultPosition, suppressionComment);
 
         await vscode.workspace.applyEdit(workspaceEdit);
 
@@ -48,15 +48,15 @@ export class SuppressService {
         switch (resultFileExtension) {
             case '.xml':
             case '.csproj':
-                return `<!--${suppressionComment}-->`;
+                return `<!--${suppressionComment}-->${EOL}`;
             case '.mod':
             case '.kt':
             case '.gradle':
-                return `// ${suppressionComment}`;
+                return `// ${suppressionComment}${EOL}`;
             case '.json':
-                return suppressionComment;
+                return `"${suppressionComment}"`;
             default:
-                return `# ${suppressionComment}`;
+                return `# ${suppressionComment}${EOL}`;
         }
     }
-};
+}
