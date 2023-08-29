@@ -53,6 +53,7 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
 
 export class CustomPopupService {
     static context: vscode.ExtensionContext;
+
     static highlightLines() {
         const document = vscode.window.activeTextEditor?.document;
         if (document) {
@@ -81,7 +82,7 @@ export class CustomPopupService {
         const hoverContent = new vscode.MarkdownString();
         const failedChecks = ResultsService.getByFilePath(document.fileName);
         const risksForLine = failedChecks.filter(failedCheck => {
-            return position.line >= failedCheck.file_line_range[0] - 1 && position.line <= failedCheck.file_line_range[1] - 1;
+            return position.line >= (failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1)  && position.line <= (failedCheck.file_line_range[1] === 0 ? 0 : failedCheck.file_line_range[1] - 1);
         });
 
         if (risksForLine.length === 0) {
