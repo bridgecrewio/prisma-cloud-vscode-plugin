@@ -2,16 +2,7 @@ import * as path from 'path';
 import { TreeItem } from '../dataProviders/abstractTreeDataProvider';
 import { IconsService } from './iconsService';
 import { CheckovResult } from '../../../../types';
-import { CHECKOV_RESULT_CATEGORY, PATH_TYPE, SEVERITY, dockerfileName } from '../../../../constants';
-
-const severityPriorityMap: Record<SEVERITY, number> = {
-    [SEVERITY.UNKNOWN]: 0,
-    [SEVERITY.INFO]: 1,
-    [SEVERITY.LOW]: 2,
-    [SEVERITY.MEDIUM]: 3,
-    [SEVERITY.HIGH]: 4,
-    [SEVERITY.CRITICAL]: 5,
-};
+import { CHECKOV_RESULT_CATEGORY, PATH_TYPE, SEVERITY, dockerfileName, severityPriorityMap } from '../../../../constants';
 
 export type FormattedCheck = {
     originalFilePath: string;

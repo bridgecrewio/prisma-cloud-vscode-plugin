@@ -1,17 +1,10 @@
 import * as vscode from 'vscode';
 import { ResultsService } from './resultsService';
 import { SuppressService } from './suppresService';
-import { SEVERITY } from '../constants';
+import { SEVERITY, severityPriorityMap, suppressionInputBoxOptions } from '../constants';
 import { FixService } from './fixService';
 
-const severityColorMap: Record<SEVERITY, string> = {
-	[SEVERITY.INFO]: '#E9EDEE',
-	[SEVERITY.LOW]: '#27b0ed',
-	[SEVERITY.HIGH]: '#f47206',
-	[SEVERITY.MEDIUM]: '#f1b287',
-	[SEVERITY.CRITICAL]: '#eb174a',
-	[SEVERITY.UNKNOWN]: '#f5dabd'
-};
+const iconsPath = 'static/icons/svg/severities';
 
 let highlightDecorationType: vscode.TextEditorDecorationType;
 let highlightIcon: vscode.TextEditorDecorationType;
@@ -21,10 +14,7 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
 		provideHover: CustomPopupService.provideHover
 	});
     vscode.commands.registerCommand('extension.suppress', async (...params) => {
-		const justification = await vscode.window.showInputBox({
-			placeHolder: 'Justification',
-			prompt: 'Include a short justification for the suppression',
-		});
+		const justification = await vscode.window.showInputBox(suppressionInputBoxOptions);
 
         if (typeof justification === 'undefined') {
             return;
@@ -39,6 +29,14 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
         CustomPopupService.highlightLines();
 	});
     CustomPopupService.context = context;
+    CustomPopupService.severityIconMap = {
+        [SEVERITY.INFO]: vscode.Uri.joinPath(CustomPopupService.context.extensionUri, iconsPath, 'info-popup.svg'),
+        [SEVERITY.LOW]: vscode.Uri.joinPath(CustomPopupService.context.extensionUri, iconsPath, 'low-popup.svg'),
+        [SEVERITY.MEDIUM]: vscode.Uri.joinPath(CustomPopupService.context.extensionUri, iconsPath, 'medium-popup.svg'),
+        [SEVERITY.HIGH]: vscode.Uri.joinPath(CustomPopupService.context.extensionUri, iconsPath, 'high-popup.svg'),
+        [SEVERITY.CRITICAL]: vscode.Uri.joinPath(CustomPopupService.context.extensionUri, iconsPath, 'critical-popup.svg'),
+        [SEVERITY.UNKNOWN]: vscode.Uri.joinPath(CustomPopupService.context.extensionUri, iconsPath, 'info-popup.svg'),
+    };
     highlightDecorationType = vscode.window.createTextEditorDecorationType({
         backgroundColor: '#D13C3C1A',
         isWholeLine: false,
@@ -53,6 +51,7 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
 
 export class CustomPopupService {
     static context: vscode.ExtensionContext;
+    static severityIconMap: Record<SEVERITY, vscode.Uri>;
 
     static highlightLines() {
         const document = vscode.window.activeTextEditor?.document;
@@ -66,7 +65,7 @@ export class CustomPopupService {
                 endLine = document.lineAt(failedCheck.file_line_range[1] === 0 ? 0 : failedCheck.file_line_range[1] > documentLineAmount ? documentLineAmount : failedCheck.file_line_range[1] - 1);
                 const startPos = startLine.range.start;
                 const endPos = endLine.range.end;
-                return { range: new vscode.Range(startPos, endPos)};
+                return { range: new vscode.Range(startPos, startLine.range.end)};
             });
             const lineRangesForIconDecorations = failedChecks.map(failedCheck => {
                 const line = document.lineAt(failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1);
@@ -89,24 +88,28 @@ export class CustomPopupService {
             return;
         }
 
+        risksForLine.sort((a, b) => {
+            return severityPriorityMap[b.severity || SEVERITY.UNKNOWN] - severityPriorityMap[a.severity || SEVERITY.UNKNOWN];
+        });
+
+        // const debugFileLineRange = `<span>(${file_line_range[0] === 0 ? 0 : 
+            // file_line_range[0]} - ${file_line_range[1] === 0 ? 0 : file_line_range[1]})</span>`;
         // hover popup markdown generation
         hoverContent.appendMarkdown(`<div>`);
         risksForLine.map((failedCheck, index) => {
             const { severity, short_description, check_name, file_line_range, guideline } = failedCheck;
-            hoverContent.appendMarkdown(`<div><span style="color:${severityColorMap[severity]};">${severity}</span><b> 
-            ${short_description || check_name}</b><span>(${file_line_range[0] === 0 ? 0 : 
-                file_line_range[0]} - ${file_line_range[1] === 0 ? 0 : file_line_range[1]})</span></div>`);
+            hoverContent.appendMarkdown(`<div><img src="${CustomPopupService.severityIconMap[severity]}"/><b>${short_description || check_name}</b></div>`);
             if (failedCheck.description) {
                 hoverContent.appendMarkdown(`<p>${failedCheck.description}<p>`);
             }
             if (guideline) {
-                hoverContent.appendMarkdown(`<a href="${guideline}"><span>Lean more</span></a><br>`);
+                hoverContent.appendMarkdown(`<a href="${guideline}"><span>Learn more</span></a><br>`);
             }
             if (failedCheck.fixed_definition) {
-                hoverContent.appendMarkdown(`<a href="command:extension.fix?${encodeURIComponent(JSON.stringify(failedCheck))}"><span style="color:#1481C1;">Fix</span></a>   `);
+                hoverContent.appendMarkdown(`<a href="command:extension.fix?${encodeURIComponent(JSON.stringify(failedCheck))}"><img src="${vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', 'fix-popup.svg')}"/><span style="color:#ffffff;"> Fix</span></a><span>  </span>`);
             }
             
-            hoverContent.appendMarkdown(`<a href="command:extension.suppress?${encodeURIComponent(JSON.stringify(failedCheck))}"><span style="color:#1481C1;">Suppress</span></a>`);
+            hoverContent.appendMarkdown(`<a href="command:extension.suppress?${encodeURIComponent(JSON.stringify(failedCheck))}"><img src="${vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', 'suppress-popup.svg')}"/><span style="color:#ffffff;"> Suppress</span></a>`);
             
             if (risksForLine.length > 1) {
                 if (index < risksForLine.length - 1) {
