@@ -61,3 +61,18 @@ export enum CHECKOV_RESULT_VIEW_MESSAGE_TYPE {
     SUPPRESS = 'suppress',
     FIX = 'fix',
 };
+
+export const severityPriorityMap: Record<SEVERITY, number> = {
+    [SEVERITY.UNKNOWN]: 0,
+    [SEVERITY.INFO]: 1,
+    [SEVERITY.LOW]: 2,
+    [SEVERITY.MEDIUM]: 3,
+    [SEVERITY.HIGH]: 4,
+    [SEVERITY.CRITICAL]: 5,
+};
+
+export const suppressionInputBoxOptions = {
+    title: 'Suppress Policy',
+    placeHolder: 'Justification',
+    prompt: 'Include a short justification for the suppression',
+};
