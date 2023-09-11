@@ -59,7 +59,7 @@ export class Pip3Executor extends AbstractExecutor {
         if (Array.isArray(result)) {
             for (const output of result) {
                 for (const failedCheck of output.results.failed_checks) {
-                    failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
+                    failedCheck.repo_file_path = failedCheck.repo_file_path.replace(fsPath, '');
                 }
             }
         } else {
