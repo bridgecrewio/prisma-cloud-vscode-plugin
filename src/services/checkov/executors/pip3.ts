@@ -26,7 +26,7 @@ export class Pip3Executor extends AbstractExecutor {
 
         Pip3Executor.pid = process.pid;
         const processOutput = await Pip3Executor.handleProcessOutput(process);
-        Pip3Executor.fixRepoFilePath(processOutput, files);
+        Pip3Executor.fixRepoFilePath(processOutput);
         AbstractExecutor.isScanInProgress = false;
         await reRenderViews();
 
@@ -41,42 +41,30 @@ export class Pip3Executor extends AbstractExecutor {
         }
     }
 
-    private static fixRepoFilePath(result: CheckovOutput, files?: string[]) {
-        if (files?.length) {
-            const workspaceFolders = vscode.workspace.workspaceFolders;
+    private static fixRepoFilePath(result: CheckovOutput) {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
 
-            if (!workspaceFolders) {
-                return;
-            }
-
-            const workspaceFolderPath = workspaceFolders[0].uri.fsPath;
-
-            Pip3Executor.replacePath(result, workspaceFolderPath);
-
+        if (!workspaceFolders) {
             return;
         }
-        
-        Pip3Executor.replacePath(result);
+
+        const workspaceFolderPath = workspaceFolders[0].uri.fsPath;
+
+        Pip3Executor.replacePath(result, workspaceFolderPath);
+
+        return;
     }
 
-    private static replacePath(result: CheckovOutput, fsPath?: string) {
+    private static replacePath(result: CheckovOutput, fsPath: string) {
         if (Array.isArray(result)) {
             for (const output of result) {
                 for (const failedCheck of output.results.failed_checks) {
-                    if (fsPath) {
-                        failedCheck.repo_file_path = failedCheck.repo_file_path.replace(fsPath, '');
-                    } else {
-                        failedCheck.repo_file_path = failedCheck.file_path;
-                    }
+                    failedCheck.repo_file_path = failedCheck.repo_file_path.replace(fsPath, '');
                 }
             }
         } else {
             for (const failedCheck of result.results.failed_checks) {
-                if (fsPath) {
-                    failedCheck.repo_file_path = failedCheck.repo_file_path.replace(fsPath, '');
-                } else {
-                    failedCheck.repo_file_path = failedCheck.file_path;
-                }
+                failedCheck.repo_file_path = failedCheck.repo_file_path.replace(fsPath, '');
             }
         }
     }
