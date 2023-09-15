@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { v4 as uuidv4 } from 'uuid';
 
 import { CHECKOV_INSTALLATION_TYPE, USER_CONFIGURATION_PARAM } from '../../constants';
 import { CheckovInstallation, CheckovOutput, CheckovResult } from '../../types';
@@ -84,7 +85,15 @@ export class CheckovExecutor {
 
     private static processOutput(output: CheckovOutput) {
         if (Array.isArray(output)) {
-            return output.reduce((acc: CheckovResult[], checkType) => acc.concat(checkType?.results.failed_checks ?? []), []);
+            const failedChecks = output.reduce((acc: CheckovResult[], checkType) => acc.concat(checkType?.results.failed_checks ?? []), []);
+            for (const failedCheck of failedChecks) {
+                failedCheck.id = uuidv4();
+            }
+            return failedChecks;
+        }
+
+        for (const failedCheck of output.results?.failed_checks) {
+            failedCheck.id = uuidv4();
         }
 
         return output.results?.failed_checks ?? [];

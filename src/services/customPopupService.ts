@@ -5,11 +5,46 @@ import { SEVERITY, severityPriorityMap, suppressionInputBoxOptions } from '../co
 import { FixService } from './fixService';
 
 const iconsPath = 'static/icons/svg/severities';
+export let lineClickDisposable: vscode.Disposable;
 
 let highlightDecorationType: vscode.TextEditorDecorationType;
 let highlightIcon: vscode.TextEditorDecorationType;
 
 export function registerCustomHighlight(context: vscode.ExtensionContext) {
+    lineClickDisposable = vscode.window.onDidChangeTextEditorSelection(event => {
+        // Check if the event was triggered by a mouse click
+        if (event.selections.length === 1 && event.kind === vscode.TextEditorSelectionChangeKind.Mouse) {
+            const editor = vscode.window.activeTextEditor;
+            if (!editor) {
+                return;
+            }
+
+            const document = vscode.window.activeTextEditor?.document;
+
+            if (!document) {
+                return;
+            }
+    
+            const clickedLineNumber = event.selections[0].active.line;
+            const failedChecks = ResultsService.getByFilePath(document.fileName);
+            const checksForLineNumber = failedChecks.filter(failedCheck => {
+                const { file_line_range } = failedCheck;
+                if (clickedLineNumber === 0) {
+                    return file_line_range[0] === 0 || file_line_range[0] === 1;
+                }
+
+                return clickedLineNumber === file_line_range[0] - 1;
+            });
+
+            // sort so first item has biggest file_line_range
+            checksForLineNumber.sort((a, b) => {
+                return b.file_line_range[1] - a.file_line_range[1];
+            });
+            
+            CustomPopupService.highlightLines(checksForLineNumber[0].id);
+        }
+    });
+
     vscode.languages.registerHoverProvider({ scheme: "file" }, {
 		provideHover: CustomPopupService.provideHover
 	});
@@ -53,19 +88,24 @@ export class CustomPopupService {
     static context: vscode.ExtensionContext;
     static severityIconMap: Record<SEVERITY, vscode.Uri>;
 
-    static highlightLines() {
+    static highlightLines(idToFullyHighlight?: string) {
         const document = vscode.window.activeTextEditor?.document;
         if (document) {
             let startLine: any;
             let endLine: any;
             const failedChecks = ResultsService.getByFilePath(document.fileName);
+            const failedChecksWithoutEmptyRisks = failedChecks.filter(failedCheck => failedCheck.file_line_range[1] !== 0);
             const documentLineAmount = document.lineCount;
-            const lineRangesForLineDecorations = failedChecks.map(failedCheck => {
+            const lineRangesForLineDecorations = failedChecksWithoutEmptyRisks.map(failedCheck => {
+                // if (failedCheck.id === idToFullyHighlight) {
+                //     // debug for full highlighting
+                //     console.log(failedCheck);
+                // }
                 startLine = document.lineAt(failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1);
                 endLine = document.lineAt(failedCheck.file_line_range[1] === 0 ? 0 : failedCheck.file_line_range[1] > documentLineAmount ? documentLineAmount : failedCheck.file_line_range[1] - 1);
                 const startPos = startLine.range.start;
-                const endPos = endLine.range.end;
-                return { range: new vscode.Range(startPos, startLine.range.end)};
+                // const endPos = endLine.range.end; commented for further usage when needed
+                return { range: new vscode.Range(startPos, failedCheck.id === idToFullyHighlight ? endLine.range.end : startLine.range.end)};
             });
             const lineRangesForIconDecorations = failedChecks.map(failedCheck => {
                 const line = document.lineAt(failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1);
