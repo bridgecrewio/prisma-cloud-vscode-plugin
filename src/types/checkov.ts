@@ -1,6 +1,7 @@
 import { SEVERITY } from "../constants";
 
 export type CheckovResult = {
+    id: string;
     bc_check_id: string;
     check_id: string;
     check_class: string;

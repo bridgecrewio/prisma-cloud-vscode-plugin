@@ -6,7 +6,7 @@ import { registerWindowEvents, registerWorkspaceEvents } from './events';
 import { initializeServices } from './services';
 import { registerSidebar } from './views/interface/primarySidebar';
 import { registerCheckovResultView } from './views/interface/checkovResult';
-import { registerCustomHighlight } from './services/customPopupService';
+import { registerCustomHighlight, lineClickDisposable } from './services/customPopupService';
 
 export function activate(context: vscode.ExtensionContext) {	
 	registerCommands(context);
@@ -19,4 +19,8 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.executeCommand(COMMAND.CHECKOV_INSTALL);
 }
 
-export function deactivate() {}
+export function deactivate() {
+	if (lineClickDisposable) {
+		lineClickDisposable.dispose();
+	}
+}
