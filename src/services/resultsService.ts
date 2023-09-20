@@ -94,18 +94,20 @@ export class ResultsService {
         ResultsService.context.workspaceState.update(CONFIG.storage.resultsKey, undefined);
     }
 
-    public static suppressResult(targetResult: CheckovResult) {
+    public static suppressResult(targetResult: CheckovResult, isPackageFile: boolean) {
         const results = ResultsService.get();
         const targetResultIndex = ResultsService.getTargetResultIndex(targetResult);
 
         results.splice(targetResultIndex, 1);
 
-        for (const result of results) {
-            if (result.repo_file_path !== targetResult.repo_file_path || result.file_line_range[0] < targetResult.file_line_range[0]) {
-                continue;
+        if (!isPackageFile) {
+            for (const result of results) {
+                if (result.repo_file_path !== targetResult.repo_file_path || result.file_line_range[0] < targetResult.file_line_range[0]) {
+                    continue;
+                }
+                result.file_line_range[0] = result.file_line_range[0] + 1;
+                result.file_line_range[1] = result.file_line_range[1] + 1;
             }
-            result.file_line_range[0] = result.file_line_range[0] + 1;
-            result.file_line_range[1] = result.file_line_range[1] + 1;
         }
 
         ResultsService.store(results);
