@@ -107,7 +107,8 @@ export class CustomPopupService {
                 // const endPos = endLine.range.end; commented for further usage when needed
                 return { range: new vscode.Range(startPos, failedCheck.id === idToFullyHighlight ? endLine.range.end : startLine.range.end)};
             });
-            const lineRangesForIconDecorations = failedChecks.map(failedCheck => {
+            const notEmptyFailedChecks = failedChecks.filter(failedCheck => failedCheck.file_line_range[1] !== 0);
+            const lineRangesForIconDecorations = notEmptyFailedChecks.map(failedCheck => {
                 const line = document.lineAt(failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1);
                 return new vscode.Range(line.range.start, line.range.start.translate(0, 1));
             });
@@ -121,7 +122,8 @@ export class CustomPopupService {
         const hoverContent = new vscode.MarkdownString();
         const failedChecks = ResultsService.getByFilePath(document.fileName);
         const risksForLine = failedChecks.filter(failedCheck => {
-            return position.line >= (failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1)  && position.line <= (failedCheck.file_line_range[1] === 0 ? 0 : failedCheck.file_line_range[1] - 1);
+            return position.line >= (failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1)  && position.line <= (failedCheck.file_line_range[1] === 0 ? 0 : failedCheck.file_line_range[1] - 1) 
+            && failedCheck.file_line_range[1] !== 0;
         });
 
         if (risksForLine.length === 0) {

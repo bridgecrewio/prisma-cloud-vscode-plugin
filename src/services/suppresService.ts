@@ -13,8 +13,9 @@ export class SuppressService {
         const resultFileName = basename(result.repo_file_path);
         const resultFileUri = SuppressService.resolveResultFileUri(result);
         let resultPosition = SuppressService.resolveResultPosition(result);
+        const isPackageFile = resultFileName === 'package.json';
 
-        if (resultFileName === 'package.json')  {
+        if (isPackageFile)  {
             const suppressPackageJsonService = new SuppressPackageJsonService(resultFileUri.path);
             suppressionComment = await suppressPackageJsonService.wrapWithSuppressionCommentsSection(suppressionComment);
             resultPosition = await suppressPackageJsonService.resolveResultPosition();
@@ -24,7 +25,7 @@ export class SuppressService {
 
         await vscode.workspace.applyEdit(workspaceEdit);
 
-        ResultsService.suppressResult(result);
+        ResultsService.suppressResult(result, isPackageFile);
     }
 
     private static resolveResultFileUri(result: CheckovResult) {
