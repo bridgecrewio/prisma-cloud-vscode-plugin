@@ -7,8 +7,12 @@ import { initializeServices } from './services';
 import { registerSidebar } from './views/interface/primarySidebar';
 import { registerCheckovResultView } from './views/interface/checkovResult';
 import { registerCustomHighlight, lineClickDisposable } from './services/customPopupService';
+import { initializeInstallationId } from './utils';
+import { initializeAnalyticsService, AnalyticsService } from './services/analyticsService';
 
-export function activate(context: vscode.ExtensionContext) {	
+export async function activate(context: vscode.ExtensionContext) {	
+	initializeInstallationId(context);
+	await initializeAnalyticsService(context);
 	registerCommands(context);
 	initializeServices(context);
 	registerWindowEvents();

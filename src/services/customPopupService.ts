@@ -3,6 +3,8 @@ import { ResultsService } from './resultsService';
 import { SuppressService } from './suppresService';
 import { SEVERITY, severityPriorityMap, suppressionInputBoxOptions } from '../constants';
 import { FixService } from './fixService';
+import { AnalyticsService } from './analyticsService';
+import { OpenDocumentation } from '../views/interface/checkovResult/messages/openDocumentation';
 
 const iconsPath = 'static/icons/svg/severities';
 export let lineClickDisposable: vscode.Disposable;
@@ -57,12 +59,18 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
 
 		await SuppressService.suppress(params[0], justification);
         CustomPopupService.highlightLines();
+        await AnalyticsService.trackSuppressFromBaloon();
 	});
 
     vscode.commands.registerCommand('extension.fix', async (...params) => {
         await FixService.fix(params[0]);
         CustomPopupService.highlightLines();
+        await AnalyticsService.trackFixFromBaloon();
 	});
+
+    vscode.commands.registerCommand('extension.openLink', async (...params) => {
+        await OpenDocumentation.handle(params[0]);
+    });
     CustomPopupService.context = context;
     CustomPopupService.severityIconMap = {
         [SEVERITY.INFO]: vscode.Uri.joinPath(CustomPopupService.context.extensionUri, iconsPath, 'info-popup.svg'),
@@ -139,13 +147,13 @@ export class CustomPopupService {
         // hover popup markdown generation
         hoverContent.appendMarkdown(`<div>`);
         risksForLine.map((failedCheck, index) => {
-            const { severity, short_description, check_name, file_line_range, guideline } = failedCheck;
+            const { severity, short_description, check_name, guideline } = failedCheck;
             hoverContent.appendMarkdown(`<div><img src="${CustomPopupService.severityIconMap[severity]}"/><b>${short_description || check_name}</b></div>`);
             if (failedCheck.description) {
                 hoverContent.appendMarkdown(`<p>${failedCheck.description}<p>`);
             }
             if (guideline) {
-                hoverContent.appendMarkdown(`<a href="${guideline}"><span>Learn more</span></a><br>`);
+                hoverContent.appendMarkdown(`<a href="command:extension.openLink?${encodeURIComponent(JSON.stringify(guideline))}"><span>Learn more</span></a><br>`);
             }
             if (failedCheck.fixed_definition) {
                 hoverContent.appendMarkdown(`<a href="command:extension.fix?${encodeURIComponent(JSON.stringify(failedCheck))}"><img src="${vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', 'fix-popup.svg')}"/><span style="color:#ffffff;"> Fix</span></a><span>  </span>`);

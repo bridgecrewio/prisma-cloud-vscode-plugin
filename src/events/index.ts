@@ -3,9 +3,11 @@ import * as vscode from 'vscode';
 import { WORKSPACE_EVENTS, WINDOW_EVENTS } from '../constants';
 import { OnSaveFile } from './onSaveFile';
 import { OnChangeActiveTextEditor } from './onChangeActiveTextEditor';
+import { OnOpenFile } from './onOpenFile';
 
 const workspaceEvents = new Map<WORKSPACE_EVENTS, (document: vscode.TextDocument) => void>([
     [WORKSPACE_EVENTS.SAVE_FILE, OnSaveFile.handle],
+    [WORKSPACE_EVENTS.OPEN_FILE, OnOpenFile.handle],
 ]);
 
 const windowEvents = new Map<WINDOW_EVENTS, (editor?: vscode.TextEditor) => void>([

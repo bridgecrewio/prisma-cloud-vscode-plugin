@@ -43,7 +43,7 @@ export class SuppressService {
     }
 
     private static generateSuppressionComment(result: CheckovResult, justification: string = 'ADD REASON') {
-        const suppressionComment = `checkov:skip=${result.check_id}: ${justification}`;
+        const suppressionComment = `checkov:skip=${result.vulnerability_details.id}: ${justification}`;
         const resultFileExtension = extname(result.repo_file_path);
 
         switch (resultFileExtension) {

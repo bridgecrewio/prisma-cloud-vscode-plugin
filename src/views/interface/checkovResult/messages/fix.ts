@@ -1,6 +1,7 @@
 
 import { CheckovResultWebviewPanel } from '../webviewPanel';
 import { FixService } from '../../../../services';
+import { AnalyticsService } from '../../../../services/analyticsService';
 
 export class FixMessage {
     public static async handle() {
@@ -9,5 +10,6 @@ export class FixMessage {
         }
 
         await FixService.fix(CheckovResultWebviewPanel.checkovResult);
+        await AnalyticsService.trackFixFromPanel();
     }
 };

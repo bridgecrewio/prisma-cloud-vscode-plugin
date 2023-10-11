@@ -45,7 +45,10 @@ export class FiltersViewProvider implements vscode.WebviewViewProvider {
 	}
 
     public async reRenderHtml() {
-        FiltersViewProvider.filtersWebview.webview.html = await this._getHtmlForWebview();
+        if (FiltersViewProvider.filtersWebview) {
+            const newHtml = await this._getHtmlForWebview();
+            FiltersViewProvider.filtersWebview.webview.html = newHtml;
+        }
     }
 
 	private async _getHtmlForWebview() {

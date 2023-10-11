@@ -13,4 +13,5 @@ export type CheckovInstallation = {
 
 export type CheckovResultViewMessage = {
     type: CHECKOV_RESULT_VIEW_MESSAGE_TYPE,
+    url?: string,
 };
