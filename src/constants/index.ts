@@ -9,6 +9,7 @@ export enum COMMAND {
 
 export enum WORKSPACE_EVENTS {
     SAVE_FILE = 'onDidSaveTextDocument',
+    OPEN_FILE = 'onDidOpenTextDocument',
 };
 
 export enum WINDOW_EVENTS {
@@ -60,6 +61,7 @@ export enum CHECKOV_RESULT_CATEGORY {
 export enum CHECKOV_RESULT_VIEW_MESSAGE_TYPE {
     SUPPRESS = 'suppress',
     FIX = 'fix',
+    DOCUMENTATION_CLICK = 'documentationClick',
 };
 
 export const severityPriorityMap: Record<SEVERITY, number> = {
@@ -76,3 +78,35 @@ export const suppressionInputBoxOptions = {
     placeHolder: 'Justification',
     prompt: 'Include a short justification for the suppression',
 };
+
+export enum EVENT_TYPE {
+    ON_FULL_SCAN = 'onFullScan',
+    ON_SUPPRESSION_BALOON = 'onSuppressionBaloon',
+    ON_SUPPRESSION_PANEL = 'onSuppressionPanel',
+    ON_DOCUMENTATION_CLICK = 'onDocumentationClick',
+    ON_FIX_BALOON = 'onFixBaloon',
+    ON_FIX_PANEL = 'onFixPanel',
+    ON_OPEN_FILE_SCAN = 'onOpenFileScan',
+}
+
+export type AnalyticsData = {
+    installationId: string;
+    pluginName: IDE_PLUGINS;
+    eventTime: Date;
+    eventType: EVENT_TYPE;
+    eventData: EventData;
+};
+
+type EventData = {
+    [key: string]: unknown;
+};
+
+export enum IDE_PLUGINS {
+    JETBRAINS = 'jetbrains',
+    VSCODE = 'vscode',
+}
+
+export enum GLOBAL_CONTEXT {
+    JWT_TOKEN = 'jwtToken',
+    INSTALLATION_ID = 'installationId',
+}

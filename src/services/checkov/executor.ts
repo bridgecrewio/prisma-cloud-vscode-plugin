@@ -10,6 +10,7 @@ import { CONFIG } from '../../config';
 import { ShowSettings } from '../../commands/checkov';
 import { AbstractExecutor } from './executors/abstractExecutor';
 import { reRenderViews } from '../../views/interface/utils';
+import { AnalyticsService } from '../analyticsService';
 
 export class CheckovExecutor {
     private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, typeof DockerExecutor | typeof Pip3Executor>([
@@ -39,13 +40,14 @@ export class CheckovExecutor {
         const emptyPrismaSettings = CheckovExecutor.getEmptyPrismaSettings();
 
         if (!emptyPrismaSettings.length) {
-            vscode.window.withProgress({ location: vscode.ProgressLocation.Notification }, async (progress) => {
+            await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification }, async (progress) => {
                 let checkovOutput: CheckovOutput;
                 StatusBar.progress();
                 progress.report({
                     message: `Prisma Cloud is scanning your ${targetFiles ? 'files: ' + targetFiles.join(',') : 'project'}`,
                 });
 
+                const startTime = new Date();
                 try {
                     checkovOutput = await executor.execute(installation, targetFiles);
                 } catch (e) {
@@ -54,12 +56,17 @@ export class CheckovExecutor {
                     StatusBar.reset();
                     return;
                 }
-    
+                const endTime = new Date();
                 const results = CheckovExecutor.processOutput(checkovOutput);
     
                 if (targetFiles) {
                     ResultsService.storeByFiles(targetFiles, results);
                 } else {
+                    await AnalyticsService.trackFullScanEvent({ 
+                        scanTime: endTime.getTime() - startTime.getTime(),
+                        executorType: installation.type,
+                        issuesFound: results.length,
+                    });
                     vscode.window.showInformationMessage(`Prisma Cloud has detected ${results.length} code security issues in your project`);
                     ResultsService.store(results);
                 }

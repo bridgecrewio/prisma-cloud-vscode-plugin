@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { CheckovResultWebviewPanel } from '../webviewPanel';
 import { SuppressService } from '../../../../services';
 import { suppressionInputBoxOptions } from '../../../../constants';
+import { AnalyticsService } from '../../../../services/analyticsService';
 
 export class SuppressMessage {
     public static async handle() {
@@ -17,6 +18,7 @@ export class SuppressMessage {
         }
 
         SuppressService.suppress(CheckovResultWebviewPanel.checkovResult, justification);
+        await AnalyticsService.trackSuppressFromPanel();
 
         CheckovResultWebviewPanel.webviewPanel.dispose();
     }

@@ -1,5 +1,7 @@
 import { exec, ExecOptions } from 'child_process';
+import { v4 as uuidv4 } from 'uuid';
 import * as vscode from 'vscode';
+import { GLOBAL_CONTEXT } from '../constants';
 
 export interface DiagnosticReferenceCode {
     target: vscode.Uri;
@@ -29,4 +31,13 @@ export const createDiagnosticKey = (diagnostic: vscode.Diagnostic): string => {
         checkId = (diagnostic.code as DiagnosticReferenceCode).value;
     }
     return `${checkId}-${diagnostic.range.start.line + 1}`;
+};
+
+export const initializeInstallationId = (context: vscode.ExtensionContext) => {
+    const installationId = context.globalState.get(GLOBAL_CONTEXT.INSTALLATION_ID);
+    if (installationId) {
+        return;
+    }
+
+    context.globalState.update(GLOBAL_CONTEXT.INSTALLATION_ID, uuidv4());
 };

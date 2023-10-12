@@ -116,6 +116,9 @@
     function onFix() {
         vscode.postMessage({ type: 'fix' });
     }
+    function onDocumentationClick(url) {
+        vscode.postMessage({ type: 'documentationClick', url: url });
+    }
   </script>
 </body>
 </html>
