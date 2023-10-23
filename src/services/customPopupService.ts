@@ -5,6 +5,7 @@ import { SEVERITY, severityPriorityMap, suppressionInputBoxOptions } from '../co
 import { FixService } from './fixService';
 import { AnalyticsService } from './analyticsService';
 import { OpenDocumentation } from '../views/interface/checkovResult/messages/openDocumentation';
+import { CheckovResultWebviewPanel } from '../views/interface/checkovResult';
 
 const iconsPath = 'static/icons/svg/severities';
 export let lineClickDisposable: vscode.Disposable;
@@ -158,8 +159,9 @@ export class CustomPopupService {
             if (failedCheck.fixed_definition) {
                 hoverContent.appendMarkdown(`<a href="command:extension.fix?${encodeURIComponent(JSON.stringify(failedCheck))}"><img src="${vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', 'fix-popup.svg')}"/><span style="color:#ffffff;"> Fix</span></a><span>  </span>`);
             }
-            
-            hoverContent.appendMarkdown(`<a href="command:extension.suppress?${encodeURIComponent(JSON.stringify(failedCheck))}"><img src="${vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', 'suppress-popup.svg')}"/><span style="color:#ffffff;"> Suppress</span></a>`);
+            if (CheckovResultWebviewPanel.isSuppressionVisible(failedCheck)) {
+                hoverContent.appendMarkdown(`<a href="command:extension.suppress?${encodeURIComponent(JSON.stringify(failedCheck))}"><img src="${vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', 'suppress-popup.svg')}"/><span style="color:#ffffff;"> Suppress</span></a>`);
+            }
             
             if (risksForLine.length > 1) {
                 if (index < risksForLine.length - 1) {
