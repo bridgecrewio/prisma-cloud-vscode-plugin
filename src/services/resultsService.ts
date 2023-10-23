@@ -94,7 +94,7 @@ export class ResultsService {
         ResultsService.context.workspaceState.update(CONFIG.storage.resultsKey, undefined);
     }
 
-    public static suppressResult(targetResult: CheckovResult, isPackageFile: boolean) {
+    public static suppressResult(targetResult: CheckovResult, isPackageFile: boolean, skipRiskLineShifting: boolean) {
         const results = ResultsService.get();
         const targetResultIndex = ResultsService.getTargetResultIndex(targetResult);
 
@@ -102,6 +102,9 @@ export class ResultsService {
 
         if (!isPackageFile) {
             for (const result of results) {
+                if (skipRiskLineShifting && result.file_line_range[0] <= targetResult.file_line_range[0]) {
+                    continue;
+                }
                 if (result.repo_file_path !== targetResult.repo_file_path || result.file_line_range[0] < targetResult.file_line_range[0]) {
                     continue;
                 }

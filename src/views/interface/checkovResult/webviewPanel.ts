@@ -5,6 +5,7 @@ import { CheckovResult } from '../../../types';
 import { MessageHandlersFactory } from './messages';
 import { CHECKOV_RESULT_CATEGORY } from '../../../constants';
 import { AbstractExecutor } from '../../../services/checkov/executors/abstractExecutor';
+import { CategoriesService } from '../../../services';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
@@ -62,6 +63,38 @@ export class CheckovResultWebviewPanel {
         }
     }
 
+    public static isSuppressionVisible(result: CheckovResult): boolean {
+        const { check_id, vulnerability_details } = result;
+        if (CategoriesService.isIaCRisk(check_id)) {
+            return true;
+        }
+
+        if (CategoriesService.isSCARisk(check_id)) {
+            if (CheckovResultWebviewPanel.restrictScaForFile(result)) {
+                return false;
+            }
+            return Boolean(vulnerability_details?.id) || Boolean(check_id);
+        }
+
+        if (CategoriesService.isLicensesRisk(check_id) || CategoriesService.isSecretsRisk(check_id)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static restrictScaForFile(result: CheckovResult): boolean {
+        const restrictedFiles = ['.bicep', '.tf', '.yml'];
+
+        for (const file of restrictedFiles) {
+            if (result.file_abs_path.endsWith(file)) {
+                return true;
+            }
+        }
+
+        return false;
+    } 
+
     private static async getHtmlTemplate(category: CHECKOV_RESULT_CATEGORY) {
         const { extensionUri } = CheckovResultWebviewPanel.context;
         const [rootTemplate, resultTempalte] = await Promise.all([
@@ -100,6 +133,7 @@ export class CheckovResultWebviewPanel {
             vulnerabilityDetailsId: result.vulnerability_details?.id,
             approvedSPDX: result.check_id === 'BC_LIC_1' ? 'true' : 'false',
             disabledClass: AbstractExecutor.isScanInProgress ? 'disabledDiv' : '',
+            suppressActionState: CheckovResultWebviewPanel.isSuppressionVisible(result) ? 'visible' : 'hidden',
         };
 
         for (const htmlParam of htmlParams) {
