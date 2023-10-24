@@ -50,7 +50,7 @@ export class CheckovExecutor {
                 const startTime = new Date();
                 try {
                     checkovOutput = await executor.execute(installation, targetFiles);
-                } catch (e) {
+                } catch (e: any) {
                     AbstractExecutor.isScanInProgress = false;
                     await reRenderViews();
                     StatusBar.reset();
