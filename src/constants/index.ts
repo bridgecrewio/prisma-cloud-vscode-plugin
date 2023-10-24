@@ -1,4 +1,5 @@
 export const dockerfileName = 'Dockerfile';
+export const REPO_ID = 'vscode/extension';
 
 export enum COMMAND {
     CHECKOV_INSTALL = 'checkov.install',

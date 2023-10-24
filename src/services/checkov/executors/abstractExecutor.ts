@@ -3,7 +3,7 @@ import { ChildProcessWithoutNullStreams } from 'child_process';
 import * as vscode from 'vscode';
 
 import { CONFIG } from '../../../config';
-import { CHECKOV_INSTALLATION_TYPE } from '../../../constants';
+import { CHECKOV_INSTALLATION_TYPE, REPO_ID } from '../../../constants';
 import { CheckovInstallation, CheckovOutput } from '../../../types';
 
 export abstract class AbstractExecutor {
@@ -21,6 +21,7 @@ export abstract class AbstractExecutor {
 
     protected static getCheckovCliParams(installation: CheckovInstallation, files?: string[]) {
         const checkovCliParams = [
+            '--repo-id', REPO_ID,
             '--quiet',
             '--soft-fail',
             '--output', 'json',
