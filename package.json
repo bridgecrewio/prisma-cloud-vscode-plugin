@@ -2,6 +2,7 @@
   "name": "prisma-cloud-vscode-plugin",
   "displayName": "prisma-cloud-vscode-plugin",
   "publisher": "prisma-cloud",
+  "repository": "https://github.com/bridgecrewio/prisma-cloud-vscode-plugin",
   "icon": "static/icons/svg/prisma.png",
   "description": "",
   "version": "0.0.1",
