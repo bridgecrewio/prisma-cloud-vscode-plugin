@@ -15,14 +15,19 @@ export class AnalyticsService {
     static async setAnalyticsJwtToken() {
         const { secretKey, accessKey } = CONFIG.userConfig;
         if (secretKey && accessKey) {
-            const loginUrl = CONFIG.userConfig.prismaURL + '/login';
-            const response = await axios.post(loginUrl, {
-                username: accessKey,
-                password: secretKey,
-            });
-
-            if (response.status === 200) {
-                await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, response.data.token);
+            try {
+                const loginUrl = CONFIG.userConfig.prismaURL + '/login';
+                const response = await axios.post(loginUrl, {
+                    username: accessKey,
+                    password: secretKey,
+                });
+    
+                if (response.status === 200) {
+                    await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, response.data.token);
+                }
+            } catch (error: any) {
+                console.log('Authorization on prisma was failed: ', error.message);
+                await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, undefined);
             }
         }
     }
