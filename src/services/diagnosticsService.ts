@@ -49,7 +49,7 @@ export class DiagnosticsService {
                     failedCheck.guideline?.startsWith('http') ? 
                         {
                             target: vscode.Uri.parse(failedCheck.guideline),
-                            value: 'Learn more'
+                            value: 'Documentation'
                         } : `${failedCheck.guideline ? `: ${failedCheck.guideline}` : ''}`;
                 const diagnostic: vscode.Diagnostic = {
                     message: `${failedCheck.severity ? (failedCheck.severity + ': ') : ''}${failedCheck.short_description || failedCheck.check_name}`,

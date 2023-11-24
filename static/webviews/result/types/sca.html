@@ -6,6 +6,52 @@
     <p class="description">{{description}}</p>
 </section>
 <section>
+  <div class="details">
+      <span>Vulnerable Package:</span>
+      <p>{{vulnerability_details.package_name}}</p>
+    </div>
+    <div class="details">
+      <span>Vulnerable Package Version:</span>
+      <p>{{vulnerability_details.package_version}}</p>
+    </div>
+    <div class="details">
+      <span>Fixed Version:</span>
+      <p>{{vulnerability_details.lowest_fixed_version}}</p>
+    </div>
+    <div class="details">
+      <span>Root Package:</span>
+      <p>{{vulnerability_details.root_package_name}}</p>
+    </div>
+    <div class="details">
+      <span>Root Package Version:</span>
+      <p>{{vulnerability_details.root_package_version}}</p>
+    </div>
+    <div class="details">
+      <span>Root Package Fix Version:</span>
+      <p>{{vulnerability_details.root_package_fix_version}}</p>
+    </div>
+    <div class="details">
+      <span>CVE ID:</span>
+      <p>{{vulnerability_details.id}}</p>
+    </div>
+    <div class="details">
+      <span>CVSS:</span>
+      <p>{{vulnerability_details.cvss}}</p>
+    </div>
+    <div class="details">
+      <span>Published:</span>
+      <p>{{vulnerability_details.published_date}}</p>
+    </div>
+    <div class="details">
+      <span>Vector:</span>
+      <p>{{vulnerability_details.vector}}</p>
+    </div>
+    <div class="details">
+      <span>Description:</span>
+      <p>{{short_description}}</p>
+    </div>
+</section>
+<section>
     <table class="code">
         <thead>
             <tr>
@@ -22,52 +68,6 @@
     </table>
 </section>
 <section>
-    <div class="details">
-        <span>Vulnerable Package:</span>
-        <p>{{vulnerability_details.package_name}}</p>
-      </div>
-      <div class="details">
-        <span>Vulnerable Package Version:</span>
-        <p>{{vulnerability_details.package_version}}</p>
-      </div>
-      <div class="details">
-        <span>Fixed Version:</span>
-        <p>{{vulnerability_details.lowest_fixed_version}}</p>
-      </div>
-      <div class="details">
-        <span>Root Package:</span>
-        <p>{{vulnerability_details.root_package_name}}</p>
-      </div>
-      <div class="details">
-        <span>Root Package Version:</span>
-        <p>{{vulnerability_details.root_package_version}}</p>
-      </div>
-      <div class="details">
-        <span>Root Package Fix Version:</span>
-        <p>{{vulnerability_details.root_package_fix_version}}</p>
-      </div>
-      <div class="details">
-        <span>CVE ID:</span>
-        <p>{{vulnerability_details.id}}</p>
-      </div>
-      <div class="details">
-        <span>CVSS:</span>
-        <p>{{vulnerability_details.cvss}}</p>
-      </div>
-      <div class="details">
-        <span>Published:</span>
-        <p>{{vulnerability_details.published_date}}</p>
-      </div>
-      <div class="details">
-        <span>Vector:</span>
-        <p>{{vulnerability_details.vector}}</p>
-      </div>
-      <div class="details">
-        <span>Description:</span>
-        <p>{{short_description}}</p>
-      </div>
-</section>
-<section>
     <div class="actions">
         <div class="action {{fixActionState}}" onclick="onFix()">
             <img src="{{fixIconUri}}" alt="fix">
@@ -79,7 +79,7 @@
         </div>
         <a target="_blank" class="action {{guidelineActionState}}" onclick="onDocumentationClick('{{guideline}}')">
             <img src="{{guidelineIconUri}}" alt="suppress">
-            <span>Guideline</span>
+            <span>Documentation</span>
         </div>
     </div>
 </section>

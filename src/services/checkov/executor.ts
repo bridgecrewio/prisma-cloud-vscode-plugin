@@ -51,6 +51,7 @@ export class CheckovExecutor {
                 try {
                     checkovOutput = await executor.execute(installation, targetFiles);
                 } catch (e: any) {
+                    console.log(`The Checkov execution was failed due to: ${e.message}`);
                     AbstractExecutor.isScanInProgress = false;
                     await reRenderViews();
                     StatusBar.reset();
