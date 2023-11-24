@@ -72,7 +72,7 @@ export class AnalyticsService {
             }
         }
 
-        throw new Error('There are no installationId or jwtToken for sending analytics data');
+        console.log('There are no installationId or jwtToken for sending analytics data');
     }
 
     static async trackFullScanEvent(eventData: Record<string, any>) {

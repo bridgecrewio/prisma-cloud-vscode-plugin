@@ -6,6 +6,20 @@
     <p class="description">{{description}}</p>
 </section>
 <section>
+    <div class="details">
+        <span>License Type:</span>
+        <p>{{vulnerability_details.license}}</p>
+    </div>
+    <div class="details">
+        <span>Approved SPDX:</span>
+        <p>{{approvedSPDX}}</p>
+    </div>
+    <div class="details">
+        <span>Description:</span>
+        <p>{{short_description}}</p>
+    </div>
+</section>
+<section>
     <table class="code">
         <thead>
             <tr>
@@ -23,20 +37,6 @@
     </table>
 </section>
 <section>
-    <div class="details">
-        <span>License Type:</span>
-        <p>{{vulnerability_details.license}}</p>
-    </div>
-    <div class="details">
-        <span>Approved SPDX:</span>
-        <p>{{approvedSPDX}}</p>
-    </div>
-    <div class="details">
-        <span>Description:</span>
-        <p>{{short_description}}</p>
-    </div>
-</section>
-<section>
     <div class="actions">
         <div class="action {{suppressActionState}}" onclick="onSuppress()">
             <img src="{{suppressIconUri}}" alt="suppress">
@@ -44,7 +44,7 @@
         </div>
         <a target="_blank" class="action {{guidelineActionState}}" onclick="onDocumentationClick('{{guideline}}')">
             <img src="{{guidelineIconUri}}" alt="suppress">
-            <span>Guideline</span>
+            <span>Documentation</span>
         </div>
     </div>
 </section>

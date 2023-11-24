@@ -149,18 +149,18 @@ export class CustomPopupService {
         hoverContent.appendMarkdown(`<div>`);
         risksForLine.map((failedCheck, index) => {
             const { severity, short_description, check_name, guideline } = failedCheck;
-            hoverContent.appendMarkdown(`<div><img src="${CustomPopupService.severityIconMap[severity]}"/><b>${short_description || check_name}</b></div>`);
+            hoverContent.appendMarkdown(`<div><img src="${CustomPopupService.severityIconMap[severity]}"/><b>${short_description || check_name} (Prisma Cloud)</b></div>`);
             if (failedCheck.description) {
                 hoverContent.appendMarkdown(`<p>${failedCheck.description}<p>`);
-            }
-            if (guideline) {
-                hoverContent.appendMarkdown(`<a href="command:extension.openLink?${encodeURIComponent(JSON.stringify(guideline))}"><span>Learn more</span></a><br>`);
             }
             if (failedCheck.fixed_definition) {
                 hoverContent.appendMarkdown(`<a href="command:extension.fix?${encodeURIComponent(JSON.stringify(failedCheck))}"><img src="${vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', 'fix-popup.svg')}"/><span style="color:#ffffff;"> Fix</span></a><span>  </span>`);
             }
             if (CheckovResultWebviewPanel.isSuppressionVisible(failedCheck)) {
                 hoverContent.appendMarkdown(`<a href="command:extension.suppress?${encodeURIComponent(JSON.stringify(failedCheck))}"><img src="${vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', 'suppress-popup.svg')}"/><span style="color:#ffffff;"> Suppress</span></a>`);
+            }
+            if (guideline) {
+                hoverContent.appendMarkdown(`<a href="command:extension.openLink?${encodeURIComponent(JSON.stringify(guideline))}"><span>   Documentation</span></a>`);
             }
             
             if (risksForLine.length > 1) {
