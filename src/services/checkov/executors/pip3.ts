@@ -20,6 +20,8 @@ export class Pip3Executor extends AbstractExecutor {
             shell: true,
             env: {
                 PRISMA_API_URL: CONFIG.userConfig.prismaURL,
+                BC_SOURCE: 'vscode',
+                BC_SOURCE_VERSION: '0.0.1',
             },
             detached: true,
         });
