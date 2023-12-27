@@ -33,13 +33,6 @@ export class FiltersViewProvider implements vscode.WebviewViewProvider {
 					ResultsService.addFilter(data.payload);
                     this.reRenderHtml();
                     return;
-                case 'clickScanButton':
-                    if (AbstractExecutor.isScanInProgress) {
-                        vscode.commands.executeCommand(COMMAND.CHECKOV_STOP_EXECUTE);
-                    } else {
-                        vscode.commands.executeCommand(COMMAND.CHECKOV_EXECUTE);
-                    }
-                    return;
 			}
 		});
 	}

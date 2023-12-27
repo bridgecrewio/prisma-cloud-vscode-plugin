@@ -57,7 +57,6 @@
     <button class="filterButton resetButtonStyles {{mediumFilterActive}}" data-severity="{{severityMedium}}">M</button>
     <button class="filterButton resetButtonStyles {{highFilterActive}}" data-severity="{{severityHigh}}">H</button>
     <button class="filterButton resetButtonStyles {{criticalFilterActive}}" data-severity="{{severityCritical}}">C</button>
-    <button id="runScan" class="runScan resetButtonStyles {{scanButtonClass}}" title="Scan Project"></button>
   </div>
   <script>
     const vscode = acquireVsCodeApi();
@@ -72,10 +71,6 @@
             }});
         });
     }
-
-    const runScanEventListener = runScanButton.addEventListener('click', () => {
-        vscode.postMessage({ command: 'clickScanButton' });
-    });
   </script>
 </body>
 </html>

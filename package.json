@@ -62,9 +62,22 @@
       },
       {
         "command": "checkov.execute",
-        "title": "Checkov: Execute"
+        "title": "Checkov: Execute",
+        "icon": {
+          "light": "./static/icons/svg/play-sidebar.svg",
+          "dark": "./static/icons/svg/play-sidebar.svg"
+        }
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "checkov.execute",
+          "group": "navigation",
+          "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses"
+        }
+      ]
+    },
     "configuration": {
       "title": "Prisma Cloud",
       "properties": {
