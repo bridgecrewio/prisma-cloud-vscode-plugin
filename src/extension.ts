@@ -8,7 +8,7 @@ import { registerSidebar } from './views/interface/primarySidebar';
 import { registerCheckovResultView } from './views/interface/checkovResult';
 import { registerCustomHighlight, lineClickDisposable } from './services/customPopupService';
 import { initializeInstallationId } from './utils';
-import { initializeAnalyticsService, AnalyticsService } from './services/analyticsService';
+import { initializeAnalyticsService } from './services/analyticsService';
 
 export async function activate(context: vscode.ExtensionContext) {	
 	initializeInstallationId(context);
