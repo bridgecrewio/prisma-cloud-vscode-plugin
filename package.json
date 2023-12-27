@@ -73,7 +73,8 @@
       "view/title": [
         {
           "command": "checkov.execute",
-          "group": "navigation"
+          "group": "navigation",
+          "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses"
         }
       ]
     },
