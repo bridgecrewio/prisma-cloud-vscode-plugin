@@ -67,12 +67,25 @@
           "light": "./static/icons/svg/play-sidebar.svg",
           "dark": "./static/icons/svg/play-sidebar.svg"
         }
+      },
+      {
+        "command": "filters.open",
+        "title": "Open filters",
+        "icon": {
+          "light": "./static/icons/svg/filter.svg",
+          "dark": "./static/icons/svg/filter.svg"
+        }
       }
     ],
     "menus": {
       "view/title": [
         {
           "command": "checkov.execute",
+          "group": "navigation",
+          "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses"
+        },
+        {
+          "command": "filters.open",
           "group": "navigation",
           "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses"
         }
