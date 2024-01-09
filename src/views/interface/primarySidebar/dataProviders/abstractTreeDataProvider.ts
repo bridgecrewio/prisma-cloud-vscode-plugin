@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { TreeService } from '../services/treeService';
 import { CheckovResult } from '../../../../types';
 import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
-import { FilesService } from '../../../../services';
+import { CategoriesService, FilesService } from '../../../../services';
 import { CheckovResultWebviewPanel } from '../../checkovResult';
 
 export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
@@ -53,8 +53,18 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
 
     console.log(result);
 
+    const isIaC = CategoriesService.isIaCRisk(result.check_id);
+
+    if (isIaC) {
+      const fetchedDescription = await CheckovResultWebviewPanel.fetchDescription(result.bc_check_id);
+
+      if (!result.description && fetchedDescription) {
+        result.description = fetchedDescription;
+      }
+    }
+
     const openedTextEditor = await FilesService.openFile(result.repo_file_path, result.file_line_range[0]);
-    CheckovResultWebviewPanel.show(this.category, result, openedTextEditor);
+    await CheckovResultWebviewPanel.show(this.category, result, openedTextEditor);
   } 
 };
 
