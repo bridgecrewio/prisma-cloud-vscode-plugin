@@ -11,6 +11,7 @@ import { AnalyticsService } from '../../../services/analyticsService';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
+    private static retryCount: number = 0;
     public static currentCategory: CHECKOV_RESULT_CATEGORY;
     public static webviewPanel?: vscode.WebviewPanel;
     public static checkovResult?: CheckovResult;
@@ -151,7 +152,6 @@ export class CheckovResultWebviewPanel {
     }
 
     public static async fetchDescription(checkId: string): Promise<string | undefined> {
-        let retryCount = 0;
         const jwtToken = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
 
         try {
@@ -159,15 +159,16 @@ export class CheckovResultWebviewPanel {
                 'Authorization': jwtToken } });
             
                 if (response.status === 200) {
+                    CheckovResultWebviewPanel.retryCount = 0;
                     return response.data.description;
                 }
         } catch (e: any) {
-            if (retryCount === 3) {
+            if (CheckovResultWebviewPanel.retryCount === 3) {
                 throw new Error('Unable to fetch description: ' + e.message);
             }
 
             if (e.response.status === 403) {
-                retryCount++;
+                CheckovResultWebviewPanel.retryCount++;
                 await AnalyticsService.setAnalyticsJwtToken();
                 return await CheckovResultWebviewPanel.fetchDescription(checkId);
             }
