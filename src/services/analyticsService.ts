@@ -9,6 +9,7 @@ export const initializeAnalyticsService = async (context: vscode.ExtensionContex
 };
 
 export class AnalyticsService {
+    private static retryCount: number = 0;
     static analyticsEndpoint: string = CONFIG.userConfig.prismaURL + '/bridgecrew/api/v1/plugins-analytics';
     static applicationContext: vscode.ExtensionContext;
 
@@ -33,7 +34,6 @@ export class AnalyticsService {
     }
 
     static async postAnalyticsEvent(eventType: EVENT_TYPE, eventData: Record<string, any>) {
-        let retryCount = 0;
         const installationId = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.INSTALLATION_ID);
         const jwtToken = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
 
@@ -51,17 +51,18 @@ export class AnalyticsService {
                     'Authorization': jwtToken } });
 
                 if (response.status === 200) {
+                    AnalyticsService.retryCount = 0;
                     console.log('Sent analytics successfully');
                 }
 
                 return;
             } catch (e: any) {
-                if (retryCount === 5) {
+                if (AnalyticsService.retryCount === 5) {
                     throw new Error('Analytics data can\'t be send with error: ' + e.message);
                 }
 
                 if (e.response.status === 403) {
-                    retryCount++;
+                    AnalyticsService.retryCount++;
                     await AnalyticsService.setAnalyticsJwtToken();
                     await AnalyticsService.postAnalyticsEvent(eventType, eventData);
                     return;

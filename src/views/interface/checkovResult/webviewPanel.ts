@@ -1,14 +1,17 @@
 import * as vscode from 'vscode';
+import axios from 'axios';
 
 import { CONFIG } from '../../../config';
 import { CheckovResult } from '../../../types';
 import { MessageHandlersFactory } from './messages';
-import { CHECKOV_RESULT_CATEGORY } from '../../../constants';
+import { CHECKOV_RESULT_CATEGORY, GLOBAL_CONTEXT } from '../../../constants';
 import { AbstractExecutor } from '../../../services/checkov/executors/abstractExecutor';
 import { CategoriesService } from '../../../services';
+import { AnalyticsService } from '../../../services/analyticsService';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
+    private static retryCount: number = 0;
     public static currentCategory: CHECKOV_RESULT_CATEGORY;
     public static webviewPanel?: vscode.WebviewPanel;
     public static checkovResult?: CheckovResult;
@@ -131,6 +134,7 @@ export class CheckovResultWebviewPanel {
             fixActionState: result.fixed_definition ? 'available' : 'unavailable',
             guidelineActionState: result.guideline ? 'available' : 'unavailable',
             vulnerabilityDetailsId: result.vulnerability_details?.id,
+            description: result.description || '',
             approvedSPDX: result.check_id === 'BC_LIC_1' ? 'true' : 'false',
             disabledClass: AbstractExecutor.isScanInProgress ? 'disabledDiv' : '',
             suppressActionState: CheckovResultWebviewPanel.isSuppressionVisible(result) ? 'visible' : 'hidden',
@@ -147,6 +151,31 @@ export class CheckovResultWebviewPanel {
         return htmlTemplate;
     }
 
+    public static async fetchDescription(checkId: string, retryCount = 0): Promise<string | undefined> {
+        const jwtToken = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
+
+        try {
+            const response = await axios.get(CheckovResultWebviewPanel.getDescriptionsEndpoint(checkId), { headers: {
+                'Authorization': jwtToken } });
+            
+                if (response.status === 200) {
+                    return response.data.description;
+                }
+        } catch (e: any) {
+            if (retryCount === 3) {
+                throw new Error('Unable to fetch description: ' + e.message);
+            }
+
+            if (e.response.status === 403) {
+                await AnalyticsService.setAnalyticsJwtToken();
+                return await CheckovResultWebviewPanel.fetchDescription(checkId, retryCount + 1);
+            }
+
+            console.log('Error: ' + e.message, e);
+            return;
+        }
+    }
+
     private static renderCodeBlock(result: CheckovResult) {
         const codeBlock = result.code_block.map(([ line, code ]) => `<tr class="original"><td>${line}</td><td>${code}</td></tr>`);
 
@@ -155,5 +184,9 @@ export class CheckovResultWebviewPanel {
         }
 
         return codeBlock.join('');
+    }
+
+    private static getDescriptionsEndpoint(checkId: string) {
+        return CONFIG.userConfig.prismaURL + `/bridgecrew/api/v1/violations/${checkId}/description`;
     }
 };
