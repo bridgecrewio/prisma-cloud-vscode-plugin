@@ -85,12 +85,28 @@
           "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses"
         },
         {
-          "command": "filters.open",
-          "group": "navigation",
-          "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses"
+          "submenu": "filters",
+          "group": "navigation"
+        }
+      ],
+      "filters": [
+        {
+          "command": "git.stageAll",
+          "group": "navigation"
+        },
+        {
+          "command": "filter.info",
+          "group": "navigation"
         }
       ]
     },
+    "submenus": [
+      {
+        "id": "filters",
+        "label": "Filters",
+        "icon": "./static/icons/svg/filter.svg"
+      }
+    ],
     "configuration": {
       "title": "Prisma Cloud",
       "properties": {
