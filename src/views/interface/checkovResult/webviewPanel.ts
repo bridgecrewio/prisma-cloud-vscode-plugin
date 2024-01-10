@@ -151,7 +151,7 @@ export class CheckovResultWebviewPanel {
         return htmlTemplate;
     }
 
-    public static async fetchDescription(checkId: string): Promise<string | undefined> {
+    public static async fetchDescription(checkId: string, retryCount = 0): Promise<string | undefined> {
         const jwtToken = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
 
         try {
@@ -159,18 +159,16 @@ export class CheckovResultWebviewPanel {
                 'Authorization': jwtToken } });
             
                 if (response.status === 200) {
-                    CheckovResultWebviewPanel.retryCount = 0;
                     return response.data.description;
                 }
         } catch (e: any) {
-            if (CheckovResultWebviewPanel.retryCount === 3) {
+            if (retryCount === 3) {
                 throw new Error('Unable to fetch description: ' + e.message);
             }
 
             if (e.response.status === 403) {
-                CheckovResultWebviewPanel.retryCount++;
                 await AnalyticsService.setAnalyticsJwtToken();
-                return await CheckovResultWebviewPanel.fetchDescription(checkId);
+                return await CheckovResultWebviewPanel.fetchDescription(checkId, retryCount + 1);
             }
 
             console.log('Error: ' + e.message, e);
