@@ -33,11 +33,6 @@
     "views": {
       "prisma-cloud": [
         {
-          "type": "webview",
-          "id": "filters",
-          "name": "Filters"
-        },
-        {
           "id": "iac-misconfiguration",
           "name": "IaC Misconfiguration"
         },
@@ -69,12 +64,44 @@
         }
       },
       {
-        "command": "filters.open",
-        "title": "Open filters",
-        "icon": {
-          "light": "./static/icons/svg/filter.svg",
-          "dark": "./static/icons/svg/filter.svg"
-        }
+        "command": "filter.infoEnable",
+        "title": "Info"
+      },
+      {
+        "command": "filter.infoDisable",
+        "title": "✓ Info"
+      },
+      {
+        "command": "filter.lowEnable",
+        "title": "Low"
+      },
+      {
+        "command": "filter.lowDisable",
+        "title": "✓ Low"
+      },
+      {
+        "command": "filter.mediumEnable",
+        "title": "Medium"
+      },
+      {
+        "command": "filter.mediumDisable",
+        "title": "✓ Medium"
+      },
+      {
+        "command": "filter.highEnable",
+        "title": "High"
+      },
+      {
+        "command": "filter.highDisable",
+        "title": "✓ High"
+      },
+      {
+        "command": "filter.criticalEnable",
+        "title": "Critical"
+      },
+      {
+        "command": "filter.criticalDisable",
+        "title": "✓ Critical"
       }
     ],
     "menus": {
@@ -91,12 +118,54 @@
       ],
       "filters": [
         {
-          "command": "git.stageAll",
-          "group": "navigation"
+          "command": "filter.infoEnable",
+          "group": "navigation@1",
+          "when": "!vscode:isINFOFilterEnabled"
         },
         {
-          "command": "filter.info",
-          "group": "navigation"
+          "command": "filter.infoDisable",
+          "group": "navigation@2",
+          "when": "vscode:isINFOFilterEnabled"
+        },
+        {
+          "command": "filter.lowEnable",
+          "group": "navigation@3",
+          "when": "!vscode:isLOWFilterEnabled"
+        },
+        {
+          "command": "filter.lowDisable",
+          "group": "navigation@3",
+          "when": "vscode:isLOWFilterEnabled"
+        },
+        {
+          "command": "filter.mediumEnable",
+          "group": "navigation@4",
+          "when": "!vscode:isMEDIUMFilterEnabled"
+        },
+        {
+          "command": "filter.mediumDisable",
+          "group": "navigation@5",
+          "when": "vscode:isMEDIUMFilterEnabled"
+        },
+        {
+          "command": "filter.highEnable",
+          "group": "navigation@6",
+          "when": "!vscode:isHIGHFilterEnabled"
+        },
+        {
+          "command": "filter.highDisable",
+          "group": "navigation@7",
+          "when": "vscode:isHIGHFilterEnabled"
+        },
+        {
+          "command": "filter.criticalEnable",
+          "group": "navigation@8",
+          "when": "!vscode:isCRITICALFilterEnabled"
+        },
+        {
+          "command": "filter.criticalDisable",
+          "group": "navigation@9",
+          "when": "vscode:isCRITICALFilterEnabled"
         }
       ]
     },
