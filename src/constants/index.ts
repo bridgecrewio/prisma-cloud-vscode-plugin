@@ -6,6 +6,16 @@ export enum COMMAND {
     CHECKOV_EXECUTE = 'checkov.execute',
     SHOW_PLUGIN_SETTINGS = 'checkov.showPluginSettings',
     CHECKOV_STOP_EXECUTE = 'checkov.stop.execute',
+    FILTER_INFO_ENABLE = 'filter.infoEnable',
+    FILTER_INFO_DISABLE = 'filter.infoDisable',
+    FILTER_LOW_ENABLE = 'filter.lowEnable',
+    FILTER_LOW_DISABLE = 'filter.lowDisable',
+    FILTER_MEDIUM_ENABLE = 'filter.mediumEnable',
+    FILTER_MEDIUM_DISABLE = 'filter.mediumDisable',
+    FILTER_HIGH_ENABLE = 'filter.highEnable',
+    FILTER_HIGH_DISABLE = 'filter.highDisable',
+    FILTER_CRITICAL_ENABLE = 'filter.criticalEnable',
+    FILTER_CRITICAL_DISABLE = 'filter.criticalDisable',
 };
 
 export enum WORKSPACE_EVENTS {

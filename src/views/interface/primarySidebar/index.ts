@@ -2,10 +2,7 @@ import * as vscode from 'vscode';
 
 import { TreeItem } from './dataProviders/abstractTreeDataProvider';
 import { TreeDataProvidersContainer } from './services/treeDataProvidersContainer';
-import { FiltersViewProvider } from './views/filtersWebviewPanel';
 import { ResultsService } from '../../../services';
-
-export let filtersViewProvider: FiltersViewProvider;
 
 export class PrimarySidebar {
     public static iacTreeView: vscode.TreeView<TreeItem>;
@@ -26,12 +23,6 @@ export class PrimarySidebar {
         PrimarySidebar.licensesTreeView = vscode.window.createTreeView('licenses', {
             treeDataProvider: TreeDataProvidersContainer.licensesTreeDataProvider,
         });
-
-        filtersViewProvider = new FiltersViewProvider(context.extensionUri);
-
-        context.subscriptions.push(
-            vscode.window.registerWebviewViewProvider('filters', filtersViewProvider),
-        );
 
         PrimarySidebar.iacTreeView.onDidChangeSelection(
             TreeDataProvidersContainer.iacTreeDataProvider.onDidChangeSelection.bind(TreeDataProvidersContainer.iacTreeDataProvider),
