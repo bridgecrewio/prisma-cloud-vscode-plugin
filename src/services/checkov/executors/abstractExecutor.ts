@@ -16,7 +16,7 @@ export abstract class AbstractExecutor {
             return null;
         }
 
-        return workspaceFolders[0].uri.path.replace(':', '');
+        return `"${workspaceFolders[0].uri.path.replace(':', '')}"`;
     }
 
     protected static getCheckovCliParams(installation: CheckovInstallation, files?: string[]) {

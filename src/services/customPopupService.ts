@@ -44,7 +44,7 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
                 return b.file_line_range[1] - a.file_line_range[1];
             });
             
-            CustomPopupService.highlightLines(checksForLineNumber[0].id);
+            CustomPopupService.highlightLines(checksForLineNumber[0]?.id);
         }
     });
 
