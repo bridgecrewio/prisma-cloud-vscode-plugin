@@ -29,7 +29,7 @@ export abstract class AbstractExecutor {
         ];
 
         if (files) {
-            files.forEach((file) => checkovCliParams.push('--file', file));
+            files.forEach((file) => checkovCliParams.push('--file', `"${file}"`));
         } else {
             checkovCliParams.push('--directory', AbstractExecutor.projectPath!);
         }
