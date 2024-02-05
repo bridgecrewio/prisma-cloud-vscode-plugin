@@ -131,8 +131,7 @@ export class CustomPopupService {
         const hoverContent = new vscode.MarkdownString();
         const failedChecks = ResultsService.getByFilePath(document.fileName);
         const risksForLine = failedChecks.filter(failedCheck => {
-            return position.line >= (failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1)  && position.line <= (failedCheck.file_line_range[1] === 0 ? 0 : failedCheck.file_line_range[1] - 1) 
-            && failedCheck.file_line_range[1] !== 0;
+            return position.line === (failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1) && failedCheck.file_line_range[1] !== 0;
         });
 
         if (risksForLine.length === 0) {
