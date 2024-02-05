@@ -180,10 +180,29 @@ export class CheckovResultWebviewPanel {
         const codeBlock = result.code_block.map(([ line, code ]) => `<tr class="original"><td>${line}</td><td>${code}</td></tr>`);
 
         if (result.fixed_definition) {
-            codeBlock.push(`<tr class="fixed"><td>${result.file_line_range[0]}</td><td>${result.fixed_definition}</td></tr>`);
+            const formattedFixCode = CheckovResultWebviewPanel.formatFixCode(result.fixed_definition, result.file_line_range[0]);
+            formattedFixCode.map(([ line, code ]) => {
+                codeBlock.push(`<tr class="fixed"><td>${line}</td><td>${code}</td></tr>`);
+            });
         }
 
         return codeBlock.join('');
+    }
+
+    private static formatFixCode(fixCode: string, startLine: number) {
+        const separatedFixCode = fixCode.split('\n');
+
+        if (separatedFixCode[separatedFixCode.length - 1] === '') {
+            separatedFixCode.pop();
+        }
+
+        const formattedFixCode: Array<any> = [];
+        separatedFixCode.reduce((acc, stringLine) => {
+            formattedFixCode.push([acc, stringLine]);
+            acc++;
+            return acc;
+        }, startLine);
+        return formattedFixCode;
     }
 
     private static getDescriptionsEndpoint(checkId: string) {
