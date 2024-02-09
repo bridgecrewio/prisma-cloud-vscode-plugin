@@ -55,6 +55,7 @@ export class CheckovExecutor {
                     AbstractExecutor.isScanInProgress = false;
                     await reRenderViews();
                     StatusBar.reset();
+                    vscode.window.showErrorMessage(`Scanning is stopped due to: ${e.message}`);
                     return;
                 }
                 const endTime = new Date();

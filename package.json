@@ -1,10 +1,10 @@
 {
-  "name": "prisma-cloud-vscode-plugin",
-  "displayName": "prisma-cloud-vscode-plugin",
-  "publisher": "prisma-cloud",
+  "name": "prisma-cloud",
+  "displayName": "Prisma Cloud",
+  "publisher": "Palo Alto Networks - Prisma Cloud",
   "repository": "https://github.com/bridgecrewio/prisma-cloud-vscode-plugin",
-  "icon": "static/icons/svg/prisma.png",
-  "description": "",
+  "icon": "static/icons/prisma.png",
+  "description": "a static code analysis tool to scan code for Infrastructure-as-Code (IaC) misconfigurations, Software Composition Analysis (SCA) issues and Secrets vulnerabilities.",
   "version": "1.0.0",
   "engines": {
     "vscode": "^1.79.0"
@@ -58,10 +58,7 @@
       {
         "command": "checkov.execute",
         "title": "Checkov: Execute",
-        "icon": {
-          "light": "./static/icons/svg/play-sidebar.svg",
-          "dark": "./static/icons/svg/play-sidebar.svg"
-        }
+        "icon": "$(run)"
       },
       {
         "command": "filter.infoEnable",
@@ -173,7 +170,7 @@
       {
         "id": "filters",
         "label": "Filters",
-        "icon": "./static/icons/svg/filter.svg"
+        "icon": "$(filter)"
       }
     ],
     "configuration": {

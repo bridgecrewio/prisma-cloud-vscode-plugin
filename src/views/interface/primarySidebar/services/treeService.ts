@@ -29,11 +29,23 @@ export class TreeService {
     public getTreeData(category: CHECKOV_RESULT_CATEGORY, checkovOutput: CheckovResult[]): TreeItem[] {
         const formattedData = this.formatCheckData(category, checkovOutput);
         const treeData = this.formTreeData(formattedData);
+        this.setParentLinks(treeData);
         if (treeData.length === 1) {
             return treeData;
         }
         this.sortTreeData(treeData[1]);
         return treeData;
+    }
+
+    private setParentLinks(formedData: TreeItem[]) {
+        for (const treeItem of formedData) {
+            if (treeItem.children) {
+                for (const childTreeItem of treeItem.children) {
+                    childTreeItem.parent = treeItem;
+                }
+                this.setParentLinks(treeItem.children);
+            }
+        }
     }
 
     private sortTreeData(treeData: TreeItem) {
@@ -58,28 +70,28 @@ export class TreeService {
     }
 
     private formTreeData(formattedData: Array<FormattedCheck>): TreeItem[] {
-        let formTreeData: any = [];
-        let level: any = { formTreeData };
+        let formedTreeData: any = [];
+        let level: any = { formedTreeData };
         let counter: number = 0;
 
         formattedData.forEach(formattedCheck => {
             formattedCheck.filePath.reduce((r, { path, pathType, severity }, i, a) => {
               const iconPath = this.iconService.getIconPath(pathType, severity);
               if (i === a.length - 1) {
-                r.formTreeData.push(new TreeItem({ label: path, iconPath, result: formattedCheck.result }));
+                r.formedTreeData.push(new TreeItem({ label: path, iconPath, result: formattedCheck.result }));
                 counter++;
               } else if(!r[path]) {
-                r[path] = {formTreeData: []};
-                r.formTreeData.push(new TreeItem({ label: path, iconPath }, r[path].formTreeData));
+                r[path] = {formedTreeData: []};
+                r.formedTreeData.push(new TreeItem({ label: path, iconPath }, r[path].formedTreeData));
               }
 
               return r[path];
             }, level);
         });
 
-        formTreeData.unshift(new TreeItem({ label: `Found issues: ${counter}` }));
+        formedTreeData.unshift(new TreeItem({ label: `Found issues: ${counter}` }));
 
-        return formTreeData;
+        return formedTreeData;
     }
 
     private formatCheckData(category: CHECKOV_RESULT_CATEGORY, results: CheckovResult[]): FormattedCheck[] {
