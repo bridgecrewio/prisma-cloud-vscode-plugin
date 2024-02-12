@@ -57,7 +57,7 @@ export class TreeService {
                 return;
             }
             treeData.children.sort((a, b) => {
-                if ((a.label && typeof a.label === 'string') && (b.label && typeof b.label === 'string')) {
+                if ((a.label && typeof a.label === 'string') && (b.label && typeof b.label === 'string') && (a.iconPath && b.iconPath)) {
                     return a?.label.localeCompare(b.label);
                 }
                 return 0;
