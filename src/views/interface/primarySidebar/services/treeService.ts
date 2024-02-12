@@ -57,7 +57,10 @@ export class TreeService {
                 return;
             }
             treeData.children.sort((a, b) => {
-                if ((a.label && typeof a.label === 'string') && (b.label && typeof b.label === 'string') && (a.iconPath && b.iconPath)) {
+                if (a.isCounter || b.isCounter) {
+                    return 0;
+                }
+                if ((a.label && typeof a.label === 'string') && (b.label && typeof b.label === 'string')) {
                     return a?.label.localeCompare(b.label);
                 }
                 return 0;
@@ -89,7 +92,7 @@ export class TreeService {
             }, level);
         });
 
-        formedTreeData.unshift(new TreeItem({ label: `Found issues: ${counter}` }));
+        formedTreeData.unshift(new TreeItem({ label: `Found issues: ${counter}`, isCounter: true }));
 
         return formedTreeData;
     }
