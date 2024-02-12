@@ -93,14 +93,16 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
 export class TreeItem extends vscode.TreeItem {
   public readonly children: TreeItem[] | undefined;
   public readonly result: CheckovResult | null;
+  public readonly isCounter?: boolean;
   public parent?: TreeItem;
 
   constructor(options: { 
     label: string, 
     iconPath?: vscode.ThemeIcon | { light: string, dark: string }, 
     result?: CheckovResult, 
+    isCounter?: boolean,
   }, children?: TreeItem[]) {
-    const { label, iconPath, result } = options;
+    const { label, iconPath, result, isCounter } = options;
 
     super(
         label,
@@ -110,5 +112,6 @@ export class TreeItem extends vscode.TreeItem {
     this.children = children;
     this.iconPath = iconPath;
     this.result = result ?? null;
+    this.isCounter = isCounter;
   }
 };
