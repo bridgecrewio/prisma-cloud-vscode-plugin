@@ -44,6 +44,10 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
     return this.data.length;
   }
 
+  public getParent(element: TreeItem): vscode.ProviderResult<TreeItem> {
+    return element.parent;
+  }
+
   public async onDidChangeSelection(event: vscode.TreeViewSelectionChangeEvent<TreeItem>) {
     const result = event.selection[0]?.result;
 
@@ -66,13 +70,36 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
     const openedTextEditor = await FilesService.openFile(result.repo_file_path, result.file_line_range[0]);
     await CheckovResultWebviewPanel.show(this.category, result, openedTextEditor);
   } 
+
+  public getTreeItemByIds(id: string) {
+    return this.traverseAndFind(id, { children: this.data } as TreeItem);
+  }
+
+  private traverseAndFind(id: string, treeItem: TreeItem): TreeItem | undefined {
+      if (treeItem?.result?.id === id) {
+        return treeItem;
+      } 
+
+      if (treeItem.children) {
+        for (const child of treeItem.children) {
+          const result = this.traverseAndFind(id, child);
+
+          if (result) { return result; }
+        }
+      }
+  }
 };
 
 export class TreeItem extends vscode.TreeItem {
   public readonly children: TreeItem[] | undefined;
   public readonly result: CheckovResult | null;
+  public parent?: TreeItem;
 
-  constructor(options: { label: string, iconPath?: vscode.ThemeIcon | { light: string, dark: string }, result?: CheckovResult }, children?: TreeItem[]) {
+  constructor(options: { 
+    label: string, 
+    iconPath?: vscode.ThemeIcon | { light: string, dark: string }, 
+    result?: CheckovResult, 
+  }, children?: TreeItem[]) {
     const { label, iconPath, result } = options;
 
     super(

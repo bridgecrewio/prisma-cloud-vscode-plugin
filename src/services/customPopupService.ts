@@ -6,9 +6,20 @@ import { FixService } from './fixService';
 import { AnalyticsService } from './analyticsService';
 import { OpenDocumentation } from '../views/interface/checkovResult/messages/openDocumentation';
 import { CheckovResultWebviewPanel } from '../views/interface/checkovResult';
+import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
+import { PrimarySidebar } from '../views/interface/primarySidebar';
+import { CheckovResult } from '../types';
 
 const iconsPath = 'static/icons/svg/severities';
 export let lineClickDisposable: vscode.Disposable;
+
+const createCommandUri = (payload: any): string => {
+    return encodeURIComponent(JSON.stringify(payload));
+};
+
+const createIconUri = (iconName: string): vscode.Uri => {
+    return vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', iconName);
+};
 
 let highlightDecorationType: vscode.TextEditorDecorationType;
 let highlightIcon: vscode.TextEditorDecorationType;
@@ -68,6 +79,19 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
         CustomPopupService.highlightLines();
         await AnalyticsService.trackFixFromBaloon();
 	});
+
+    vscode.commands.registerCommand('extension.focusTreeItem', async (...params) => {
+        const { checkId, id } = params[0];
+        const treeItemToFocus = TreeDataProvidersContainer.getTreeItemByCheckIds({ checkId, id });
+        const treeView = PrimarySidebar.getTreeViewByCheckId(checkId);
+        
+        if (treeView && treeItemToFocus) {
+            treeView.reveal(treeItemToFocus, { focus: true, select: true });
+        } else {
+            console.error(`Eithere there are no treeView or treeItemToFocus for the risk: ${JSON.stringify(params[0])}, treeItemToFocus: ${treeItemToFocus}`);
+        }
+	});
+
 
     vscode.commands.registerCommand('extension.openLink', async (...params) => {
         await OpenDocumentation.handle(params[0]);
@@ -145,31 +169,41 @@ export class CustomPopupService {
         // const debugFileLineRange = `<span>(${file_line_range[0] === 0 ? 0 : 
             // file_line_range[0]} - ${file_line_range[1] === 0 ? 0 : file_line_range[1]})</span>`;
         // hover popup markdown generation
-        hoverContent.appendMarkdown(`<div>`);
         risksForLine.map((failedCheck, index) => {
-            const { severity, short_description, check_name, guideline } = failedCheck;
+            const { 
+                severity, 
+                short_description, 
+                check_name, 
+                guideline, 
+                check_id, 
+                id, 
+                fixed_definition,
+            } = failedCheck;
+            hoverContent.appendMarkdown('<div>');
             hoverContent.appendMarkdown(`<div><img src="${CustomPopupService.severityIconMap[severity]}"/><b>${short_description || check_name} (Prisma Cloud)</b></div>`);
             if (failedCheck.description) {
-                hoverContent.appendMarkdown(`<p>${failedCheck.description}<p>`);
+                hoverContent.appendMarkdown(`<span>${failedCheck.description.replace(/\n/g, "")}</span><br>`);
             }
-            if (failedCheck.fixed_definition) {
-                hoverContent.appendMarkdown(`<a href="command:extension.fix?${encodeURIComponent(JSON.stringify(failedCheck))}"><img src="${vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', 'fix-popup.svg')}"/><span style="color:#ffffff;"> Fix</span></a><span>  </span>`);
+            if (fixed_definition) {
+                hoverContent.appendMarkdown(`<a href="command:extension.fix?${createCommandUri(failedCheck)}"><img src="${createIconUri('fix.svg')}"/><span style="color:#ffffff;"> Fix </span></a>`);
             }
             if (CheckovResultWebviewPanel.isSuppressionVisible(failedCheck)) {
-                hoverContent.appendMarkdown(`<a href="command:extension.suppress?${encodeURIComponent(JSON.stringify(failedCheck))}"><img src="${vscode.Uri.joinPath(CustomPopupService.context.extensionUri, 'static/icons/svg/', 'suppress-popup.svg')}"/><span style="color:#ffffff;"> Suppress</span></a>`);
+                hoverContent.appendMarkdown(`<a href="command:extension.suppress?${createCommandUri(failedCheck)}"><img src="${createIconUri('suppress-popup.svg')}"/><span style="color:#ffffff;"> Suppress </span></a>`);
             }
             if (guideline) {
-                hoverContent.appendMarkdown(`<a href="command:extension.openLink?${encodeURIComponent(JSON.stringify(guideline))}"><span>   Documentation</span></a>`);
+                hoverContent.appendMarkdown(`<a href="command:extension.openLink?${createCommandUri(guideline)}"><span> Documentation </span></a>`);
             }
+            hoverContent.appendMarkdown(`<a href="command:extension.focusTreeItem?${createCommandUri({checkId: check_id, id })}"><img src="${createIconUri('console.svg')}"/><span style="color:#ffffff;"> Console</span></a>`);
             
             if (risksForLine.length > 1) {
                 if (index < risksForLine.length - 1) {
                     hoverContent.appendMarkdown(`<br><span>_________________________________________________________________</span>`);
                 }
             }
+            hoverContent.appendMarkdown('</div>');
         });
-        hoverContent.appendMarkdown(`</div>`);
         hoverContent.isTrusted = true;
+        hoverContent.supportThemeIcons = true;
         hoverContent.supportHtml = true;
         
         return new vscode.Hover(hoverContent);

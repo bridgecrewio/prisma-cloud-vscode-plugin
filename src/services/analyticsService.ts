@@ -24,11 +24,11 @@ export class AnalyticsService {
                 });
     
                 if (response.status === 200) {
-                    console.log('Fetched new JWT token');
+                    console.log('Fetched new JWT token successfully');
                     await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, response.data.token);
                 }
             } catch (error: any) {
-                console.log('Is not able to fetch new JWT token. Authorization on prisma was failed: ', error.message);
+                console.log('Is not possible to fetch new JWT token. Authorization on prisma was failed: ', error.message);
                 await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, undefined);
             }
         }
