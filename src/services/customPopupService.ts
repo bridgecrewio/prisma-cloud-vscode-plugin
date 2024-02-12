@@ -185,7 +185,7 @@ export class CustomPopupService {
                 hoverContent.appendMarkdown(`<span>${failedCheck.description.replace(/\n/g, "")}</span><br>`);
             }
             if (fixed_definition) {
-                hoverContent.appendMarkdown(`<a href="command:extension.fix?${createCommandUri({failedCheck})}"><img src="${createIconUri('fix.svg')}"/><span style="color:#ffffff;"> Fix </span></a>`);
+                hoverContent.appendMarkdown(`<a href="command:extension.fix?${createCommandUri(failedCheck)}"><img src="${createIconUri('fix.svg')}"/><span style="color:#ffffff;"> Fix </span></a>`);
             }
             if (CheckovResultWebviewPanel.isSuppressionVisible(failedCheck)) {
                 hoverContent.appendMarkdown(`<a href="command:extension.suppress?${createCommandUri(failedCheck)}"><img src="${createIconUri('suppress-popup.svg')}"/><span style="color:#ffffff;"> Suppress </span></a>`);
