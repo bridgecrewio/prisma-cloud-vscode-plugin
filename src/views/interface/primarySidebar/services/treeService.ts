@@ -33,7 +33,7 @@ export class TreeService {
         if (treeData.length === 1) {
             return treeData;
         }
-        this.sortTreeData(treeData[1]);
+        this.sortTreeData({children: treeData} as TreeItem);
         return treeData;
     }
 
