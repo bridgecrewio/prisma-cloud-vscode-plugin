@@ -75,7 +75,7 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
 	});
 
     vscode.commands.registerCommand('extension.fix', async (...params) => {
-        await FixService.fix(params[0].fixParamsObject as CheckovResult);
+        await FixService.fix(params[0]);
         CustomPopupService.highlightLines();
         await AnalyticsService.trackFixFromBaloon();
 	});
