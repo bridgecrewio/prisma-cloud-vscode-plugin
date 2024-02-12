@@ -8,13 +8,15 @@ export class OnSaveFile {
     private static releaseTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
     public static handle(document: vscode.TextDocument) {
-        clearTimeout(OnSaveFile.releaseTimeoutId!);
+        if (document.uri.scheme === 'file') {
+            clearTimeout(OnSaveFile.releaseTimeoutId!);
 
-        if (!OnSaveFile.changedFiles.includes(document.fileName)) {
-            OnSaveFile.changedFiles.push(document.fileName);
+            if (!OnSaveFile.changedFiles.includes(document.fileName)) {
+                OnSaveFile.changedFiles.push(document.fileName);
+            }
+    
+            OnSaveFile.releaseTimeoutId = setTimeout(OnSaveFile.release, CONFIG.filesSyncInterval);
         }
-
-        OnSaveFile.releaseTimeoutId = setTimeout(OnSaveFile.release, CONFIG.filesSyncInterval);
     }
 
     private static async release() {
