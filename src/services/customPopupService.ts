@@ -178,17 +178,34 @@ export class CustomPopupService {
                 check_id, 
                 id, 
                 fixed_definition,
+                vulnerability_details,
+                file_abs_path,
+                repo_file_path,
+                file_line_range
             } = failedCheck;
             hoverContent.appendMarkdown('<div>');
             hoverContent.appendMarkdown(`<div><img src="${CustomPopupService.severityIconMap[severity]}"/><b>${short_description || check_name} (Prisma Cloud)</b></div>`);
             if (failedCheck.description) {
-                hoverContent.appendMarkdown(`<span>${failedCheck.description.replace(/\n/g, "")}</span><br>`);
+                hoverContent.appendMarkdown(`<span>${failedCheck.description.replace(/[^a-zA-Z ]/g, "")}</span><br>`);
             }
             if (fixed_definition) {
-                hoverContent.appendMarkdown(`<a href="command:extension.fix?${createCommandUri(failedCheck)}"><img src="${createIconUri('fix.svg')}"/><span style="color:#ffffff;"> Fix </span></a>`);
+                hoverContent.appendMarkdown(`<a href="command:extension.fix?${createCommandUri({ 
+                    fixed_definition, 
+                    check_id, 
+                    vulnerability_details,
+                    file_abs_path,
+                    repo_file_path,
+                    file_line_range,
+                })}"><img src="${createIconUri('fix.svg')}"/><span style="color:#ffffff;"> Fix </span></a>`);
             }
             if (CheckovResultWebviewPanel.isSuppressionVisible(failedCheck)) {
-                hoverContent.appendMarkdown(`<a href="command:extension.suppress?${createCommandUri(failedCheck)}"><img src="${createIconUri('suppress-popup.svg')}"/><span style="color:#ffffff;"> Suppress </span></a>`);
+                hoverContent.appendMarkdown(`<a href="command:extension.suppress?${createCommandUri({
+                    vulnerability_details,
+                    check_id,
+                    repo_file_path,
+                    file_line_range,
+                    file_abs_path,
+                })}"><img src="${createIconUri('suppress-popup.svg')}"/><span style="color:#ffffff;"> Suppress </span></a>`);
             }
             if (guideline) {
                 hoverContent.appendMarkdown(`<a href="command:extension.openLink?${createCommandUri(guideline)}"><span> Documentation </span></a>`);

@@ -56,7 +56,7 @@ export class FixService {
     private static async applyIaCFix(targetResult: CheckovResult) {
         const activeEditor = CheckovResultWebviewPanel.fileEditorMap.get(targetResult.file_abs_path) || vscode.window.activeTextEditor;
         if (activeEditor) {
-            const { repo_file_path, file_line_range, fixed_definition } = targetResult;
+            const { repo_file_path, file_line_range, fixed_definition, file_abs_path } = targetResult;
             const workspaceEdit = new vscode.WorkspaceEdit();
             const workspaceFolders = vscode.workspace.workspaceFolders;
             const resultFileUri = vscode.Uri.joinPath(workspaceFolders![0].uri, repo_file_path);
@@ -67,7 +67,7 @@ export class FixService {
             workspaceEdit.replace(resultFileUri, blockRange, fixed_definition);
             await vscode.workspace.applyEdit(workspaceEdit);
             await activeEditor.document.save();
-            await CheckovExecutor.execute([targetResult.file_abs_path]);
+            await CheckovExecutor.execute([file_abs_path]);
             CustomPopupService.highlightLines();
             TreeDataProvidersContainer.refresh();
             return;
