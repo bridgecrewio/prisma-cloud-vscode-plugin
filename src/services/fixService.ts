@@ -31,7 +31,8 @@ export class FixService {
         const message = `${vulnerability_details.fix_command.msg}:${EOL}${command}`;
 
         if (vulnerability_details.fix_command.manualCodeFix) {
-            // todo
+            const { msg, cmds } = vulnerability_details.fix_command;
+            vscode.window.showInformationMessage(`${msg}: ${cmds.length > 1 ? cmds.join(', ') : cmds[0]}`);
             return;
         }
 
