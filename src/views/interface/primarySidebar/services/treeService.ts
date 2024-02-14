@@ -168,7 +168,7 @@ export class TreeService {
     }
 
     private extractPackage(resource: string): string {
-        return resource.split(' ').find(elem => elem[0] === '(')?.replace('(', '') || '';
+        return resource.split(' ').find(elem => elem[0] === '(')?.replace('(', '') || resource.split('/').pop() || '';
     }
 
     private escapeRedundantChars(filePath: string): string {
