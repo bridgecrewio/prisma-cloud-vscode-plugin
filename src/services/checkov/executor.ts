@@ -101,6 +101,11 @@ export class CheckovExecutor {
             return failedChecks;
         }
 
+        // response from checkov with EmptyCheckovOutput type
+        if (!output.results) {
+            return [];
+        }
+
         for (const failedCheck of output.results?.failed_checks) {
             failedCheck.id = uuidv4();
         }
