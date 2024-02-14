@@ -48,4 +48,14 @@ export type CheckovCheckTypeOutput = {
     };
 };
 
+// response type from checkov when file is empty, the response is totally different format from the one with risks data
+export type EmptyCheckovOutput = {
+    checkov_version: string;
+    failed: number;
+    parsing_errors: number;
+    passed: number;
+    resource_count: number;
+    skipped: number;
+};
+
 export type CheckovOutput = CheckovCheckTypeOutput[] | CheckovCheckTypeOutput;
