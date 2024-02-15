@@ -1,6 +1,6 @@
 {
   "name": "prisma-cloud",
-  "public": false,
+  "private":  true,
   "displayName": "Prisma Cloud",
   "publisher": "PrismaCloud",
   "repository": "https://github.com/bridgecrewio/prisma-cloud-vscode-plugin",
