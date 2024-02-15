@@ -1,7 +1,7 @@
 {
   "name": "prisma-cloud",
   "displayName": "Prisma Cloud",
-  "publisher": "Palo Alto Networks - Prisma Cloud",
+  "publisher": "PrismaCloud",
   "repository": "https://github.com/bridgecrewio/prisma-cloud-vscode-plugin",
   "icon": "static/icons/prisma.png",
   "description": "a static code analysis tool to scan code for Infrastructure-as-Code (IaC) misconfigurations, Software Composition Analysis (SCA) issues and Secrets vulnerabilities.",
