@@ -1,6 +1,6 @@
 {
   "name": "prisma-cloud",
-  "displayName": "Prisma Cloud Beta release",
+  "displayName": "Prisma Cloud",
   "publisher": "Palo Alto Networks - Prisma Cloud",
   "repository": "https://github.com/bridgecrewio/prisma-cloud-vscode-plugin",
   "icon": "static/icons/prisma.png",
