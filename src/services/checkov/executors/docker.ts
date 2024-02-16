@@ -28,7 +28,7 @@ export class DockerExecutor extends AbstractExecutor {
             ...DockerExecutor.getCheckovCliParams(installation, files),
         ];
 
-        console.log(`${installation.entrypoint} ${args.join(' ')}`);
+        console.log(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);
         DockerExecutor.activeProcess = spawn(installation.entrypoint, args, { shell: true });
         const executionResult = await DockerExecutor.handleProcessOutput(DockerExecutor.activeProcess);
         AbstractExecutor.isScanInProgress = false;
