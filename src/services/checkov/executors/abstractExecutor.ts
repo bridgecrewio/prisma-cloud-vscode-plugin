@@ -52,6 +52,12 @@ export abstract class AbstractExecutor {
     protected static async handleProcessOutput(process: ChildProcessWithoutNullStreams): Promise<CheckovOutput> {
         return new Promise((resolve, reject) => {
             const outputBuffers: string[] = [];
+            let containerOutput = '';
+
+            process.stderr.on('data', (data: any) => {
+                data=data.toString();
+                containerOutput+=data;
+            });
 
             process.stdout.on('data', (data) => {
                 if (outputBuffers.length || data.toString().startsWith('{') || data.toString().startsWith('[')) {
@@ -65,6 +71,7 @@ export abstract class AbstractExecutor {
 
             process.on('exit', (code) => {
                 if (code !== 0) {
+                    console.log('Full error container output: \n' + (containerOutput === '' ? 'no errors' : containerOutput));
                     return reject(new Error(`The Checkov execution exited with code ${code}`));
                 }
 
