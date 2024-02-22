@@ -6,7 +6,7 @@ export const CONFIG = Object.freeze({
     get userConfig(): WorkspaceConfiguration & UserConfiguration {
         return workspace.getConfiguration(CONFIG.userConfigurationKey) as WorkspaceConfiguration & UserConfiguration;
     },
-    extensionId: 'prisma-cloud.prisma-cloud-vscode-plugin',
+    extensionId: 'prismacloud.prisma-cloud',
     userConfigurationKey: 'prismaCloud',
     requirenments: {
         minPythonVersion: '3.7.0',
