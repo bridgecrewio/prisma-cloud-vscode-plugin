@@ -5,6 +5,7 @@ import { CONFIG } from '../../../config';
 import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation, CheckovOutput } from '../../../types';
 import { reRenderViews } from '../../../views/interface/utils';
+import { CheckovInstall } from '../../../commands/checkov';
 
 export class Pip3Executor extends AbstractExecutor {
     private static pid: any;
@@ -17,9 +18,10 @@ export class Pip3Executor extends AbstractExecutor {
         ];
 
         console.log(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);
-        const process = spawn(installation.entrypoint, args, {
+        const scanProcess = spawn(installation.entrypoint, args, {
             shell: true,
             env: {
+                PATH: CheckovInstall.processPathEnv,
                 PRISMA_API_URL: CONFIG.userConfig.prismaURL,
                 BC_SOURCE: 'vscode',
                 BC_SOURCE_VERSION: '0.0.1',
@@ -27,8 +29,8 @@ export class Pip3Executor extends AbstractExecutor {
             detached: true,
         });
 
-        Pip3Executor.pid = process.pid;
-        const processOutput = await Pip3Executor.handleProcessOutput(process);
+        Pip3Executor.pid = scanProcess.pid;
+        const processOutput = await Pip3Executor.handleProcessOutput(scanProcess);
         Pip3Executor.fixRepoFilePath(processOutput);
         AbstractExecutor.isScanInProgress = false;
         await reRenderViews();

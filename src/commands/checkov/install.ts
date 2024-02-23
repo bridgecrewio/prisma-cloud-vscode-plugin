@@ -12,6 +12,7 @@ import { asyncExec } from '../../utils';
 import { CheckovExecutor } from '../../services';
 
 export class CheckovInstall {
+    public static processPathEnv: string;
     private static readonly installations = [
         CheckovInstall.withDocker,
         CheckovInstall.withPip3,
@@ -65,7 +66,9 @@ export class CheckovInstall {
                 return false;
             }
 
-            await asyncExec('pip3 install --user -U -i https://pypi.org/simple/ checkov');
+            (await asyncExec('pip3 install --user -U -i https://pypi.org/simple/ checkov')).stdout;
+            CheckovInstall.processPathEnv = (await asyncExec('echo $PATH')).stdout.trim();
+            CheckovInstall.processPathEnv = (await asyncExec('python3 -c "import site; print(site.USER_BASE)"')).stdout.trim() + '/bin' + ':' + CheckovInstall.processPathEnv;
 
             const entrypoint = await CheckovInstall.resolveEntrypoint(CHECKOV_INSTALLATION_TYPE.PIP3);
 
@@ -120,7 +123,9 @@ export class CheckovInstall {
                 return 'docker';
             case CHECKOV_INSTALLATION_TYPE.PIP3:
                 try {
-                    await asyncExec('checkov --version');
+                    await asyncExec('checkov --version', {env: {
+                        PATH: CheckovInstall.processPathEnv
+                    }});
 
                     return 'checkov';
                 } catch (error) {
