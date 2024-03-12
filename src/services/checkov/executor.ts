@@ -33,6 +33,10 @@ export class CheckovExecutor {
         const installation = CheckovExecutor.installation;
         const executor = CheckovExecutor.getExecutor();
 
+        if (process.platform === 'win32') {
+            targetFiles = targetFiles?.map(file => `/${file.replace(':', '').replace(/\\/g, '/')}`);
+        } 
+
         if (!executor || AbstractExecutor.isScanInProgress) {
             return;
         }

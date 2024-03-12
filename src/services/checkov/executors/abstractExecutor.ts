@@ -71,7 +71,7 @@ export abstract class AbstractExecutor {
 
             process.on('exit', (code) => {
                 if (code !== 0) {
-                    console.log('Full error container output: \n' + (containerOutput === '' ? 'no errors' : containerOutput));
+                    console.log('Full error checkov process output: \n' + (containerOutput === '' ? 'no errors' : containerOutput));
                     return reject(new Error(`The Checkov execution exited with code ${code}`));
                 }
 
