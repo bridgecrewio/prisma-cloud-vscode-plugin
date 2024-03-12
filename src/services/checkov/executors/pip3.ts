@@ -63,12 +63,12 @@ export class Pip3Executor extends AbstractExecutor {
     private static replacePath(result: CheckovOutput, fsPath: string) {
         if (Array.isArray(result)) {
             for (const output of result) {
-                for (const failedCheck of output.results.failed_checks) {
+                for (const failedCheck of output.results?.failed_checks) {
                     failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
                 }
             }
         } else {
-            for (const failedCheck of result.results.failed_checks) {
+            for (const failedCheck of result.results?.failed_checks) {
                 failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
             }
         }
