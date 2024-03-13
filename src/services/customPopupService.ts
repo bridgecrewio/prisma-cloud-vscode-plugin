@@ -8,7 +8,7 @@ import { OpenDocumentation } from '../views/interface/checkovResult/messages/ope
 import { CheckovResultWebviewPanel } from '../views/interface/checkovResult';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 import { PrimarySidebar } from '../views/interface/primarySidebar';
-import { CheckovResult } from '../types';
+import { formatWindowsFilePath } from '../utils';
 
 const iconsPath = 'static/icons/svg/severities';
 export let lineClickDisposable: vscode.Disposable;
@@ -126,7 +126,7 @@ export class CustomPopupService {
         if (document) {
             let startLine: any;
             let endLine: any;
-            const failedChecks = ResultsService.getByFilePath(document.fileName);
+            const failedChecks = ResultsService.getByFilePath(process.platform === 'win32' ? formatWindowsFilePath(document.fileName) : document.fileName);
             const failedChecksWithoutEmptyRisks = failedChecks.filter(failedCheck => failedCheck.file_line_range[1] !== 0);
             const documentLineAmount = document.lineCount;
             const lineRangesForLineDecorations = failedChecksWithoutEmptyRisks.map(failedCheck => {
@@ -153,7 +153,7 @@ export class CustomPopupService {
 
     static provideHover(document: vscode.TextDocument, position: vscode.Position) {
         const hoverContent = new vscode.MarkdownString();
-        const failedChecks = ResultsService.getByFilePath(document.fileName);
+        const failedChecks = ResultsService.getByFilePath(process.platform === 'win32' ? formatWindowsFilePath(document.fileName) : document.fileName);
         const risksForLine = failedChecks.filter(failedCheck => {
             return position.line === (failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1) && failedCheck.file_line_range[1] !== 0;
         });

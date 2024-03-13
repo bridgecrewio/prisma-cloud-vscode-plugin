@@ -72,7 +72,13 @@ export class ResultsService {
             filePath = filePath.replace(vscode.workspace.workspaceFolders[0].uri.path, '');
         }
 
-        return results.filter(result => result.repo_file_path === filePath);
+        return results.filter(result => {
+            if (process.platform === 'win32') {
+                return result.file_abs_path === `/${filePath}`;
+            }
+
+            return result.repo_file_path === filePath;
+        });
     }
 
     public static store(results: CheckovResult[]) {

@@ -11,6 +11,7 @@ import { ShowSettings } from '../../commands/checkov';
 import { AbstractExecutor } from './executors/abstractExecutor';
 import { reRenderViews } from '../../views/interface/utils';
 import { AnalyticsService } from '../analyticsService';
+import { formatWindowsFilePath } from '../../utils';
 
 export class CheckovExecutor {
     private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, typeof DockerExecutor | typeof Pip3Executor>([
@@ -34,7 +35,7 @@ export class CheckovExecutor {
         const executor = CheckovExecutor.getExecutor();
 
         if (process.platform === 'win32') {
-            targetFiles = targetFiles?.map(file => `/${file.replace(':', '').replace(/\\/g, '/')}`);
+            targetFiles = targetFiles?.map(file => file[0] === '/' ? formatWindowsFilePath(file) : `/${formatWindowsFilePath(file)}`);
         } 
 
         if (!executor || AbstractExecutor.isScanInProgress) {
