@@ -8,6 +8,10 @@ export interface DiagnosticReferenceCode {
     value: string;
 }
 
+export const formatWindowsFilePath = (path: string): string => {
+    return path.replace(':', '').replace(/\\/g, '/');
+};
+
 export const asyncExec = async (command: string, options: ExecOptions = {}): Promise<{ stdout: string, stderr: string }> => {
     const defaultOptions: ExecOptions = { maxBuffer: 1024 * 1000 };
 
