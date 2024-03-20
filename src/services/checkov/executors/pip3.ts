@@ -17,7 +17,7 @@ export class Pip3Executor extends AbstractExecutor {
             ...Pip3Executor.getCheckovCliParams(installation, files),
         ];
 
-        console.log(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);
+        console.log(`${installation.entrypoint} ${args.join(' ')}`);
         const scanProcess = spawn(installation.entrypoint, args, {
             shell: true,
             env: {
@@ -68,8 +68,10 @@ export class Pip3Executor extends AbstractExecutor {
                 }
             }
         } else {
-            for (const failedCheck of result.results?.failed_checks) {
-                failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
+            if (result.results) {
+                for (const failedCheck of result.results?.failed_checks) {
+                    failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
+                }
             }
         }
     }
