@@ -17,7 +17,7 @@ export class Pip3Executor extends AbstractExecutor {
             ...Pip3Executor.getCheckovCliParams(installation, files),
         ];
 
-        console.log(`${installation.entrypoint} ${args.join(' ')}`);
+        console.log(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);
         const scanProcess = spawn(installation.entrypoint, args, {
             shell: true,
             env: {
