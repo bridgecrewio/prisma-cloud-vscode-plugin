@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../../../config';
 import { CHECKOV_INSTALLATION_TYPE, REPO_ID } from '../../../constants';
 import { CheckovInstallation, CheckovOutput } from '../../../types';
+import { isPipInstall, isWindows } from '../../../utils';
 
 export abstract class AbstractExecutor {
     public static isScanInProgress: boolean = false;
@@ -14,6 +15,12 @@ export abstract class AbstractExecutor {
 
         if (!workspaceFolders) {
             return null;
+        }
+
+        if (isWindows()) {
+            if (isPipInstall()) {
+                return `"${workspaceFolders[0].uri.fsPath.replace(/\\/g, '/')}"`;
+            }
         }
 
         return `"${workspaceFolders[0].uri.path.replace(':', '')}"`;

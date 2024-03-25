@@ -8,7 +8,7 @@ import { OpenDocumentation } from '../views/interface/checkovResult/messages/ope
 import { CheckovResultWebviewPanel } from '../views/interface/checkovResult';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 import { PrimarySidebar } from '../views/interface/primarySidebar';
-import { formatWindowsFilePath } from '../utils';
+import { formatWindowsFilePath, isWindows } from '../utils';
 
 const iconsPath = 'static/icons/svg/severities';
 export let lineClickDisposable: vscode.Disposable;
@@ -126,7 +126,7 @@ export class CustomPopupService {
         if (document) {
             let startLine: any;
             let endLine: any;
-            const failedChecks = ResultsService.getByFilePath(process.platform === 'win32' ? formatWindowsFilePath(document.fileName) : document.fileName);
+            const failedChecks = ResultsService.getByFilePath(isWindows() ? formatWindowsFilePath(document.fileName) : document.fileName);
             const failedChecksWithoutEmptyRisks = failedChecks.filter(failedCheck => failedCheck.file_line_range[1] !== 0);
             const documentLineAmount = document.lineCount;
             const lineRangesForLineDecorations = failedChecksWithoutEmptyRisks.map(failedCheck => {
@@ -153,7 +153,7 @@ export class CustomPopupService {
 
     static provideHover(document: vscode.TextDocument, position: vscode.Position) {
         const hoverContent = new vscode.MarkdownString();
-        const failedChecks = ResultsService.getByFilePath(process.platform === 'win32' ? formatWindowsFilePath(document.fileName) : document.fileName);
+        const failedChecks = ResultsService.getByFilePath(isWindows() ? formatWindowsFilePath(document.fileName) : document.fileName);
         const risksForLine = failedChecks.filter(failedCheck => {
             return position.line === (failedCheck.file_line_range[0] === 0 ? 0 : failedCheck.file_line_range[0] - 1) && failedCheck.file_line_range[1] !== 0;
         });
@@ -181,7 +181,8 @@ export class CustomPopupService {
                 vulnerability_details,
                 file_abs_path,
                 repo_file_path,
-                file_line_range
+                file_line_range,
+                original_abs_path,
             } = failedCheck;
             hoverContent.appendMarkdown('<div>');
             hoverContent.appendMarkdown(`<div><img src="${CustomPopupService.severityIconMap[severity]}"/><b>${short_description || check_name} (Prisma Cloud)</b></div>`);
@@ -196,6 +197,7 @@ export class CustomPopupService {
                     file_abs_path,
                     repo_file_path,
                     file_line_range,
+                    original_abs_path,
                 })}"><img src="${createIconUri('fix.svg')}"/><span style="color:#ffffff;"> Fix </span></a>`);
             }
             if (CheckovResultWebviewPanel.isSuppressionVisible(failedCheck)) {

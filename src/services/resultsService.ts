@@ -6,6 +6,7 @@ import { CheckovResult } from '../types';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 import { CategoriesService } from './categoriesService';
 import { CustomPopupService } from './customPopupService';
+import { isPipInstall, isWindows } from '../utils';
 
 type Filter = {
     filterName: keyof CheckovResult;
@@ -73,7 +74,7 @@ export class ResultsService {
         }
 
         return results.filter(result => {
-            if (process.platform === 'win32') {
+            if (isWindows()) {
                 return result.file_abs_path === `/${filePath}`;
             }
 
@@ -89,7 +90,12 @@ export class ResultsService {
     public static storeByFiles(files: string[], results: CheckovResult[]) {
         const storedResults = ResultsService.get();
         const updatedResults = [
-            ...storedResults.filter((result) => !files.includes(result.file_abs_path)),
+            ...storedResults.filter((result) => {
+                if (isWindows() && isPipInstall()) {
+                    return !files.includes(result.original_abs_path);
+                }
+                return !files.includes(result.file_abs_path);
+            }),
             ...results,
         ];
 
