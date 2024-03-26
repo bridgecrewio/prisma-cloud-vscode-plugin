@@ -40,7 +40,7 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
             }
     
             const clickedLineNumber = event.selections[0].active.line;
-            const failedChecks = ResultsService.getByFilePath(document.fileName);
+            const failedChecks = ResultsService.getByFilePath(isWindows() ? formatWindowsFilePath(document.fileName) : document.fileName);
             const checksForLineNumber = failedChecks.filter(failedCheck => {
                 const { file_line_range } = failedCheck;
                 if (clickedLineNumber === 0) {
