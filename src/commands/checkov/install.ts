@@ -3,16 +3,18 @@ import { join, dirname } from 'path';
 import { EOL } from 'os';
 
 import * as semver from 'semver';
+import * as path from 'path';
 import * as vscode from 'vscode';
 
 import { CONFIG } from '../../config';
 import { CHECKOV_INSTALLATION_TYPE } from '../../constants';
 import { StatusBar } from '../../views';
-import { asyncExec } from '../../utils';
+import { asyncExec, isWindows } from '../../utils';
 import { CheckovExecutor } from '../../services';
 
 export class CheckovInstall {
     public static processPathEnv: string;
+    public static installationType: CHECKOV_INSTALLATION_TYPE;
     private static readonly installations = [
         CheckovInstall.withDocker,
         CheckovInstall.withPip3,
@@ -48,6 +50,7 @@ export class CheckovInstall {
             await asyncExec(`docker pull bridgecrew/checkov:${CONFIG.checkov.version}`);
 
             const entrypoint = await CheckovInstall.resolveEntrypoint(CHECKOV_INSTALLATION_TYPE.DOCKER);
+            CheckovInstall.installationType = CHECKOV_INSTALLATION_TYPE.DOCKER;
 
             return { type: CHECKOV_INSTALLATION_TYPE.DOCKER, entrypoint };
         } catch (error) {
@@ -66,11 +69,16 @@ export class CheckovInstall {
                 return false;
             }
 
-            (await asyncExec('pip3 install --user -U -i https://pypi.org/simple/ checkov')).stdout;
-            CheckovInstall.processPathEnv = (await asyncExec('echo $PATH')).stdout.trim();
-            CheckovInstall.processPathEnv = (await asyncExec('python3 -c "import site; print(site.USER_BASE)"')).stdout.trim() + '/bin' + ':' + CheckovInstall.processPathEnv;
+            (await asyncExec('pip3 install --user -U -i https://pypi.org/simple/ checkov'));
+            if (isWindows()) {
+                CheckovInstall.processPathEnv = (await asyncExec('echo %PATH%')).stdout.trim();
+            } else {
+                CheckovInstall.processPathEnv = (await asyncExec('echo $PATH')).stdout.trim();
+                CheckovInstall.processPathEnv = (await asyncExec('python3 -c "import site; print(site.USER_BASE)"')).stdout.trim() + '/bin' + ':' + CheckovInstall.processPathEnv;
+            }
 
             const entrypoint = await CheckovInstall.resolveEntrypoint(CHECKOV_INSTALLATION_TYPE.PIP3);
+            CheckovInstall.installationType = CHECKOV_INSTALLATION_TYPE.PIP3;
 
             return { type: CHECKOV_INSTALLATION_TYPE.PIP3, entrypoint };
         } catch (error) {
@@ -129,12 +137,23 @@ export class CheckovInstall {
 
                     return 'checkov';
                 } catch (error) {
+                    if (isWindows()) {
+                        const checkovLocationOutput = (await asyncExec('pip3 show checkov')).stdout.trim();
+
+                        for (const line of checkovLocationOutput.split(EOL)) {
+                            if (line.startsWith('Location: ')) {
+                                const sitePackagePath = line.split(' ')[1];
+                                return path.join(path.dirname(sitePackagePath), 'Scripts', 'checkov');
+                            }
+                        }
+                    }
+
                     const sitePackagesDirectory = (await asyncExec('python3 -c "import site; print(site.USER_BASE)"')).stdout;
 
                     return join(sitePackagesDirectory.trim(), 'bin', 'checkov');
                 }
             case CHECKOV_INSTALLATION_TYPE.PIPENV:
-                if (process.platform === 'win32') {
+                if (isWindows()) {
                     const envPath = (await asyncExec('pipenv run where python', { cwd })).stdout;
 
                     return `"${join(dirname(envPath.split(EOL)[0]), 'checkov')}"`;

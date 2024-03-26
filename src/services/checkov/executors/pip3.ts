@@ -6,6 +6,7 @@ import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation, CheckovOutput } from '../../../types';
 import { reRenderViews } from '../../../views/interface/utils';
 import { CheckovInstall } from '../../../commands/checkov';
+import { formatWindowsFilePath, isPipInstall, isWindows } from '../../../utils';
 
 export class Pip3Executor extends AbstractExecutor {
     private static pid: any;
@@ -21,12 +22,13 @@ export class Pip3Executor extends AbstractExecutor {
         const scanProcess = spawn(installation.entrypoint, args, {
             shell: true,
             env: {
+                ...(isWindows() ? process.env : {}),
                 PATH: CheckovInstall.processPathEnv,
                 PRISMA_API_URL: CONFIG.userConfig.prismaURL,
                 BC_SOURCE: 'vscode',
                 BC_SOURCE_VERSION: '0.0.1',
             },
-            detached: true,
+            detached: !isWindows(),
         });
 
         Pip3Executor.pid = scanProcess.pid;
@@ -65,11 +67,25 @@ export class Pip3Executor extends AbstractExecutor {
             for (const output of result) {
                 for (const failedCheck of output.results?.failed_checks) {
                     failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
+                    if (isWindows() && isPipInstall()) {
+                        failedCheck.original_abs_path = failedCheck.file_abs_path;
+                        failedCheck.repo_file_path = formatWindowsFilePath(failedCheck.repo_file_path);
+                        failedCheck.file_path = formatWindowsFilePath(failedCheck.file_path);
+                        failedCheck.file_abs_path = `/${formatWindowsFilePath(failedCheck.file_abs_path)}`;
+                    }
                 }
             }
         } else {
-            for (const failedCheck of result.results?.failed_checks) {
-                failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
+            if (result.results) {
+                for (const failedCheck of result.results?.failed_checks) {
+                    failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
+                    if (isWindows() && isPipInstall()) {
+                        failedCheck.original_abs_path = failedCheck.file_abs_path;
+                        failedCheck.repo_file_path = formatWindowsFilePath(failedCheck.repo_file_path);
+                        failedCheck.file_path = formatWindowsFilePath(failedCheck.file_path);
+                        failedCheck.file_abs_path = `/${formatWindowsFilePath(failedCheck.file_abs_path)}`;
+                    }
+                }
             }
         }
     }

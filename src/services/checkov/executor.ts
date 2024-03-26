@@ -7,11 +7,11 @@ import { DockerExecutor, Pip3Executor } from './executors';
 import { ResultsService } from '../resultsService';
 import { StatusBar } from '../../views';
 import { CONFIG } from '../../config';
-import { ShowSettings } from '../../commands/checkov';
+import { ShowSettings, CheckovInstall } from '../../commands/checkov';
 import { AbstractExecutor } from './executors/abstractExecutor';
 import { reRenderViews } from '../../views/interface/utils';
 import { AnalyticsService } from '../analyticsService';
-import { formatWindowsFilePath } from '../../utils';
+import { formatWindowsFilePath, isWindows } from '../../utils';
 
 export class CheckovExecutor {
     private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, typeof DockerExecutor | typeof Pip3Executor>([
@@ -34,8 +34,14 @@ export class CheckovExecutor {
         const installation = CheckovExecutor.installation;
         const executor = CheckovExecutor.getExecutor();
 
-        if (process.platform === 'win32') {
-            targetFiles = targetFiles?.map(file => file[0] === '/' ? formatWindowsFilePath(file) : `/${formatWindowsFilePath(file)}`);
+        if (isWindows()) {
+            targetFiles = targetFiles?.map(file => {
+                if (CheckovInstall.installationType === CHECKOV_INSTALLATION_TYPE.DOCKER) {
+                    return file[0] === '/' ? formatWindowsFilePath(file) : `/${formatWindowsFilePath(file)}`;
+                } else {
+                    return file;
+                }
+            });
         } 
 
         if (!executor || AbstractExecutor.isScanInProgress) {

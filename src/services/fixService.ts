@@ -9,6 +9,7 @@ import { CategoriesService, CheckovExecutor, ResultsService } from '../services'
 import { CheckovResultWebviewPanel } from '../views/interface/checkovResult';
 import { CustomPopupService } from './customPopupService';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
+import { isPipInstall, isWindows } from '../utils';
 
 export class FixService {
     public static async fix(result: CheckovResult) {
@@ -57,7 +58,7 @@ export class FixService {
     private static async applyIaCFix(targetResult: CheckovResult) {
         const activeEditor = CheckovResultWebviewPanel.fileEditorMap.get(targetResult.file_abs_path) || vscode.window.activeTextEditor;
         if (activeEditor) {
-            const { repo_file_path, file_line_range, fixed_definition, file_abs_path } = targetResult;
+            const { repo_file_path, file_line_range, fixed_definition, file_abs_path, original_abs_path } = targetResult;
             const workspaceEdit = new vscode.WorkspaceEdit();
             const workspaceFolders = vscode.workspace.workspaceFolders;
             const resultFileUri = vscode.Uri.joinPath(workspaceFolders![0].uri, repo_file_path);
@@ -68,7 +69,7 @@ export class FixService {
             workspaceEdit.replace(resultFileUri, blockRange, fixed_definition);
             await vscode.workspace.applyEdit(workspaceEdit);
             await activeEditor.document.save();
-            await CheckovExecutor.execute([file_abs_path]);
+            await CheckovExecutor.execute([(isWindows() && isPipInstall()) ? original_abs_path : file_abs_path]);
             CustomPopupService.highlightLines();
             TreeDataProvidersContainer.refresh();
             return;

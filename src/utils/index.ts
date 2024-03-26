@@ -1,12 +1,21 @@
 import { exec, ExecOptions } from 'child_process';
 import { v4 as uuidv4 } from 'uuid';
 import * as vscode from 'vscode';
-import { GLOBAL_CONTEXT } from '../constants';
+import { CHECKOV_INSTALLATION_TYPE, GLOBAL_CONTEXT } from '../constants';
+import { CheckovInstall } from '../commands/checkov';
 
 export interface DiagnosticReferenceCode {
     target: vscode.Uri;
     value: string;
 }
+
+export const isPipInstall = (): boolean => {
+    return CheckovInstall.installationType === CHECKOV_INSTALLATION_TYPE.PIP3;
+};
+
+export const isWindows = (): boolean => {
+    return process.platform === 'win32';
+};
 
 export const formatWindowsFilePath = (path: string): string => {
     return path.replace(':', '').replace(/\\/g, '/');
