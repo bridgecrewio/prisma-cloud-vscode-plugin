@@ -17,6 +17,10 @@ export class CategoriesService {
         return checkId.startsWith('BC_LIC');
     }
 
+    public static isWeaknessesRisk(checkType: string): boolean {
+        return checkType.startsWith('cdk_') || checkType.startsWith('sast_');
+    }
+
     public static getCategoryByCheckId(checkId: string): CHECKOV_RESULT_CATEGORY | undefined {
         if (this.isIaCRisk(checkId)) {
             return CHECKOV_RESULT_CATEGORY.IAC;
@@ -29,6 +33,10 @@ export class CategoriesService {
         }
         if (this.isLicensesRisk(checkId)) {
             return CHECKOV_RESULT_CATEGORY.LICENSES;
+        }
+        // TODO fix here to pass not checkId but checkType
+        if (this.isWeaknessesRisk(checkId)) {
+            return CHECKOV_RESULT_CATEGORY.WEAKNESSES;
         }
     }
 }

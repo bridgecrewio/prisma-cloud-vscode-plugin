@@ -66,7 +66,8 @@ export enum CHECKOV_RESULT_CATEGORY {
     IAC = 'iac', 
     SCA = 'sca', 
     SECRETS = 'secrets', 
-    LICENSES = 'licenses' 
+    LICENSES = 'licenses',
+    WEAKNESSES = 'weaknesses',
 };
 
 export enum CHECKOV_RESULT_VIEW_MESSAGE_TYPE {

@@ -7,6 +7,7 @@ export type CheckovResult = {
     check_class: string;
     check_name: string;
     code_block: [number, string][];
+    check_type: string;
     original_abs_path: string;
     file_abs_path: string;
     file_line_range: number[];

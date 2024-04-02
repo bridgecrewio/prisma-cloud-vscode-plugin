@@ -105,10 +105,16 @@ export class CheckovExecutor {
 
     private static processOutput(output: CheckovOutput) {
         if (Array.isArray(output)) {
-            const failedChecks = output.reduce((acc: CheckovResult[], checkType) => acc.concat(checkType?.results.failed_checks ?? []), []);
-            for (const failedCheck of failedChecks) {
-                failedCheck.id = uuidv4();
-            }
+            const failedChecks = output.reduce((acc: CheckovResult[], checkType) => {
+                if (checkType) {
+                    for (const check of checkType.results.failed_checks) {
+                        check.check_type = checkType.check_type;
+                        check.id = uuidv4();
+                    };
+                }
+                return acc.concat(checkType?.results.failed_checks ?? []);
+            }, []);
+
             return failedChecks;
         }
 
@@ -119,6 +125,7 @@ export class CheckovExecutor {
 
         for (const failedCheck of output.results?.failed_checks) {
             failedCheck.id = uuidv4();
+            failedCheck.check_type = output.check_type;
         }
 
         return output.results?.failed_checks ?? [];

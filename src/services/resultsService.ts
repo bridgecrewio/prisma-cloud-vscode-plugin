@@ -63,6 +63,8 @@ export class ResultsService {
                 return results.filter((result) => CategoriesService.isSecretsRisk(result.check_id));
             case CHECKOV_RESULT_CATEGORY.LICENSES:
                 return results.filter((result) => CategoriesService.isLicensesRisk(result.check_id));
+            case CHECKOV_RESULT_CATEGORY.WEAKNESSES:
+                return results.filter((result) => CategoriesService.isWeaknessesRisk(result.check_type));
         }
     }
 

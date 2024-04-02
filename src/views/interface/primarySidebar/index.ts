@@ -10,6 +10,7 @@ export class PrimarySidebar {
     public static secretsTreeView: vscode.TreeView<TreeItem>;
     public static vulnerabilitiesTreeView: vscode.TreeView<TreeItem>;
     public static licensesTreeView: vscode.TreeView<TreeItem>;
+    public static weaknessesTreeView: vscode.TreeView<TreeItem>;
 
     public static initialize(context: vscode.ExtensionContext) {
         PrimarySidebar.iacTreeView = vscode.window.createTreeView('iac-misconfiguration', {
@@ -24,6 +25,9 @@ export class PrimarySidebar {
         PrimarySidebar.licensesTreeView = vscode.window.createTreeView('licenses', {
             treeDataProvider: TreeDataProvidersContainer.licensesTreeDataProvider,
         });
+        PrimarySidebar.weaknessesTreeView = vscode.window.createTreeView('weaknesses', {
+            treeDataProvider: TreeDataProvidersContainer.weaknessesTreeDataProvider,
+        });
 
         PrimarySidebar.iacTreeView.onDidChangeSelection(
             TreeDataProvidersContainer.iacTreeDataProvider.onDidChangeSelection.bind(TreeDataProvidersContainer.iacTreeDataProvider),
@@ -36,6 +40,9 @@ export class PrimarySidebar {
         );
         PrimarySidebar.licensesTreeView.onDidChangeSelection(
             TreeDataProvidersContainer.licensesTreeDataProvider.onDidChangeSelection.bind(TreeDataProvidersContainer.licensesTreeDataProvider),
+        );
+        PrimarySidebar.weaknessesTreeView.onDidChangeSelection(
+            TreeDataProvidersContainer.weaknessesTreeDataProvider.onDidChangeSelection.bind(TreeDataProvidersContainer.weaknessesTreeDataProvider),
         );
     }
 
@@ -62,6 +69,8 @@ export class PrimarySidebar {
                 return PrimarySidebar.vulnerabilitiesTreeView;
             case CHECKOV_RESULT_CATEGORY.SECRETS:
                 return PrimarySidebar.secretsTreeView;
+            case CHECKOV_RESULT_CATEGORY.WEAKNESSES:
+                return PrimarySidebar.weaknessesTreeView;
             default:
                 console.log(`No such tree view for the category: ${category}`);
         }

@@ -48,6 +48,10 @@
         {
           "id": "licenses",
           "name": "Licenses"
+        },
+        {
+          "id": "weaknesses",
+          "name": "Weaknesses"
         }
       ]
     },
