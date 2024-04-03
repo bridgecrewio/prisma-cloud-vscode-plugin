@@ -61,29 +61,41 @@ export class CheckovInstall {
 
     private static async withPip3() {
         console.log('Installing Checkov with Pip3');
+        let firstTry = true;
+        let pythonExe = 'python3';
+        let pipExe = 'pip3';
 
-        try {
-            const isPythonVersionSuitable = await CheckovInstall.isPythonVersionSuitable('python3 --version');
-
-            if (!isPythonVersionSuitable) {
-                return false;
+        while (true) {
+            try {
+                const isPythonVersionSuitable = await CheckovInstall.isPythonVersionSuitable(`${pythonExe} --version`);
+    
+                if (!isPythonVersionSuitable) {
+                    return false;
+                }
+    
+                (await asyncExec(`${pipExe} install --user -U -i https://pypi.org/simple/ checkov`));
+                if (isWindows()) {
+                    CheckovInstall.processPathEnv = (await asyncExec('echo %PATH%')).stdout.trim();
+                } else {
+                    CheckovInstall.processPathEnv = (await asyncExec('echo $PATH')).stdout.trim();
+                    CheckovInstall.processPathEnv = (await asyncExec(`${pythonExe} -c "import site; print(site.USER_BASE)"`)).stdout.trim() + '/bin' + ':' + CheckovInstall.processPathEnv;
+                }
+    
+                const entrypoint = await CheckovInstall.resolveEntrypoint(CHECKOV_INSTALLATION_TYPE.PIP3);
+                CheckovInstall.installationType = CHECKOV_INSTALLATION_TYPE.PIP3;
+    
+                return { type: CHECKOV_INSTALLATION_TYPE.PIP3, entrypoint };
+            } catch (error) {
+                console.error(`The Checkov installation with ${pythonExe} was failed`, { error });
+                if (firstTry) {
+                    console.log('Retrying using `python` and `pip`');
+                    pythonExe = 'python';
+                    pipExe = 'pip';
+                    firstTry = false;
+                } else {
+                    return false;
+                }
             }
-
-            (await asyncExec('pip3 install --user -U -i https://pypi.org/simple/ checkov'));
-            if (isWindows()) {
-                CheckovInstall.processPathEnv = (await asyncExec('echo %PATH%')).stdout.trim();
-            } else {
-                CheckovInstall.processPathEnv = (await asyncExec('echo $PATH')).stdout.trim();
-                CheckovInstall.processPathEnv = (await asyncExec('python3 -c "import site; print(site.USER_BASE)"')).stdout.trim() + '/bin' + ':' + CheckovInstall.processPathEnv;
-            }
-
-            const entrypoint = await CheckovInstall.resolveEntrypoint(CHECKOV_INSTALLATION_TYPE.PIP3);
-            CheckovInstall.installationType = CHECKOV_INSTALLATION_TYPE.PIP3;
-
-            return { type: CHECKOV_INSTALLATION_TYPE.PIP3, entrypoint };
-        } catch (error) {
-            console.error('The Checkov installation with Pip3 was failed', { error });
-            return false;
         }
     }
 
@@ -120,8 +132,7 @@ export class CheckovInstall {
             
             return !semver.lt(pythonVersion, CONFIG.requirenments.minPythonVersion);
         } catch (error) {
-            console.error('Checking the Python version was failed', { error });
-            return false;
+            throw new Error(`Checking the Python version was failed due: ${error}`);
         }
     }
 
