@@ -148,7 +148,13 @@ export class TreeService {
                 { path: package_name, pathType: PATH_TYPE.PACKAGE }, 
                 { path: license, pathType: PATH_TYPE.RISK, severity }
             ];
-        }    
+        }  
+        if (category === CHECKOV_RESULT_CATEGORY.WEAKNESSES) {
+            return [
+                ...repoPathCells,
+                { path: `${result.check_name} (${file_line_range[0]} - ${file_line_range[1]})`, pathType: PATH_TYPE.RISK, severity }
+            ];
+        }  
         return [{ path: '', pathType: PATH_TYPE.EMPTY }];
     }
 

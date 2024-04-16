@@ -56,7 +56,7 @@ export class ResultsService {
 
         switch (category) {
             case CHECKOV_RESULT_CATEGORY.IAC:
-                return results.filter((result) => CategoriesService.isIaCRisk(result.check_id));
+                return results.filter((result) => CategoriesService.isIaCRisk(result.check_id, result.check_type));
             case CHECKOV_RESULT_CATEGORY.SCA:
                 return results.filter((result) => CategoriesService.isSCARisk(result.check_id));
             case CHECKOV_RESULT_CATEGORY.SECRETS:

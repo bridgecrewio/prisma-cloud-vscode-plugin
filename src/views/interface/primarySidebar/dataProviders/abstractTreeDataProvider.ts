@@ -57,7 +57,7 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
 
     console.log(result);
 
-    const isIaC = CategoriesService.isIaCRisk(result.check_id);
+    const isIaC = CategoriesService.isIaCRisk(result.check_id, result.check_type);
 
     if (isIaC) {
       const fetchedDescription = await CheckovResultWebviewPanel.fetchDescription(result.bc_check_id);

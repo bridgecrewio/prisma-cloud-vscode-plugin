@@ -81,9 +81,9 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
 	});
 
     vscode.commands.registerCommand('extension.focusTreeItem', async (...params) => {
-        const { checkId, id } = params[0];
-        const treeItemToFocus = TreeDataProvidersContainer.getTreeItemByCheckIds({ checkId, id });
-        const treeView = PrimarySidebar.getTreeViewByCheckId(checkId);
+        const { checkId, id, checkType } = params[0];
+        const treeItemToFocus = TreeDataProvidersContainer.getTreeItem({ checkId, id, checkType });
+        const treeView = PrimarySidebar.getTreeView(checkId, checkType);
         
         if (treeView && treeItemToFocus) {
             treeView.reveal(treeItemToFocus, { focus: true, select: true });
@@ -175,7 +175,8 @@ export class CustomPopupService {
                 short_description, 
                 check_name, 
                 guideline, 
-                check_id, 
+                check_id,
+                check_type,
                 id, 
                 fixed_definition,
                 vulnerability_details,
@@ -212,7 +213,7 @@ export class CustomPopupService {
             if (guideline) {
                 hoverContent.appendMarkdown(`<a href="command:extension.openLink?${createCommandUri(guideline)}"><span> Documentation </span></a>`);
             }
-            hoverContent.appendMarkdown(`<a href="command:extension.focusTreeItem?${createCommandUri({checkId: check_id, id })}"><img src="${createIconUri('console.svg')}"/><span style="color:#ffffff;"> Console</span></a>`);
+            hoverContent.appendMarkdown(`<a href="command:extension.focusTreeItem?${createCommandUri({checkId: check_id, id, checkType: check_type})}"><img src="${createIconUri('console.svg')}"/><span style="color:#ffffff;"> Console</span></a>`);
             
             if (risksForLine.length > 1) {
                 if (index < risksForLine.length - 1) {

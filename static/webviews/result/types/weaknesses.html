@@ -1,0 +1,66 @@
+<header class="header">
+    <img src="{{severityIconUri}}" alt="critical">
+    <h2>{{check_name}}</h2>
+</header>
+<section id="taint" class="{{taintRiskState}}">
+    <section>
+        <div class="details">
+            <span>Data flow:</span>
+            <p>{{dataFlow}}</p>
+        </div>
+        <div class="details {{owaspVisibility}}">
+            <span>OWASP Top 10:</span>
+            <p>{{owaspValue}}</p>
+        </div>
+        <div class="details {{cweVisibility}}">
+            <span>CWE(s):</span>
+            <p>{{cweValue}}</p>
+        </div>
+        <div>
+            {{dataFlowLinks}}
+        </div>
+    </section>
+</section>
+
+<section id="non-taint" class="{{nonTaintRiskState}}">
+    <section>
+        <table class="code">
+            <thead>
+                <tr>
+                    <th colspan="2" class="resource">
+                        <!-- <img src="{{resourceIconUri}}" alt="resource"> -->
+                        <span>{{resource}}</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {{codeBlock}}
+            </tbody>
+        </table>
+    </section>
+    <div class="details">
+        <span>File:</span>
+        <p>{{repoFilePath}}</p>
+    </div>
+    <div class="details">
+        <span>Line numbers:</span>
+        <p>{{lineNumbers}}</p>
+    </div>
+    <div class="details {{owaspVisibility}}">
+        <span>OWASP Top 10:</span>
+        <p>{{owaspValue}}</p>
+    </div>
+    <div class="details {{cweVisibility}}">
+        <span>CWE(s):</span>
+        <p>{{cweValue}}</p>
+    </div>
+</section>
+
+<section>
+    <div class="actions">
+        <a target="_blank" class="action {{guidelineActionState}}" onclick="onDocumentationClick('{{guideline}}')">
+            <img src="{{guidelineIconUri}}" alt="suppress">
+            <span>Documentation</span>
+        </div>
+    </div>
+</section>

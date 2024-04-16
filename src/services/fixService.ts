@@ -16,7 +16,7 @@ export class FixService {
         if (!result.fixed_definition || !CheckovExecutor.getExecutor()) {
             return;
         }
-        const resultCategory = CategoriesService.getCategoryByCheckId(result.check_id);
+        const resultCategory = CategoriesService.getCategory(result.check_id, result.check_type);
         
         if (resultCategory === CHECKOV_RESULT_CATEGORY.SCA) {
             await FixService.applyScaFix(result);

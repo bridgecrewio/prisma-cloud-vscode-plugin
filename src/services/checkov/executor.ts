@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { v4 as uuidv4 } from 'uuid';
 
-import { CHECKOV_INSTALLATION_TYPE, USER_CONFIGURATION_PARAM } from '../../constants';
+import { CHECKOV_INSTALLATION_TYPE, SEVERITY, USER_CONFIGURATION_PARAM } from '../../constants';
 import { CheckovInstallation, CheckovOutput, CheckovResult } from '../../types';
 import { DockerExecutor, Pip3Executor } from './executors';
 import { ResultsService } from '../resultsService';
@@ -110,6 +110,7 @@ export class CheckovExecutor {
                     for (const check of checkType.results.failed_checks) {
                         check.check_type = checkType.check_type;
                         check.id = uuidv4();
+                        check.severity = check.severity || SEVERITY.INFO;
                     };
                 }
                 return acc.concat(checkType?.results.failed_checks ?? []);
@@ -126,6 +127,7 @@ export class CheckovExecutor {
         for (const failedCheck of output.results?.failed_checks) {
             failedCheck.id = uuidv4();
             failedCheck.check_type = output.check_type;
+            failedCheck.severity = failedCheck.severity || SEVERITY.INFO;
         }
 
         return output.results?.failed_checks ?? [];

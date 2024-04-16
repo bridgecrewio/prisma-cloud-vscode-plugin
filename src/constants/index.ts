@@ -74,6 +74,7 @@ export enum CHECKOV_RESULT_VIEW_MESSAGE_TYPE {
     SUPPRESS = 'suppress',
     FIX = 'fix',
     DOCUMENTATION_CLICK = 'documentationClick',
+    ON_STEP_CLICK = 'sastStepClick',
 };
 
 export const severityPriorityMap: Record<SEVERITY, number> = {

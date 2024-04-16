@@ -111,7 +111,7 @@
         {
           "command": "checkov.execute",
           "group": "navigation",
-          "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses"
+          "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses || view == weaknesses"
         },
         {
           "submenu": "filters",

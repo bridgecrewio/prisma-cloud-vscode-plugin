@@ -49,8 +49,8 @@ export class TreeDataProvidersContainer {
         }
     }
 
-    public static getTreeItemByCheckIds({ checkId, id }: { checkId: string, id: string }) {
-        const checkCategory = CategoriesService.getCategoryByCheckId(checkId);
+    public static getTreeItem({ checkId, id, checkType }: { checkId: string, id: string, checkType: string }) {
+        const checkCategory = CategoriesService.getCategory(checkId, checkType);
         if (checkCategory) {
             const treeDataProvider = TreeDataProvidersContainer.getTreeDataProviderByCategory(checkCategory);
             return treeDataProvider?.getTreeItemByIds(id);

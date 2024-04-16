@@ -50,8 +50,8 @@ export class PrimarySidebar {
         PrimarySidebar.iacTreeView.badge = { value: ResultsService.getCount(), tooltip: '' };
     }
 
-    public static getTreeViewByCheckId(checkId: string) {
-        const checkCategory = CategoriesService.getCategoryByCheckId(checkId);
+    public static getTreeView(checkId: string, checkType: string) {
+        const checkCategory = CategoriesService.getCategory(checkId, checkType);
         if (checkCategory) {
             return PrimarySidebar.getTreeViewByCategory(checkCategory);
         }
