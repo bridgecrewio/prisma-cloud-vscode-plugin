@@ -1,7 +1,7 @@
 import { CHECKOV_RESULT_CATEGORY } from "../constants";
 
 export class CategoriesService {
-    public static isIaCRisk(checkId: string, checkType: string): boolean {
+    public static isIaCRisk(checkId: string, checkType: string = ''): boolean {
         return (['BC_VUL', 'CKV_SECRET', 'BC_LIC'].every((prefix) => !checkId.startsWith(prefix))) 
             && (['cdk_', 'sast_'].every((prefix) => !checkType.startsWith(prefix)));
     }
@@ -18,7 +18,7 @@ export class CategoriesService {
         return checkId.startsWith('BC_LIC');
     }
 
-    public static isWeaknessesRisk(checkType: string): boolean {
+    public static isWeaknessesRisk(checkType: string = ''): boolean {
         return checkType.startsWith('cdk_') || checkType.startsWith('sast_');
     }
 
