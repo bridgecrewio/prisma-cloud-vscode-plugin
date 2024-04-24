@@ -25,7 +25,7 @@ export class DockerExecutor extends AbstractExecutor {
             ...DockerExecutor.getVolumeMounts(),
             ...DockerExecutor.getWorkdir(),
             ...DockerExecutor.getImage(),
-            ...DockerExecutor.getCheckovCliParams(installation, files),
+            ...(await DockerExecutor.getCheckovCliParams(installation, files)),
         ];
 
         console.log(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);

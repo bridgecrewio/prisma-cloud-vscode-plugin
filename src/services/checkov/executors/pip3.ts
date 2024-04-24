@@ -15,7 +15,7 @@ export class Pip3Executor extends AbstractExecutor {
         AbstractExecutor.isScanInProgress = true;
         await reRenderViews();
         const args = [
-            ...Pip3Executor.getCheckovCliParams(installation, files),
+            ...(await Pip3Executor.getCheckovCliParams(installation, files)),
         ];
 
         console.log(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);

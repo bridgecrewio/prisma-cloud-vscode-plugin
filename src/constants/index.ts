@@ -39,6 +39,7 @@ export enum USER_CONFIGURATION_PARAM {
     PRISMA_URL = 'prismaURL',
     CERTIFICATE = 'certificate',
     USE_ENFORCEMENT_RULES = 'useEnforcementRules',
+    SAST_SIZE_LIMIT = 'weaknessesFullScanSizeLimit',
 };
 
 export enum PATH_TYPE {
@@ -66,13 +67,15 @@ export enum CHECKOV_RESULT_CATEGORY {
     IAC = 'iac', 
     SCA = 'sca', 
     SECRETS = 'secrets', 
-    LICENSES = 'licenses' 
+    LICENSES = 'licenses',
+    WEAKNESSES = 'weaknesses',
 };
 
 export enum CHECKOV_RESULT_VIEW_MESSAGE_TYPE {
     SUPPRESS = 'suppress',
     FIX = 'fix',
     DOCUMENTATION_CLICK = 'documentationClick',
+    ON_STEP_CLICK = 'sastStepClick',
 };
 
 export const severityPriorityMap: Record<SEVERITY, number> = {

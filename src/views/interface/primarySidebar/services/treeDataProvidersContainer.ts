@@ -1,5 +1,6 @@
 import { IaCTreeDataProvider } from '../dataProviders/iacTreeDataProvider';
 import { SecretsTreeDataProvider } from '../dataProviders/secretsTreeDataProvider';
+import { WeaknessesTreeDataProvider } from '../dataProviders/weaknessesTreeDataProvider';
 import { VulnerabilitiesTreeDataProvider } from '../dataProviders/vulnerabilitiesTreeDataProvider';
 import { LicensesTreeDataProvider } from '../dataProviders/licensesTreeDataProvider';
 import { PrimarySidebar } from '../../primarySidebar';
@@ -12,12 +13,14 @@ export class TreeDataProvidersContainer {
     public static secretsTreeDataProvicer: SecretsTreeDataProvider;
     public static vulnerabilitiesTreeDataProvider: VulnerabilitiesTreeDataProvider;
     public static licensesTreeDataProvider: LicensesTreeDataProvider;
+    public static weaknessesTreeDataProvider: WeaknessesTreeDataProvider;
 
     static {
         TreeDataProvidersContainer.iacTreeDataProvider = new IaCTreeDataProvider();
         TreeDataProvidersContainer.secretsTreeDataProvicer = new SecretsTreeDataProvider();
         TreeDataProvidersContainer.vulnerabilitiesTreeDataProvider = new VulnerabilitiesTreeDataProvider();
         TreeDataProvidersContainer.licensesTreeDataProvider = new LicensesTreeDataProvider();
+        TreeDataProvidersContainer.weaknessesTreeDataProvider = new WeaknessesTreeDataProvider();
     }
 
     public static refresh() {
@@ -25,6 +28,7 @@ export class TreeDataProvidersContainer {
         TreeDataProvidersContainer.secretsTreeDataProvicer.refresh();
         TreeDataProvidersContainer.vulnerabilitiesTreeDataProvider.refresh();
         TreeDataProvidersContainer.licensesTreeDataProvider.refresh();
+        TreeDataProvidersContainer.weaknessesTreeDataProvider.refresh();
         PrimarySidebar.refreshBadgeCount();
     }
 
@@ -38,13 +42,15 @@ export class TreeDataProvidersContainer {
                 return TreeDataProvidersContainer.vulnerabilitiesTreeDataProvider;
             case CHECKOV_RESULT_CATEGORY.SECRETS:
                 return TreeDataProvidersContainer.secretsTreeDataProvicer;
+            case CHECKOV_RESULT_CATEGORY.WEAKNESSES:
+                return TreeDataProvidersContainer.weaknessesTreeDataProvider;
             default:
                 console.log(`No such tree data provider for the category: ${category}`);
         }
     }
 
-    public static getTreeItemByCheckIds({ checkId, id }: { checkId: string, id: string }) {
-        const checkCategory = CategoriesService.getCategoryByCheckId(checkId);
+    public static getTreeItem({ checkId, id, checkType }: { checkId: string, id: string, checkType: string }) {
+        const checkCategory = CategoriesService.getCategory(checkId, checkType);
         if (checkCategory) {
             const treeDataProvider = TreeDataProvidersContainer.getTreeDataProviderByCategory(checkCategory);
             return treeDataProvider?.getTreeItemByIds(id);

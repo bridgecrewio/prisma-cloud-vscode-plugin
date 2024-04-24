@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import axios from 'axios';
 
 import { CONFIG } from '../../../config';
-import { CheckovResult } from '../../../types';
+import { CheckovResult, DataFlow } from '../../../types';
 import { MessageHandlersFactory } from './messages';
 import { CHECKOV_RESULT_CATEGORY, GLOBAL_CONTEXT } from '../../../constants';
 import { AbstractExecutor } from '../../../services/checkov/executors/abstractExecutor';
@@ -67,8 +67,8 @@ export class CheckovResultWebviewPanel {
     }
 
     public static isSuppressionVisible(result: CheckovResult): boolean {
-        const { check_id, vulnerability_details } = result;
-        if (CategoriesService.isIaCRisk(check_id)) {
+        const { check_id, vulnerability_details, check_type } = result;
+        if (CategoriesService.isIaCRisk(check_id, check_type)) {
             return true;
         }
 
@@ -79,7 +79,9 @@ export class CheckovResultWebviewPanel {
             return Boolean(vulnerability_details?.id) || Boolean(check_id);
         }
 
-        if (CategoriesService.isLicensesRisk(check_id) || CategoriesService.isSecretsRisk(check_id)) {
+        if (CategoriesService.isLicensesRisk(check_id) 
+            || CategoriesService.isSecretsRisk(check_id) 
+            || CategoriesService.isWeaknessesRisk(check_type)) {
             return false;
         }
 
@@ -138,6 +140,16 @@ export class CheckovResultWebviewPanel {
             approvedSPDX: result.check_id === 'BC_LIC_1' ? 'true' : 'false',
             disabledClass: AbstractExecutor.isScanInProgress ? 'disabledDiv' : '',
             suppressActionState: CheckovResultWebviewPanel.isSuppressionVisible(result) ? 'visible' : 'hidden',
+            taintRiskState: (result.metadata?.taint_mode || result.metadata?.code_locations?.length) ? 'visible' : 'hidden',
+            nonTaintRiskState: (result.metadata?.taint_mode || result.metadata?.code_locations?.length) ? 'hidden' : 'visible',
+            dataFlow: CheckovResultWebviewPanel.getDataFlowValue(result),
+            owaspVisibility: result.owasp?.length ? 'visible' : 'hidden',
+            owaspValue: CheckovResultWebviewPanel.getOwaspStringValue(result),
+            cweVisibility: result.cwe?.length ? 'visible' : 'hidden',
+            cweValue: CheckovResultWebviewPanel.getCweValue(result),
+            dataFlowLinks: CheckovResultWebviewPanel.getDataFlowLinks(result),
+            repoFilePath: result.repo_file_path,
+            lineNumbers: CheckovResultWebviewPanel.getLineNumbers(result),
         };
 
         for (const htmlParam of htmlParams) {
@@ -207,5 +219,104 @@ export class CheckovResultWebviewPanel {
 
     private static getDescriptionsEndpoint(checkId: string) {
         return CONFIG.userConfig.prismaURL + `/bridgecrew/api/v1/violations/${checkId}/description`;
+    }
+
+    private static getDataFlowValue(result: CheckovResult): string {
+        let steps: number;
+        let filesCount: number;
+        const filesSet = new Set();
+
+        if (result.metadata?.taint_mode) {
+            steps = result.metadata?.taint_mode?.data_flow.length;
+
+            for (const dataFlow of result.metadata.taint_mode.data_flow) {
+                filesSet.add(dataFlow.path);
+            }
+            filesCount = filesSet.size;
+
+            return `${steps} in ${filesCount} file(s)`;
+        } else if (result.metadata?.code_locations) {
+            steps = result.metadata?.code_locations?.length || 0;
+
+            for (const dataFlow of result.metadata?.code_locations) {
+                filesSet.add(dataFlow.path);
+            }
+            filesCount = filesSet.size;
+
+            return `${steps} in ${filesCount} file(s)`;
+        } else {
+            return '---';
+        }
+    }
+
+    private static getOwaspStringValue(result: CheckovResult): string {
+        let resultString: string = '';
+        
+        if (result.owasp?.length) {
+            for (const owaspString of result?.owasp) {
+                resultString += `${owaspString}`;
+            }
+        }
+
+        return resultString;
+    }
+
+    private static getCweValue(result: CheckovResult): string {
+        let resultString: string = '';
+        
+        if (result.cwe?.length) {
+            for (const cweString of result?.cwe) {
+                resultString += `${cweString}`;
+            }
+        }
+
+        return resultString;
+    }
+
+    private static getDataFlowLinks(result: CheckovResult): string {
+        let resultString: string = '';
+
+        if (result.metadata?.taint_mode) {
+            const items = result.metadata.taint_mode.data_flow;
+            items.sort((a, b) => {
+                return a.start.row - b.start.row;
+            });
+
+            for (const dataFlow of items) {
+                resultString += CheckovResultWebviewPanel.getDataFlowItemString(dataFlow, result);
+            }
+
+            return resultString;
+        } else if (result.metadata?.code_locations) {
+            const items = result.metadata.code_locations;
+            items.sort((a, b) => {
+                return a.start.row - b.start.row;
+            });
+
+            for (const dataFlow of items) {
+                resultString += CheckovResultWebviewPanel.getDataFlowItemString(dataFlow, result);
+            }
+
+            return resultString;
+        } else {
+            return '---';
+        }
+    }
+
+    private static getDataFlowItemString(dataFlow: DataFlow, result: CheckovResult): string {
+        const splitPath = dataFlow.path.split('/');
+        return `<div class="details">
+                    <a target="_blank" onclick="onSastStepClick('${result.repo_file_path}', ${dataFlow.start.row})">${splitPath[splitPath.length - 1]}: ${dataFlow.start.row}</a><span>${dataFlow.code_block}</span>
+                </div>`;
+    }
+
+    private static getLineNumbers(result: CheckovResult): string {
+        const { file_line_range } = result;
+
+        if (file_line_range[0] === file_line_range[1]) {
+            return `${file_line_range[0]}`;
+        }
+
+        return `${file_line_range[0]} - ${file_line_range[1]}`;
     }
 };

@@ -61,7 +61,7 @@ export class DiagnosticsService {
                             uri: document.uri,
                             range,
                         },
-                        message: this.getMessageByCategory(failedCheck, CategoriesService.getCategoryByCheckId(failedCheck.check_id)),
+                        message: this.getMessageByCategory(failedCheck, CategoriesService.getCategory(failedCheck.check_id, failedCheck.check_type)),
                     }],
                 };
                 const diagnosticsMap = DiagnosticsService.context.workspaceState.get(DIAGNOSTICS_MAP) as object;

@@ -6,7 +6,7 @@
   "repository": "https://github.com/bridgecrewio/prisma-cloud-vscode-plugin",
   "icon": "static/icons/prisma.png",
   "description": "a static code analysis tool to scan code for Infrastructure-as-Code (IaC) misconfigurations, Software Composition Analysis (SCA) issues and Secrets vulnerabilities.",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "engines": {
     "vscode": "^1.79.0"
   },
@@ -48,6 +48,10 @@
         {
           "id": "licenses",
           "name": "Licenses"
+        },
+        {
+          "id": "weaknesses",
+          "name": "Weaknesses"
         }
       ]
     },
@@ -107,7 +111,7 @@
         {
           "command": "checkov.execute",
           "group": "navigation",
-          "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses"
+          "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses || view == weaknesses"
         },
         {
           "submenu": "filters",
@@ -202,6 +206,12 @@
           "order": 4,
           "markdownDescription": "Whether to have the soft-fail thresholds set by Enforcement apply to the VS Code scan",
           "type": "boolean"
+        },
+        "prismaCloud.weaknessesFullScanSizeLimit": {
+          "order": 5,
+          "markdownDescription": "**[Optional]** Set the size (in MB) threshold above which SAST will not run on a repository",
+          "type": "number",
+          "default": 512
         }
       }
     }

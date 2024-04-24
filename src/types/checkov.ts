@@ -7,6 +7,7 @@ export type CheckovResult = {
     check_class: string;
     check_name: string;
     code_block: [number, string][];
+    check_type: string;
     original_abs_path: string;
     file_abs_path: string;
     file_line_range: number[];
@@ -30,6 +31,14 @@ export type CheckovResult = {
             msg: string;
         }
     };
+    owasp?: string[];
+    cwe?: string[];
+    metadata?: {
+        taint_mode?: {
+            data_flow: DataFlow[]
+        },
+        code_locations?: DataFlow[]
+    }
     description: string;
     short_description: string;
 };
@@ -57,6 +66,18 @@ export type EmptyCheckovOutput = {
     passed: number;
     resource_count: number;
     skipped: number;
+};
+
+export type DataFlow = {
+    path: string;
+    start: FileCoordinates;
+    end: FileCoordinates;
+    code_block: string;
+};
+
+export type FileCoordinates = {
+    row: number;
+    column: number;
 };
 
 export type CheckovOutput = CheckovCheckTypeOutput[] | CheckovCheckTypeOutput;

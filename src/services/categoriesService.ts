@@ -1,8 +1,9 @@
 import { CHECKOV_RESULT_CATEGORY } from "../constants";
 
 export class CategoriesService {
-    public static isIaCRisk(checkId: string): boolean {
-        return ['BC_VUL', 'CKV_SECRET', 'BC_LIC'].every((prefix) => !checkId.startsWith(prefix));
+    public static isIaCRisk(checkId: string, checkType: string): boolean {
+        return (['BC_VUL', 'CKV_SECRET', 'BC_LIC'].every((prefix) => !checkId.startsWith(prefix))) 
+            && (['cdk_', 'sast_'].every((prefix) => !checkType.startsWith(prefix)));
     }
 
     public static isSCARisk(checkId: string): boolean {
@@ -17,8 +18,12 @@ export class CategoriesService {
         return checkId.startsWith('BC_LIC');
     }
 
-    public static getCategoryByCheckId(checkId: string): CHECKOV_RESULT_CATEGORY | undefined {
-        if (this.isIaCRisk(checkId)) {
+    public static isWeaknessesRisk(checkType: string): boolean {
+        return checkType.startsWith('cdk_') || checkType.startsWith('sast_');
+    }
+
+    public static getCategory(checkId: string, checkType: string): CHECKOV_RESULT_CATEGORY | undefined {
+        if (this.isIaCRisk(checkId, checkType)) {
             return CHECKOV_RESULT_CATEGORY.IAC;
         }
         if (this.isSCARisk(checkId)) {
@@ -29,6 +34,9 @@ export class CategoriesService {
         }
         if (this.isLicensesRisk(checkId)) {
             return CHECKOV_RESULT_CATEGORY.LICENSES;
+        }
+        if (this.isWeaknessesRisk(checkType)) {
+            return CHECKOV_RESULT_CATEGORY.WEAKNESSES;
         }
     }
 }

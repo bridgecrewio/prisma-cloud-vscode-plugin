@@ -84,8 +84,8 @@ export class SuppressService {
     }
 
     private static getSkipCheckId(result: CheckovResult): string {
-        const { check_id } = result;
-        if (CategoriesService.isIaCRisk(check_id) || CategoriesService.isSecretsRisk(check_id)) {
+        const { check_id, check_type } = result;
+        if (CategoriesService.isIaCRisk(check_id, check_type) || CategoriesService.isSecretsRisk(check_id)) {
             return result.check_id;
         }
 
