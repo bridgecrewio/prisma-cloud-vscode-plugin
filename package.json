@@ -206,6 +206,12 @@
           "order": 4,
           "markdownDescription": "Whether to have the soft-fail thresholds set by Enforcement apply to the VS Code scan",
           "type": "boolean"
+        },
+        "prismaCloud.weaknessesFullScanSizeLimit": {
+          "order": 5,
+          "markdownDescription": "**[Optional]** Set the size (in MB) threshold above which SAST will not run on a repository",
+          "type": "number",
+          "default": 512
         }
       }
     }

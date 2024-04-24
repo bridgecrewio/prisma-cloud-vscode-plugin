@@ -1,5 +1,7 @@
 import { exec, ExecOptions } from 'child_process';
 import { v4 as uuidv4 } from 'uuid';
+import { join } from 'path';
+import { readdir, stat } from 'fs/promises';
 import * as vscode from 'vscode';
 import { CHECKOV_INSTALLATION_TYPE, GLOBAL_CONTEXT } from '../constants';
 import { CheckovInstall } from '../commands/checkov';
@@ -53,4 +55,26 @@ export const initializeInstallationId = (context: vscode.ExtensionContext) => {
     }
 
     context.globalState.update(GLOBAL_CONTEXT.INSTALLATION_ID, uuidv4());
+};
+
+export const getDirSize = async (dir: string): Promise<number> => {
+    const files = await readdir(dir, { withFileTypes: true });
+
+  const paths: Promise<number>[] = files.map(async file => {
+    const path = join(dir, file.name);
+
+    if (file.isDirectory()) {
+        return await getDirSize(path);
+    }
+
+    if (file.isFile()) {
+      const { size } = await stat(path);
+      
+      return size;
+    }
+
+    return 0;
+  } );
+
+  return (await Promise.all(paths)).flat(Infinity).reduce((i, size) => i + size, 0);
 };

@@ -199,6 +199,7 @@ export class CustomPopupService {
                     repo_file_path,
                     file_line_range,
                     original_abs_path,
+                    check_type,
                 })}"><img src="${createIconUri('fix.svg')}"/><span style="color:#ffffff;"> Fix </span></a>`);
             }
             if (CheckovResultWebviewPanel.isSuppressionVisible(failedCheck)) {

@@ -5,7 +5,8 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../../../config';
 import { CHECKOV_INSTALLATION_TYPE, REPO_ID } from '../../../constants';
 import { CheckovInstallation, CheckovOutput } from '../../../types';
-import { isPipInstall, isWindows } from '../../../utils';
+import { getDirSize, isPipInstall, isWindows } from '../../../utils';
+import { ShowSettings } from '../../../commands/checkov';
 
 export abstract class AbstractExecutor {
     public static isScanInProgress: boolean = false;
@@ -26,7 +27,7 @@ export abstract class AbstractExecutor {
         return `"${workspaceFolders[0].uri.path.replace(':', '')}"`;
     }
 
-    protected static getCheckovCliParams(installation: CheckovInstallation, files?: string[]) {
+    protected static async getCheckovCliParams(installation: CheckovInstallation, files?: string[]) {
         const checkovCliParams = [
             '--repo-id', REPO_ID,
             '--quiet',
@@ -39,6 +40,15 @@ export abstract class AbstractExecutor {
             files.forEach((file) => checkovCliParams.push('--file', `"${file}"`));
         } else {
             checkovCliParams.push('--directory', AbstractExecutor.projectPath!);
+
+            const shouldSkipSast = await AbstractExecutor.shouldSkipSast();
+
+            if (shouldSkipSast) {
+                checkovCliParams.push('--skip-framework', 'sast');
+                vscode.window.showInformationMessage('SAST didn\'t run due to the size of the repository. Adjust this limit in the settings', 'Prisma Cloud Settings').then(() => {
+                    ShowSettings.execute();
+                });
+            }
         }
 
         if (CONFIG.userConfig.certificate) {
@@ -87,5 +97,17 @@ export abstract class AbstractExecutor {
                 resolve(output);
             });
         });
+    }
+
+    private static async shouldSkipSast(): Promise<boolean> {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+
+        if (workspaceFolders) {
+            const dirSize = Math.round((await getDirSize(workspaceFolders[0].uri.path)) / 8 / 100000);
+            const mbLimit = Number(CONFIG.userConfig.weaknessesFullScanSizeLimit);
+            return dirSize > mbLimit;
+        }
+
+        return false;
     }
 };

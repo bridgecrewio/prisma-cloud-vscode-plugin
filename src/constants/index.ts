@@ -39,6 +39,7 @@ export enum USER_CONFIGURATION_PARAM {
     PRISMA_URL = 'prismaURL',
     CERTIFICATE = 'certificate',
     USE_ENFORCEMENT_RULES = 'useEnforcementRules',
+    SAST_SIZE_LIMIT = 'weaknessesFullScanSizeLimit',
 };
 
 export enum PATH_TYPE {
