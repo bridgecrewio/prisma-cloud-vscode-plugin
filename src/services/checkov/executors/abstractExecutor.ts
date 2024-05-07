@@ -101,13 +101,17 @@ export abstract class AbstractExecutor {
 
     private static async shouldSkipSast(): Promise<boolean> {
         const workspaceFolders = vscode.workspace.workspaceFolders;
-
-        if (workspaceFolders) {
-            const dirSize = Math.round((await getDirSize(workspaceFolders[0].uri.path)) / 8 / 100000);
-            const mbLimit = Number(CONFIG.userConfig.weaknessesFullScanSizeLimit);
-            return dirSize > mbLimit;
+        try {
+            if (workspaceFolders) {
+                const dirSize = Math.round((await getDirSize(workspaceFolders[0].uri.path)) / 8 / 100000);
+                const mbLimit = Number(CONFIG.userConfig.weaknessesFullScanSizeLimit);
+                return dirSize > mbLimit;
+            }
+    
+            return false;
+        } catch (e: any) {
+            console.error('Error during calculating folder size for SAST: ' + e.message);
+            return true;
         }
-
-        return false;
     }
 };
