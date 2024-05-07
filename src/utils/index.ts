@@ -58,23 +58,29 @@ export const initializeInstallationId = (context: vscode.ExtensionContext) => {
 };
 
 export const getDirSize = async (dir: string): Promise<number> => {
+    if (isWindows()) {
+        if (dir[0] === '/' || dir[0] === '\\') {
+            dir = dir.substring(1);
+        }
+    }
+
     const files = await readdir(dir, { withFileTypes: true });
 
-  const paths: Promise<number>[] = files.map(async file => {
-    const path = join(dir, file.name);
+    const paths: Promise<number>[] = files.map(async file => {
+        const path = join(dir, file.name);
 
-    if (file.isDirectory()) {
-        return await getDirSize(path);
-    }
+        if (file.isDirectory()) {
+            return await getDirSize(path);
+        }
 
-    if (file.isFile()) {
-      const { size } = await stat(path);
-      
-      return size;
-    }
+        if (file.isFile()) {
+        const { size } = await stat(path);
+        
+        return size;
+        }
 
-    return 0;
-  } );
+        return 0;
+    } );
 
   return (await Promise.all(paths)).flat(Infinity).reduce((i, size) => i + size, 0);
 };
