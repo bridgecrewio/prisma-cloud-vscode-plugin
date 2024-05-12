@@ -8,6 +8,7 @@ import { CHECKOV_RESULT_CATEGORY, GLOBAL_CONTEXT } from '../../../constants';
 import { AbstractExecutor } from '../../../services/checkov/executors/abstractExecutor';
 import { CategoriesService } from '../../../services';
 import { AnalyticsService } from '../../../services/analyticsService';
+import logger from '../../../logger';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
@@ -183,7 +184,7 @@ export class CheckovResultWebviewPanel {
                 return await CheckovResultWebviewPanel.fetchDescription(checkId, retryCount + 1);
             }
 
-            console.log('Error: ' + e.message, e);
+            logger.info('Error: ' + e.message, e);
             return;
         }
     }

@@ -6,6 +6,7 @@ import { CONFIG } from '../../../config';
 import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
 import { reRenderViews } from '../../../views/interface/utils';
+import logger from '../../../logger';
 
 export class DockerExecutor extends AbstractExecutor {
     private static containerName: string;
@@ -28,7 +29,7 @@ export class DockerExecutor extends AbstractExecutor {
             ...(await DockerExecutor.getCheckovCliParams(installation, files)),
         ];
 
-        console.log(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);
+        logger.info(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);
         DockerExecutor.activeProcess = spawn(installation.entrypoint, args, { shell: true });
         const executionResult = await DockerExecutor.handleProcessOutput(DockerExecutor.activeProcess);
         AbstractExecutor.isScanInProgress = false;
@@ -45,10 +46,10 @@ export class DockerExecutor extends AbstractExecutor {
                 await reRenderViews();
 
                 if (process.stderr) {
-                    process.stderr.on('data', (data) => console.log('error' + data.toString()));
+                    process.stderr.on('data', (data) => logger.info('error' + data.toString()));
                 }
             } catch(e) {
-                console.log(e);
+                logger.info(e);
             }
         }
     }

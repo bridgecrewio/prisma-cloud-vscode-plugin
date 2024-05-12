@@ -16,6 +16,7 @@ export enum COMMAND {
     FILTER_HIGH_DISABLE = 'filter.highDisable',
     FILTER_CRITICAL_ENABLE = 'filter.criticalEnable',
     FILTER_CRITICAL_DISABLE = 'filter.criticalDisable',
+    OPEN_PRISMA_LOG = 'prisma.open-log',
 };
 
 export enum WORKSPACE_EVENTS {

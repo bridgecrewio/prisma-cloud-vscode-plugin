@@ -7,6 +7,8 @@ import { CHECKOV_INSTALLATION_TYPE, REPO_ID } from '../../../constants';
 import { CheckovInstallation, CheckovOutput } from '../../../types';
 import { getDirSize, isPipInstall, isWindows } from '../../../utils';
 import { ShowSettings } from '../../../commands/checkov';
+import logger from '../../../logger';
+
 
 export abstract class AbstractExecutor {
     public static isScanInProgress: boolean = false;
@@ -88,7 +90,7 @@ export abstract class AbstractExecutor {
 
             process.on('exit', (code) => {
                 if (code !== 0) {
-                    console.log('Full error checkov process output: \n' + (containerOutput === '' ? 'no errors' : containerOutput));
+                    logger.info('Full error checkov process output: \n' + (containerOutput === '' ? 'no errors' : containerOutput));
                     return reject(new Error(`The Checkov execution exited with code ${code}`));
                 }
 
@@ -110,7 +112,7 @@ export abstract class AbstractExecutor {
     
             return false;
         } catch (e: any) {
-            console.error('Error during calculating folder size for SAST: ' + e.message);
+            logger.error('Error during calculating folder size for SAST: ' + e.message);
             return true;
         }
     }

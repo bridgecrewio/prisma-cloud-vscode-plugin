@@ -7,6 +7,7 @@ import { CheckovInstallation, CheckovOutput } from '../../../types';
 import { reRenderViews } from '../../../views/interface/utils';
 import { CheckovInstall } from '../../../commands/checkov';
 import { formatWindowsFilePath, isPipInstall, isWindows } from '../../../utils';
+import logger from '../../../logger';
 
 export class Pip3Executor extends AbstractExecutor {
     private static pid: any;
@@ -18,7 +19,7 @@ export class Pip3Executor extends AbstractExecutor {
             ...(await Pip3Executor.getCheckovCliParams(installation, files)),
         ];
 
-        console.log(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);
+        logger.info(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);
         const scanProcess = spawn(installation.entrypoint, args, {
             shell: true,
             env: {

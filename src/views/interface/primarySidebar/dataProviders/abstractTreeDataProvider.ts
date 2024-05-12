@@ -5,6 +5,7 @@ import { CheckovResult } from '../../../../types';
 import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
 import { CategoriesService, FilesService } from '../../../../services';
 import { CheckovResultWebviewPanel } from '../../checkovResult';
+import logger from '../../../../logger';
 
 export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   abstract readonly category: CHECKOV_RESULT_CATEGORY;
@@ -55,7 +56,7 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
         return;
     }
 
-    console.log(result);
+    logger.info(result);
 
     const isIaC = CategoriesService.isIaCRisk(result.check_id, result.check_type);
 

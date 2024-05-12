@@ -4,6 +4,8 @@ import { TreeItem } from './dataProviders/abstractTreeDataProvider';
 import { TreeDataProvidersContainer } from './services/treeDataProvidersContainer';
 import { CategoriesService, ResultsService } from '../../../services';
 import { CHECKOV_RESULT_CATEGORY } from '../../../constants';
+import logger from '../../../logger';
+
 
 export class PrimarySidebar {
     public static iacTreeView: vscode.TreeView<TreeItem>;
@@ -56,7 +58,7 @@ export class PrimarySidebar {
             return PrimarySidebar.getTreeViewByCategory(checkCategory);
         }
 
-        console.error(`Can not get tree data provider by category for checkId: ${checkId}`);
+        logger.error(`Can not get tree data provider by category for checkId: ${checkId}`);
     }
 
     private static getTreeViewByCategory(category: CHECKOV_RESULT_CATEGORY): vscode.TreeView<TreeItem> | undefined {
@@ -72,7 +74,7 @@ export class PrimarySidebar {
             case CHECKOV_RESULT_CATEGORY.WEAKNESSES:
                 return PrimarySidebar.weaknessesTreeView;
             default:
-                console.log(`No such tree view for the category: ${category}`);
+                logger.info(`No such tree view for the category: ${category}`);
         }
     }
 }

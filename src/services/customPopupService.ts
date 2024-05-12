@@ -9,6 +9,7 @@ import { CheckovResultWebviewPanel } from '../views/interface/checkovResult';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 import { PrimarySidebar } from '../views/interface/primarySidebar';
 import { formatWindowsFilePath, isWindows } from '../utils';
+import logger from '../logger';
 
 const iconsPath = 'static/icons/svg/severities';
 export let lineClickDisposable: vscode.Disposable;
@@ -88,7 +89,7 @@ export function registerCustomHighlight(context: vscode.ExtensionContext) {
         if (treeView && treeItemToFocus) {
             treeView.reveal(treeItemToFocus, { focus: true, select: true });
         } else {
-            console.error(`Eithere there are no treeView or treeItemToFocus for the risk: ${JSON.stringify(params[0])}, treeItemToFocus: ${treeItemToFocus}`);
+            logger.error(`Eithere there are no treeView or treeItemToFocus for the risk: ${JSON.stringify(params[0])}, treeItemToFocus: ${treeItemToFocus}`);
         }
 	});
 
