@@ -5,14 +5,19 @@ import { EVENT_TYPE, GLOBAL_CONTEXT, IDE_PLUGINS } from "../constants";
 import logger from '../logger';
 
 export const initializeAnalyticsService = async (context: vscode.ExtensionContext) => {
-    AnalyticsService.applicationContext = context;
-	await AnalyticsService.setAnalyticsJwtToken();
+    AnalyticsService.enabled = !!CONFIG.userConfig.prismaURL;
+
+    if (AnalyticsService.enabled) {
+        AnalyticsService.applicationContext = context;
+        await AnalyticsService.setAnalyticsJwtToken();
+    } 
 };
 
 export class AnalyticsService {
     private static retryCount: number = 0;
     static analyticsEndpoint: string = CONFIG.userConfig.prismaURL + '/bridgecrew/api/v1/plugins-analytics';
     static applicationContext: vscode.ExtensionContext;
+    static enabled: boolean = true;
 
     static async setAnalyticsJwtToken() {
         const { secretKey, accessKey } = CONFIG.userConfig;
@@ -36,6 +41,8 @@ export class AnalyticsService {
     }
 
     static async postAnalyticsEvent(eventType: EVENT_TYPE, eventData: Record<string, any>) {
+        if (!AnalyticsService.enabled) { return; }
+
         const installationId = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.INSTALLATION_ID);
         const jwtToken = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
 
