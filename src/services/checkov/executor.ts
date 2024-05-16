@@ -12,6 +12,7 @@ import { AbstractExecutor } from './executors/abstractExecutor';
 import { reRenderViews } from '../../views/interface/utils';
 import { AnalyticsService } from '../analyticsService';
 import { formatWindowsFilePath, isWindows } from '../../utils';
+import logger from '../../logger';
 
 export class CheckovExecutor {
     private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, typeof DockerExecutor | typeof Pip3Executor>([
@@ -62,7 +63,7 @@ export class CheckovExecutor {
                 try {
                     checkovOutput = await executor.execute(installation, targetFiles);
                 } catch (e: any) {
-                    console.log(`The Checkov execution was failed due to: ${e.message}`);
+                    logger.info(`The Checkov execution was failed due to: ${e.message}`);
                     AbstractExecutor.isScanInProgress = false;
                     await reRenderViews();
                     StatusBar.reset();

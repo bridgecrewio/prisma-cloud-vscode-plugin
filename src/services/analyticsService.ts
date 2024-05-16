@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as vscode from 'vscode';
 import { CONFIG } from "../config";
 import { EVENT_TYPE, GLOBAL_CONTEXT, IDE_PLUGINS } from "../constants";
+import logger from '../logger';
 
 export const initializeAnalyticsService = async (context: vscode.ExtensionContext) => {
     AnalyticsService.applicationContext = context;
@@ -24,11 +25,11 @@ export class AnalyticsService {
                 });
     
                 if (response.status === 200) {
-                    console.log('Fetched new JWT token successfully');
+                    logger.info('Fetched new JWT token successfully');
                     await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, response.data.token);
                 }
             } catch (error: any) {
-                console.log('Is not possible to fetch new JWT token. Authorization on prisma was failed: ', error.message);
+                logger.info('Is not possible to fetch new JWT token. Authorization on prisma was failed: ', error.message);
                 await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, undefined);
             }
         }
@@ -53,7 +54,7 @@ export class AnalyticsService {
 
                 if (response.status === 200) {
                     AnalyticsService.retryCount = 0;
-                    console.log('Sent analytics successfully');
+                    logger.info('Sent analytics successfully');
                 }
 
                 return;
@@ -63,19 +64,19 @@ export class AnalyticsService {
                 }
 
                 if (e.response.status === 403) {
-                    console.log('Got 403 for analytics, refreshing JWT token');
+                    logger.info('Got 403 for analytics, refreshing JWT token');
                     AnalyticsService.retryCount++;
                     await AnalyticsService.setAnalyticsJwtToken();
                     await AnalyticsService.postAnalyticsEvent(eventType, eventData);
                     return;
                 }
 
-                console.log('Error: ' + e.message);
+                logger.info('Error: ' + e.message);
                 return;
             }
         }
 
-        console.log('There are no installationId or jwtToken for sending analytics data');
+        logger.info('There are no installationId or jwtToken for sending analytics data');
     }
 
     static async trackFullScanEvent(eventData: Record<string, any>) {

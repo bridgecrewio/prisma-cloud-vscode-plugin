@@ -4,6 +4,7 @@ import { COMMAND } from '../constants';
 import { CheckovInstall, CheckovExecute, ShowSettings } from './checkov';
 import { CheckovExecutor, ResultsService } from '../services';
 import { FiltersService } from '../services/filtersService';
+import { LOG_FILE_NAME } from '../logger';
 
 const commands = new Map<COMMAND, (context: vscode.ExtensionContext) => void>([
     [COMMAND.CHECKOV_INSTALL, CheckovInstall.execute],
@@ -28,4 +29,9 @@ export function registerCommands(context: vscode.ExtensionContext): void {
             vscode.commands.registerCommand(command, () => executor(context)),
         );
     }
+    context.subscriptions.push(
+        vscode.commands.registerCommand(COMMAND.OPEN_PRISMA_LOG, async () => {
+            vscode.window.showTextDocument(vscode.Uri.joinPath(context.logUri, LOG_FILE_NAME));
+        }),
+    );
 };

@@ -7,6 +7,7 @@ import { PrimarySidebar } from '../../primarySidebar';
 import { CategoriesService } from '../../../../services';
 import { TreeDataProvider } from '../dataProviders/abstractTreeDataProvider';
 import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
+import logger from '../../../../logger';
 
 export class TreeDataProvidersContainer {
     public static iacTreeDataProvider: IaCTreeDataProvider;
@@ -45,7 +46,7 @@ export class TreeDataProvidersContainer {
             case CHECKOV_RESULT_CATEGORY.WEAKNESSES:
                 return TreeDataProvidersContainer.weaknessesTreeDataProvider;
             default:
-                console.log(`No such tree data provider for the category: ${category}`);
+                logger.info(`No such tree data provider for the category: ${category}`);
         }
     }
 
@@ -55,7 +56,7 @@ export class TreeDataProvidersContainer {
             const treeDataProvider = TreeDataProvidersContainer.getTreeDataProviderByCategory(checkCategory);
             return treeDataProvider?.getTreeItemByIds(id);
         } else {
-            console.error(`Can not specify category for the risk. checkId: ${checkId} id: ${id}`);
+            logger.error(`Can not specify category for the risk. checkId: ${checkId} id: ${id}`);
         }
     }
 };

@@ -11,6 +11,7 @@ import { CHECKOV_INSTALLATION_TYPE } from '../../constants';
 import { StatusBar } from '../../views';
 import { asyncExec, isWindows } from '../../utils';
 import { CheckovExecutor } from '../../services';
+import logger from '../../logger';
 
 export class CheckovInstall {
     public static processPathEnv: string;
@@ -30,7 +31,7 @@ export class CheckovInstall {
     
                 if (installationResult) {
                     CheckovExecutor.initialize(installationResult);
-                    console.log('Checkov installation was succeed', installationResult);
+                    logger.info('Checkov installation was succeed', installationResult);
                     return;
                 }
             }
@@ -44,7 +45,7 @@ export class CheckovInstall {
     }
 
     private static async withDocker() {
-        console.log('Installing Checkov with Docker');
+        logger.info('Installing Checkov with Docker');
 
         try {
             await asyncExec(`docker pull bridgecrew/checkov:${CONFIG.checkov.version}`);
@@ -54,13 +55,13 @@ export class CheckovInstall {
 
             return { type: CHECKOV_INSTALLATION_TYPE.DOCKER, entrypoint };
         } catch (error) {
-            console.error('The Checkov installation with Docker was failed', { error });
+            logger.error('The Checkov installation with Docker was failed', { error });
             return false;
         }
     }
 
     private static async withPip3() {
-        console.log('Installing Checkov with Pip3');
+        logger.info('Installing Checkov with Pip3');
         let firstTry = true;
         let pythonExe = 'python3';
         let pipExe = 'pip3';
@@ -86,9 +87,9 @@ export class CheckovInstall {
     
                 return { type: CHECKOV_INSTALLATION_TYPE.PIP3, entrypoint };
             } catch (error) {
-                console.error(`The Checkov installation with ${pythonExe} was failed`, { error });
+                logger.error(`The Checkov installation with ${pythonExe} was failed`, { error });
                 if (firstTry) {
-                    console.log('Retrying using `python` and `pip`');
+                    logger.info('Retrying using `python` and `pip`');
                     pythonExe = 'python';
                     pipExe = 'pip';
                     firstTry = false;
@@ -100,7 +101,7 @@ export class CheckovInstall {
     }
 
     private static async withPipenv(context: vscode.ExtensionContext) {
-        console.log('Installing Checkov with Pipenv');
+        logger.info('Installing Checkov with Pipenv');
 
         try {
             const isPythonVersionSuitable = await CheckovInstall.isPythonVersionSuitable('pipenv run python --version');
@@ -119,13 +120,13 @@ export class CheckovInstall {
 
             return { type: CHECKOV_INSTALLATION_TYPE.PIPENV, entrypoint };
         } catch (error) {
-            console.error('The Checkov installation with Pipenv was failed', { error });
+            logger.error('The Checkov installation with Pipenv was failed', { error });
             return false;
         }
     }
 
     private static async isPythonVersionSuitable(extractionCommand: string) {
-        console.log('Checking the Python version');
+        logger.info('Checking the Python version');
 
         try {
             const pythonVersion = (await asyncExec(extractionCommand)).stdout.split(' ')[1];
