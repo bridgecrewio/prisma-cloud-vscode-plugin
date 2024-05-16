@@ -1,7 +1,7 @@
 import * as winston from 'winston';
 
 export const LOG_FILE_NAME = 'prisma.log';
-let logger: winston.Logger = winston.createLogger({
+const logger: winston.Logger = winston.createLogger({
     level: 'debug',
     format: winston.format.combine(
         winston.format.timestamp({
