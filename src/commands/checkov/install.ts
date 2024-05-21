@@ -133,7 +133,7 @@ export class CheckovInstall {
             
             return !semver.lt(pythonVersion, CONFIG.requirenments.minPythonVersion);
         } catch (error) {
-            throw new Error(`Checking the Python version was failed due: ${{ error: formatError(error as Error) }}`);
+            throw new Error(`Checking the Python version was failed due: ${(error as Error).message}`);
         }
     }
 
