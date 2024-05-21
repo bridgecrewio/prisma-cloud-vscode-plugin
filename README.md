@@ -30,9 +30,9 @@ To adjust the Prisma Cloud VSCode Plugin settings, follow these steps:
 2. Navigate to the extension settings by clicking on the gear icon in the sidebar or pressing `Ctrl+,`.
 3. Find the 'Prisma Cloud' extension settings.
 4. Update the following fields:
-   - **Access Key (required)**: Enter the Prisma Cloud access key ID.
-   - **Secret Key (required)**: Enter the Prisma Cloud secret key.
-   - **Prisma URL (required)**: Enter your Prisma Cloud URL e.g. `https://api.prismacloud.io`.
+   - **Access Key (optional)**: Optionally add the Prisma Cloud access key ID.
+   - **Secret Key (optional)**: Optionally add the Prisma Cloud secret key.
+   - **Prisma URL (optional)**: Optionally add your Prisma Cloud URL e.g. `https://api.prismacloud.io`.
    - **CA-Certificate (optional)**: Optionally add the CA certificate in .pem file format.
    - **Use Enforcement Rules (optional)**: Enable enforcement of soft-fail thresholds for VS Code scans.
 

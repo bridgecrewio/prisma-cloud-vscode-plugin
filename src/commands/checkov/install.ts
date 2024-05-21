@@ -9,7 +9,7 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../../config';
 import { CHECKOV_INSTALLATION_TYPE } from '../../constants';
 import { StatusBar } from '../../views';
-import { asyncExec, isWindows } from '../../utils';
+import { asyncExec, isWindows, formatError } from '../../utils';
 import { CheckovExecutor } from '../../services';
 import logger from '../../logger';
 
@@ -55,7 +55,7 @@ export class CheckovInstall {
 
             return { type: CHECKOV_INSTALLATION_TYPE.DOCKER, entrypoint };
         } catch (error) {
-            logger.error('The Checkov installation with Docker was failed', { error });
+            logger.error('The Checkov installation with Docker was failed', { error: formatError(error as Error) });
             return false;
         }
     }
@@ -87,7 +87,7 @@ export class CheckovInstall {
     
                 return { type: CHECKOV_INSTALLATION_TYPE.PIP3, entrypoint };
             } catch (error) {
-                logger.error(`The Checkov installation with ${pythonExe} was failed`, { error });
+                logger.error(`The Checkov installation with ${pythonExe} was failed`, { error: formatError(error as Error) });
                 if (firstTry) {
                     logger.info('Retrying using `python` and `pip`');
                     pythonExe = 'python';
@@ -120,7 +120,7 @@ export class CheckovInstall {
 
             return { type: CHECKOV_INSTALLATION_TYPE.PIPENV, entrypoint };
         } catch (error) {
-            logger.error('The Checkov installation with Pipenv was failed', { error });
+            logger.error('The Checkov installation with Pipenv was failed', { error: formatError(error as Error) });
             return false;
         }
     }
@@ -133,7 +133,7 @@ export class CheckovInstall {
             
             return !semver.lt(pythonVersion, CONFIG.requirenments.minPythonVersion);
         } catch (error) {
-            throw new Error(`Checking the Python version was failed due: ${error}`);
+            throw new Error(`Checking the Python version was failed due: ${{ error: formatError(error as Error) }}`);
         }
     }
 
