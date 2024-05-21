@@ -7,6 +7,8 @@ import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
 import { reRenderViews } from '../../../views/interface/utils';
 import logger from '../../../logger';
+import { getPrismaApiUrl } from '../../../config/configUtils';
+import { CheckovInstall } from '../../../commands/checkov';
 
 export class DockerExecutor extends AbstractExecutor {
     private static containerName: string;
@@ -70,8 +72,8 @@ export class DockerExecutor extends AbstractExecutor {
             '--env', `BC_SOURCE_VERSION=${vscode.extensions.getExtension(CONFIG.extensionId)?.packageJSON.version}` 
         ];
 
-        if (CONFIG.userConfig.prismaURL) {
-            envs.push('--env', `PRISMA_API_URL=${CONFIG.userConfig.prismaURL}`);
+        if (getPrismaApiUrl()) {
+            envs.push('--env', `PRISMA_API_URL=${getPrismaApiUrl()}`);
         }
 
         return envs;
@@ -94,7 +96,7 @@ export class DockerExecutor extends AbstractExecutor {
     }
 
     private static getImage() {
-        return [`bridgecrew/checkov:${CONFIG.checkov.version}`];
+        return [`bridgecrew/checkov:${CheckovInstall.checkovVersion}`];
     }
 };
 

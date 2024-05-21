@@ -219,7 +219,7 @@ export class CheckovResultWebviewPanel {
     }
 
     private static getDescriptionsEndpoint(checkId: string) {
-        return CONFIG.userConfig.prismaURL + `/bridgecrew/api/v1/violations/${checkId}/description`;
+        return getPrismaApiUrl() + `/bridgecrew/api/v1/violations/${checkId}/description`;
     }
 
     private static getDataFlowValue(result: CheckovResult): string {

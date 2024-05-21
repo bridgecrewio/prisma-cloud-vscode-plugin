@@ -8,12 +8,14 @@ import { reRenderViews } from '../../../views/interface/utils';
 import { CheckovInstall } from '../../../commands/checkov';
 import { formatWindowsFilePath, isPipInstall, isWindows } from '../../../utils';
 import logger from '../../../logger';
+import { getPrismaApiUrl } from '../../../config/configUtils';
 
 export class Pip3Executor extends AbstractExecutor {
     private static pid: any;
 
     public static async execute(installation: CheckovInstallation, files?: string[]) {
         AbstractExecutor.isScanInProgress = true;
+        const prismaApiUrl = getPrismaApiUrl();
         await reRenderViews();
         const args = [
             ...(await Pip3Executor.getCheckovCliParams(installation, files)),
@@ -28,8 +30,8 @@ export class Pip3Executor extends AbstractExecutor {
             BC_SOURCE_VERSION: '0.0.1',
         };
 
-        if (CONFIG.userConfig.prismaURL) {
-            env['PRISMA_API_URL'] = CONFIG.userConfig.prismaURL;
+        if (prismaApiUrl) {
+            env['PRISMA_API_URL'] = prismaApiUrl;
         }
 
         const scanProcess = spawn(installation.entrypoint, args, {

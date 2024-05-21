@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CONFIG } from '../config';
+import { getAccessKey, getSecretKey } from '../config/configUtils';
 
 const message = `You’re about to use the plugin without an API key. This means you’ll be utilizing Checkov open source with limited features. For a more comprehensive analysis and full functionality, we highly recommend using an API key to access the complete capabilities of Prisma Cloud.`;
 
@@ -9,7 +9,7 @@ export class OnConfigChanged {
     public static async handle(event: vscode.ConfigurationChangeEvent) {
         if (!OnConfigChanged.alreadyPresented) {
             // Check if the specific configuration of interest has changed
-            if (!CONFIG.userConfig.accessKey && !CONFIG.userConfig.secretKey) {
+            if (!getAccessKey() && !getSecretKey()) {
                 vscode.window.showInformationMessage(message);
                 OnConfigChanged.alreadyPresented = true;
             }

@@ -7,6 +7,7 @@ import { CategoriesService, FilesService } from '../../../../services';
 import { CheckovResultWebviewPanel } from '../../checkovResult';
 import logger from '../../../../logger';
 import { CONFIG } from '../../../../config';
+import { getPrismaApiUrl } from '../../../../config/configUtils';
 
 export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   abstract readonly category: CHECKOV_RESULT_CATEGORY;
@@ -64,7 +65,7 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
     if (isIaC) {
       let fetchedDescription;
 
-      if (CONFIG.userConfig.prismaURL) {
+      if (getPrismaApiUrl()) {
         fetchedDescription = await CheckovResultWebviewPanel.fetchDescription(result.bc_check_id);
       }
 
