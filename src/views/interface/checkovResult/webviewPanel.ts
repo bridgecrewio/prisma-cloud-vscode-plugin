@@ -9,6 +9,7 @@ import { AbstractExecutor } from '../../../services/checkov/executors/abstractEx
 import { CategoriesService } from '../../../services';
 import { AnalyticsService } from '../../../services/analyticsService';
 import logger from '../../../logger';
+import { getPrismaApiUrl } from '../../../config/configUtils';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;

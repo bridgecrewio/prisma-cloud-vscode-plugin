@@ -5,8 +5,8 @@ import { CONFIG } from '.';
 const minCheckovVersion = '2.0.0';
 
 export const getNoCertVerify = (): boolean => {
-    const noCertVerify = CONFIG.userConfig.noCertVerify;
-    return (noCertVerify && noCertVerify.toLowerCase() === 'true') ? true : false;
+    const noCertVerify = CONFIG.userConfig.noCertVerify as any as boolean;
+    return noCertVerify;
 };
 
 export const getAccessKey = (): string | undefined => {
@@ -34,9 +34,9 @@ export const getFrameworks = (): string[] | undefined => {
     return frameworks ? frameworks.split(' ').map((entry: string) => entry.trim()) : undefined;
 };
 
-export const shouldDisableErrorMessage = (): boolean | undefined => {
-    const disableErrorMessageFlag = CONFIG.userConfig.disableErrorMessage;
-    return (disableErrorMessageFlag && disableErrorMessageFlag.toLowerCase() === 'true') ? true : false;
+export const shouldDisableErrorMessage = (): boolean => {
+    const disableErrorMessageFlag = CONFIG.userConfig.disableErrorMessage as any as boolean;
+    return disableErrorMessageFlag;
 };
 
 export const getExternalChecksDir = (): string | undefined => {
