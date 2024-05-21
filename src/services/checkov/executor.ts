@@ -135,16 +135,8 @@ export class CheckovExecutor {
     }
 
     private static getEmptyPrismaSettings(): string[] {
-        const requiredSettings = [
-            USER_CONFIGURATION_PARAM.ACCESS_KEY, 
-            USER_CONFIGURATION_PARAM.SECRET_KEY, 
-            USER_CONFIGURATION_PARAM.PRISMA_URL
-        ];
-        const configParamToText: Record<string, string> = {
-            [USER_CONFIGURATION_PARAM.ACCESS_KEY]: 'Access Key',
-            [USER_CONFIGURATION_PARAM.SECRET_KEY]: 'Secret Key',
-            [USER_CONFIGURATION_PARAM.PRISMA_URL]: 'Prisma URL'
-        };
+        const requiredSettings: string[] = [];
+        const configParamToText: Record<string, string> = {};
         const emptyParams: string[] = [];
 
         for (const setting of requiredSettings) {

@@ -34,9 +34,12 @@ export abstract class AbstractExecutor {
             '--repo-id', REPO_ID,
             '--quiet',
             '--soft-fail',
-            '--output', 'json',
-            '--bc-api-key', `${CONFIG.userConfig.accessKey}::${CONFIG.userConfig.secretKey}`,
+            '--output', 'json'
         ];
+
+        if (CONFIG.userConfig.accessKey && CONFIG.userConfig.secretKey) {
+            checkovCliParams.push('--bc-api-key', `${CONFIG.userConfig.accessKey}::${CONFIG.userConfig.secretKey}`);
+        }
 
         if (files) {
             files.forEach((file) => checkovCliParams.push('--file', `"${file}"`));

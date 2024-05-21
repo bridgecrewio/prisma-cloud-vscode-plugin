@@ -20,15 +20,21 @@ export class Pip3Executor extends AbstractExecutor {
         ];
 
         logger.info(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);
+        
+        const env: any = {
+            ...(isWindows() ? process.env : {}),
+            PATH: CheckovInstall.processPathEnv,
+            BC_SOURCE: 'vscode',
+            BC_SOURCE_VERSION: '0.0.1',
+        };
+
+        if (CONFIG.userConfig.prismaURL) {
+            env['PRISMA_API_URL'] = CONFIG.userConfig.prismaURL;
+        }
+
         const scanProcess = spawn(installation.entrypoint, args, {
             shell: true,
-            env: {
-                ...(isWindows() ? process.env : {}),
-                PATH: CheckovInstall.processPathEnv,
-                PRISMA_API_URL: CONFIG.userConfig.prismaURL,
-                BC_SOURCE: 'vscode',
-                BC_SOURCE_VERSION: '0.0.1',
-            },
+            env,
             detached: !isWindows(),
         });
 

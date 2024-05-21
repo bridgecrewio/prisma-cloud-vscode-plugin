@@ -84,3 +84,11 @@ export const getDirSize = async (dir: string): Promise<number> => {
 
   return (await Promise.all(paths)).flat(Infinity).reduce((i, size) => i + size, 0);
 };
+
+export const formatError = (err: Error): any => {
+    return {
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
+    };
+};
