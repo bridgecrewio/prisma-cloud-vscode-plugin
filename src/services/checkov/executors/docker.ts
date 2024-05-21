@@ -67,9 +67,12 @@ export class DockerExecutor extends AbstractExecutor {
     private static getEnvs() {
         const envs = [
             '--env', 'BC_SOURCE=vscode',
-            '--env', `BC_SOURCE_VERSION=${vscode.extensions.getExtension(CONFIG.extensionId)?.packageJSON.version}`,
-            '--env', `PRISMA_API_URL=${CONFIG.userConfig.prismaURL}`,
+            '--env', `BC_SOURCE_VERSION=${vscode.extensions.getExtension(CONFIG.extensionId)?.packageJSON.version}` 
         ];
+
+        if (CONFIG.userConfig.prismaURL) {
+            envs.push('--env', `PRISMA_API_URL=${CONFIG.userConfig.prismaURL}`);
+        }
 
         return envs;
     }

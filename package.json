@@ -6,7 +6,7 @@
   "repository": "https://github.com/bridgecrewio/prisma-cloud-vscode-plugin",
   "icon": "static/icons/prisma.png",
   "description": "a static code analysis tool to scan code for Infrastructure-as-Code (IaC) misconfigurations, Software Composition Analysis (SCA) issues and Secrets vulnerabilities.",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "engines": {
     "vscode": "^1.79.0"
   },
@@ -187,19 +187,18 @@
       "properties": {
         "prismaCloud.accessKey": {
           "order": 0,
-          "markdownDescription": "**[Required]** Access Key of your Prisma Cloud application",
+          "markdownDescription": "**[Optional]** Access Key of your Prisma Cloud application",
           "type": "string"
         },
         "prismaCloud.secretKey": {
           "order": 1,
-          "markdownDescription": "**[Required]** Secret Key of your Prisma Cloud application",
+          "markdownDescription": "**[Optional]** Secret Key of your Prisma Cloud application",
           "type": "string"
         },
         "prismaCloud.prismaURL": {
           "order": 2,
-          "markdownDescription": "**[Required]** URL of your Prisma Cloud application API (e.g., https://api.prismacloud.io)",
-          "type": "string",
-          "format": "uri"
+          "markdownDescription": "**[Optional]** URL of your Prisma Cloud application API (e.g., https://api.prismacloud.io)",
+          "type": "string"
         },
         "prismaCloud.certificate": {
           "order": 3,

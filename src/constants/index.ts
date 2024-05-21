@@ -22,6 +22,7 @@ export enum COMMAND {
 export enum WORKSPACE_EVENTS {
     SAVE_FILE = 'onDidSaveTextDocument',
     OPEN_FILE = 'onDidOpenTextDocument',
+    CONFIGURATION_CHANGED = 'onDidChangeConfiguration'
 };
 
 export enum WINDOW_EVENTS {
