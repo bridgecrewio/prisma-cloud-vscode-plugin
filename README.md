@@ -33,6 +33,11 @@ To adjust the Prisma Cloud VSCode Plugin settings, follow these steps:
    - **Access Key (optional)**: Optionally add the Prisma Cloud access key ID.
    - **Secret Key (optional)**: Optionally add the Prisma Cloud secret key.
    - **Prisma URL (optional)**: Optionally add your Prisma Cloud URL e.g. `https://api.prismacloud.io`.
+   - **Checkov version (optional)**: The Checkov scanner version to use (e.g., 2.0.123). Enter 'latest' or leave blank to always use the latest version.
+   - **Display error messages (optional)**: Stop showing error message popups.
+   - **External checks dir (optional)**: Path to external checks to be added.
+   - **No certificate verify (optional)**: Skip SSL certificate verification. Use this to bypass errors related to SSL certificates. Warning: this should only be used for testing purposes. Skipping certificate verification is dangerous as invalid and falsified certificates cannot be detected..
+   - **Frameworks (optional)**: Filter scan to run only on specific frameworks (e.g., 'arm json secrets serverless').  \n Add multiple frameworks using spaces.  \n See [Checkov Frameworks](https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html) for more information.  \n You may need to run the extension command 'Clear Checkov results cache' after modifying this setting.
    - **CA-Certificate (optional)**: Optionally add the CA certificate in .pem file format.
    - **Use Enforcement Rules (optional)**: Enable enforcement of soft-fail thresholds for VS Code scans.
 

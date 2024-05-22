@@ -204,13 +204,13 @@
           "order": 3,
           "title": "Checkov version",
           "type": "string",
-          "markdownDescription": "The Checkov scanner version to use (e.g., 2.0.123). Enter 'latest' or leave blank to always use the latest version. Enter 'platform' to use the version currently used by the Bridgecrew / Prisma platform. Be sure to run the 'Install or Update Checkov' command after changing this value. Use the 'About Checkov' command to view the current version.",
+          "markdownDescription": "The Checkov scanner version to use (e.g., 2.0.123). Enter 'latest' or leave blank to always use the latest version. Be sure to run the 'Checkov: Install' command after changing this value.",
           "readOnly": true
         },
         "prismaCloud.disableErrorMessage": {
           "order": 4,
           "title": "Disable error message",
-          "markdownDescription": "Stop showing error message popups (use the 'Open Checkov Log' command to view the log).",
+          "markdownDescription": "Stop showing error message popups (use the 'Open Prisma Log' command to view the log).",
           "type": "boolean",
           "default": false
         },

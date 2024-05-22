@@ -44,7 +44,7 @@ export const getExternalChecksDir = (): string | undefined => {
     return externalChecksDir;
 };
 
-export const getCheckovVersion = async (): Promise<string> => {
+export const getCheckovVersion = (): string => {
     let checkovVersion = CONFIG.userConfig.checkovVersion;
     checkovVersion = checkovVersion ? checkovVersion.trim().toLowerCase() : '';
 
