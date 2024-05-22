@@ -40,6 +40,7 @@ To adjust the Prisma Cloud VSCode Plugin settings, follow these steps:
    - **Frameworks (optional)**: Filter scan to run only on specific frameworks (e.g., 'arm json secrets serverless').  \n Add multiple frameworks using spaces.  \n See [Checkov Frameworks](https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html) for more information.
    - **CA-Certificate (optional)**: Add the CA certificate as a .pem file format.
    - **Use Enforcement Rules (optional)**: Enable enforcement of soft-fail thresholds for VS Code scans.
+   - **Sast full scan size limit (optional)**: Define the maximum file size (in MB) for files in a repository. Files exceeding this limit will not be included in a SAST scan
 
 ## Usage
 Once configured, you can start using the Prisma Cloud VSCode Plugin to enhance your development workflow:
