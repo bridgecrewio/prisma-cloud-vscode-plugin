@@ -187,64 +187,61 @@
       "properties": {
         "prismaCloud.accessKey": {
           "order": 0,
-          "markdownDescription": "**[Optional]** Access Key of your Prisma Cloud application",
+          "markdownDescription": "Required to access all Prisma Cloud scan types. Without it, access is limited to open source scan capabilities",
           "type": "string"
         },
         "prismaCloud.secretKey": {
           "order": 1,
-          "markdownDescription": "**[Optional]** Secret Key of your Prisma Cloud application",
+          "markdownDescription": "Required to access all Prisma Cloud scan types. Without it, access is limited to open source scan capabilities",
           "type": "string"
         },
         "prismaCloud.prismaURL": {
           "order": 2,
-          "markdownDescription": "**[Optional]** URL of your Prisma Cloud application API (e.g., https://api.prismacloud.io)",
+          "markdownDescription": "Required if access key and secret key are provided",
           "type": "string"
         },
         "prismaCloud.checkovVersion": {
           "order": 3,
           "title": "Checkov version",
           "type": "string",
-          "markdownDescription": "The Checkov scanner version to use (e.g., 2.0.123). Enter 'latest' or leave blank to always use the latest version. Be sure to run the 'Checkov: Install' command after changing this value.",
+          "markdownDescription": "Leave blank to use the latest Checkov version (or enter “latest”), or specify a version like 2.0.123",
           "readOnly": true
         },
-        "prismaCloud.disableErrorMessage": {
+        "prismaCloud.disableErrorMessagePopups": {
           "order": 4,
-          "title": "Disable error message",
-          "markdownDescription": "Stop showing error message popups (use the 'Open Prisma Log' command to view the log).",
+          "markdownDescription": "Hides error message popups. View errors in the logs via the ‘Open Prisma Log’ command",
           "type": "boolean",
           "default": false
         },
         "prismaCloud.certificate": {
           "order": 5,
-          "markdownDescription": "**[Optional]** You can use a custom CA-Certificate, set the path to it here",
+          "markdownDescription": "Add the CA certificate as a .pem file format",
           "type": "string"
         },
         "prismaCloud.useEnforcementRules": {
           "order": 6,
-          "markdownDescription": "Whether to have the soft-fail thresholds set by Enforcement apply to the VS Code scan",
+          "markdownDescription": "Enforce soft-fail thresholds for Prisma Cloud scans",
           "type": "boolean"
         },
-        "prismaCloud.externalChecksDir": {
+        "prismaCloud.externalChecksDirectory": {
           "order": 7,
-          "title": "External Checks Directory",
-          "markdownDescription": "Path to external checks to be added",
+          "markdownDescription": "Provide the path to the folder containing custom security checks",
           "type": "string"
         },
-        "prismaCloud.noCertVerify": {
+        "prismaCloud.skipSSLVerification": {
           "order": 8,
-          "title": "Skip SSL cert verification",
-          "markdownDescription": "Skip SSL certificate verification. Use this to bypass errors related to SSL certificates. Warning: this should only be used for testing purposes. Skipping certificate verification is dangerous as invalid and falsified certificates cannot be detected.",
+          "markdownDescription": "Bypass SSL certificate verification for troubleshooting purposes in test environments ONLY. ֿ\nDo not use in production settings due to potential security risks from undetected invalid or falsified certificates",
           "type": "boolean"
         },
-        "prismaCloud.frameworks": {
+        "prismaCloud.specificFrameworks": {
           "order": 9,
           "title": "Frameworks",
-          "markdownDescription": "Filter scan to run only on specific frameworks (e.g., 'arm json secrets serverless').  \n Add multiple frameworks using spaces.  \n See [Checkov Frameworks](https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html) for more information.  \n You may need to run the extension command 'Clear Checkov results cache' after modifying this setting.",
+          "markdownDescription": "Scan specific frameworks (e.g., 'arm json secrets serverless').  \n Add multiple frameworks using spaces.  \n See [Checkov Frameworks](https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html) for more information.",
           "type": "string"
         },
-        "prismaCloud.weaknessesFullScanSizeLimit": {
+        "prismaCloud.sastFullScanSizeLimit": {
           "order": 10,
-          "markdownDescription": "**[Optional]** Set the size (in MB) threshold above which SAST will not run on a repository",
+          "markdownDescription": "Define the maximum file size (in MB) for files in a repository. Files exceeding this limit will not be included in a SAST scan",
           "type": "number",
           "default": 512
         }

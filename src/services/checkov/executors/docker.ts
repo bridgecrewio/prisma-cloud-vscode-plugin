@@ -7,7 +7,7 @@ import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
 import { reRenderViews } from '../../../views/interface/utils';
 import logger from '../../../logger';
-import { getPrismaApiUrl } from '../../../config/configUtils';
+import { getCertificate, getPrismaApiUrl } from '../../../config/configUtils';
 import { CheckovInstall } from '../../../commands/checkov';
 
 export class DockerExecutor extends AbstractExecutor {
@@ -84,8 +84,9 @@ export class DockerExecutor extends AbstractExecutor {
             '--volume', `${DockerExecutor.projectPath}:${DockerExecutor.projectPath}`,
         ];
 
-        if (CONFIG.userConfig.certificate) {
-            volumeMounts.push('--volume', `${CONFIG.userConfig.certificate}:${CONFIG.checkov.docker.certificateMountPath}`);
+        const cert = getCertificate();
+        if (cert) {
+            volumeMounts.push('--volume', `${cert}:${CONFIG.checkov.docker.certificateMountPath}`);
         }
 
         return volumeMounts;

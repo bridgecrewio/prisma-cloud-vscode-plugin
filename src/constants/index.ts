@@ -40,13 +40,13 @@ export enum USER_CONFIGURATION_PARAM {
     SECRET_KEY = 'secretKey',
     PRISMA_URL = 'prismaURL',
     CERTIFICATE = 'certificate',
-    NO_VERIFY_CERT = 'noCertVerify',
+    SKIP_SSL_VERIFICATION = 'skipSSLVerification',
     USE_ENFORCEMENT_RULES = 'useEnforcementRules',
-    SAST_SIZE_LIMIT = 'weaknessesFullScanSizeLimit',
-    FRAMEWORKS = 'frameworks',
+    SAST_SIZE_LIMIT = 'sastFullScanSizeLimit',
+    FRAMEWORKS = 'specificFrameworks',
     CHECKOV_VERSION = 'checkovVersion',
-    DISABLE_ERROR_MESSAGE = 'disableErrorMessage',
-    EXTERNAL_CHECK_DIR = 'externalChecksDir'
+    DISABLE_ERROR_MESSAGE_POPUP = 'disableErrorMessagePopups',
+    EXTERNAL_CHECK_DIR = 'externalChecksDirectory'
 };
 
 export enum PATH_TYPE {

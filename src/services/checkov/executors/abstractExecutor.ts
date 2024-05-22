@@ -8,7 +8,7 @@ import { CheckovInstallation, CheckovOutput } from '../../../types';
 import { getDirSize, isPipInstall, isWindows } from '../../../utils';
 import { ShowSettings } from '../../../commands/checkov';
 import logger from '../../../logger';
-import { getAccessKey, getExternalChecksDir, getFrameworks, getNoCertVerify, getSecretKey, getToken } from '../../../config/configUtils';
+import { getAccessKey, getCertificate, getExternalChecksDir, getFrameworks, getNoCertVerify, getSastMaxSizeLimit, getSecretKey, getToken, shouldUseEnforcmentRules } from '../../../config/configUtils';
 
 
 export abstract class AbstractExecutor {
@@ -74,15 +74,16 @@ export abstract class AbstractExecutor {
             }
         }
 
-        if (CONFIG.userConfig.certificate) {
+        const cert = getCertificate();
+        if (cert) {
             if (installation.type === CHECKOV_INSTALLATION_TYPE.DOCKER) {
                 checkovCliParams.push('--ca-certificate', `"${CONFIG.checkov.docker.certificateMountPath}"`);
             } else {
-                checkovCliParams.push('--ca-certificate', `"${CONFIG.userConfig.certificate}"`);
+                checkovCliParams.push('--ca-certificate', `"${cert}"`);
             }
         }
 
-        if (CONFIG.userConfig.useEnforcementRules) {
+        if (shouldUseEnforcmentRules()) {
             checkovCliParams.push('--use-enforcement-rules');
         }
 
@@ -127,7 +128,7 @@ export abstract class AbstractExecutor {
         try {
             if (workspaceFolders) {
                 const dirSize = Math.round((await getDirSize(workspaceFolders[0].uri.path)) / 8 / 100000);
-                const mbLimit = Number(CONFIG.userConfig.weaknessesFullScanSizeLimit);
+                const mbLimit = getSastMaxSizeLimit();
                 return dirSize > mbLimit;
             }
     

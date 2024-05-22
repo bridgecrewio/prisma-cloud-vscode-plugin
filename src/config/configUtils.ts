@@ -1,21 +1,22 @@
 import * as semver from 'semver';
 import logger from '../logger';
 import { CONFIG } from '.';
+import { USER_CONFIGURATION_PARAM } from '../constants';
 
 const minCheckovVersion = '2.0.0';
 
 export const getNoCertVerify = (): boolean => {
-    const noCertVerify = CONFIG.userConfig.noCertVerify as any as boolean;
+    const noCertVerify = Boolean(CONFIG.userConfig[USER_CONFIGURATION_PARAM.SKIP_SSL_VERIFICATION]);
     return noCertVerify;
 };
 
 export const getAccessKey = (): string | undefined => {
-    const accessKey = CONFIG.userConfig.accessKey;
+    const accessKey = CONFIG.userConfig[USER_CONFIGURATION_PARAM.ACCESS_KEY];
     return accessKey;
 };
 
 export const getSecretKey = (): string | undefined => {
-    const secretKey = CONFIG.userConfig.secretKey;
+    const secretKey = CONFIG.userConfig[USER_CONFIGURATION_PARAM.SECRET_KEY];
     return secretKey;
 };
 
@@ -25,22 +26,37 @@ export const getToken = (): string | undefined => {
 };
 
 export const getPrismaApiUrl = (): string | undefined => {
-    const prismaURL = CONFIG.userConfig.prismaURL;
+    const prismaURL = CONFIG.userConfig[USER_CONFIGURATION_PARAM.PRISMA_URL];
     return prismaURL;
 };
 
+export const getCertificate = (): string | undefined => {
+    const cert = CONFIG.userConfig[USER_CONFIGURATION_PARAM.CERTIFICATE];
+    return cert;
+};
+
 export const getFrameworks = (): string[] | undefined => {
-    const frameworks = CONFIG.userConfig.frameworks;
+    const frameworks = CONFIG.userConfig[USER_CONFIGURATION_PARAM.FRAMEWORKS];
     return frameworks ? frameworks.split(' ').map((entry: string) => entry.trim()) : undefined;
 };
 
 export const shouldDisableErrorMessage = (): boolean => {
-    const disableErrorMessageFlag = CONFIG.userConfig.disableErrorMessage as any as boolean;
+    const disableErrorMessageFlag = Boolean(CONFIG.userConfig[USER_CONFIGURATION_PARAM.DISABLE_ERROR_MESSAGE_POPUP]);
     return disableErrorMessageFlag;
 };
 
+export const shouldUseEnforcmentRules = (): boolean => {
+    const shouldUseEnforcementRules = Boolean(CONFIG.userConfig[USER_CONFIGURATION_PARAM.USE_ENFORCEMENT_RULES]);
+    return shouldUseEnforcementRules;
+};
+
+export const getSastMaxSizeLimit = (): number => {
+    const sastMaxSizeLimit = Number(CONFIG.userConfig[USER_CONFIGURATION_PARAM.SAST_SIZE_LIMIT]);
+    return sastMaxSizeLimit;
+};
+
 export const getExternalChecksDir = (): string | undefined => {
-    const externalChecksDir = CONFIG.userConfig.externalChecksDir;
+    const externalChecksDir = CONFIG.userConfig[USER_CONFIGURATION_PARAM.EXTERNAL_CHECK_DIR];
     if (externalChecksDir) {
         return `"${externalChecksDir}"`;
     }
@@ -48,7 +64,7 @@ export const getExternalChecksDir = (): string | undefined => {
 };
 
 export const getCheckovVersion = (): string => {
-    let checkovVersion = CONFIG.userConfig.checkovVersion;
+    let checkovVersion = CONFIG.userConfig[USER_CONFIGURATION_PARAM.CHECKOV_VERSION];
     checkovVersion = checkovVersion ? checkovVersion.trim().toLowerCase() : '';
 
     if (!checkovVersion || checkovVersion === 'latest') {
