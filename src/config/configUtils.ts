@@ -20,7 +20,7 @@ export const getSecretKey = (): string | undefined => {
 };
 
 export const getToken = (): string | undefined => {
-    const token = `${getAccessKey()}::${getSecretKey}`;
+    const token = `${getAccessKey()}::${getSecretKey()}`;
     return token;
 };
 
@@ -41,6 +41,9 @@ export const shouldDisableErrorMessage = (): boolean => {
 
 export const getExternalChecksDir = (): string | undefined => {
     const externalChecksDir = CONFIG.userConfig.externalChecksDir;
+    if (externalChecksDir) {
+        return `"${externalChecksDir}"`;
+    }
     return externalChecksDir;
 };
 

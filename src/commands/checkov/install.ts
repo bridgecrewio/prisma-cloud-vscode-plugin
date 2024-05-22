@@ -51,7 +51,7 @@ export class CheckovInstall {
         logger.info('Installing Checkov with Docker');
 
         try {
-            await asyncExec(`docker pull bridgecrew/checkov:${this.checkovVersion}`);
+            await asyncExec(`docker pull bridgecrew/checkov:${CheckovInstall.checkovVersion}`);
 
             const entrypoint = await CheckovInstall.resolveEntrypoint(CHECKOV_INSTALLATION_TYPE.DOCKER);
             CheckovInstall.installationType = CHECKOV_INSTALLATION_TYPE.DOCKER;
@@ -77,7 +77,7 @@ export class CheckovInstall {
                     return false;
                 }
     
-                (await asyncExec(`${pipExe} install --user -U -i https://pypi.org/simple/ checkov${this.checkovVersion === 'latest' ? '' : `==${this.checkovVersion}`}`));
+                (await asyncExec(`${pipExe} install --user -U -i https://pypi.org/simple/ checkov${CheckovInstall.checkovVersion === 'latest' ? '' : `==${CheckovInstall.checkovVersion}`}`));
                 if (isWindows()) {
                     CheckovInstall.processPathEnv = (await asyncExec('echo %PATH%')).stdout.trim();
                 } else {
