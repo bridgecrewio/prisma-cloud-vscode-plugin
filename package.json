@@ -230,18 +230,18 @@
         },
         "prismaCloud.skipSSLVerification": {
           "order": 8,
-          "markdownDescription": "Bypass SSL certificate verification for troubleshooting purposes in test environments ONLY. ֿ\nDo not use in production settings due to potential security risks from undetected invalid or falsified certificates",
+          "markdownDescription": "Bypass SSL certificate verification for troubleshooting purposes in test environments ONLY.  \n Do NOT skip in production due to potential security risks from undetected invalid or falsified certificates",
           "type": "boolean"
         },
         "prismaCloud.specificFrameworks": {
           "order": 9,
           "title": "Frameworks",
-          "markdownDescription": "Scan specific frameworks (e.g., 'arm json secrets serverless').  \n Add multiple frameworks using spaces.  \n See [Checkov Frameworks](https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html) for more information.",
+          "markdownDescription": "Scan specific frameworks (e.g., 'arm json secrets serverless'). Add multiple frameworks using spaces.  \n See [Checkov Frameworks](https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html) for more information",
           "type": "string"
         },
         "prismaCloud.sastFullScanSizeLimit": {
           "order": 10,
-          "markdownDescription": "Define the maximum file size (in MB) for files in a repository. Files exceeding this limit will not be included in a SAST scan",
+          "markdownDescription": "Set the threshold (in MB), above which SAST will not run on a repository",
           "type": "number",
           "default": 512
         }
