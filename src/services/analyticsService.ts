@@ -3,9 +3,10 @@ import * as vscode from 'vscode';
 import { CONFIG } from "../config";
 import { EVENT_TYPE, GLOBAL_CONTEXT, IDE_PLUGINS } from "../constants";
 import logger from '../logger';
+import { getPrismaApiUrl } from '../config/configUtils';
 
 export const initializeAnalyticsService = async (context: vscode.ExtensionContext) => {
-    AnalyticsService.enabled = !!CONFIG.userConfig.prismaURL;
+    AnalyticsService.enabled = !!getPrismaApiUrl();
 
     if (AnalyticsService.enabled) {
         AnalyticsService.applicationContext = context;
@@ -15,7 +16,7 @@ export const initializeAnalyticsService = async (context: vscode.ExtensionContex
 
 export class AnalyticsService {
     private static retryCount: number = 0;
-    static analyticsEndpoint: string = CONFIG.userConfig.prismaURL + '/bridgecrew/api/v1/plugins-analytics';
+    static analyticsEndpoint: string = getPrismaApiUrl() + '/bridgecrew/api/v1/plugins-analytics';
     static applicationContext: vscode.ExtensionContext;
     static enabled: boolean = true;
 
@@ -23,7 +24,7 @@ export class AnalyticsService {
         const { secretKey, accessKey } = CONFIG.userConfig;
         if (secretKey && accessKey) {
             try {
-                const loginUrl = CONFIG.userConfig.prismaURL + '/login';
+                const loginUrl = getPrismaApiUrl() + '/login';
                 const response = await axios.post(loginUrl, {
                     username: accessKey,
                     password: secretKey,

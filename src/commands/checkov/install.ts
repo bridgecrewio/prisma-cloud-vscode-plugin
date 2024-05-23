@@ -12,9 +12,11 @@ import { StatusBar } from '../../views';
 import { asyncExec, isWindows, formatError } from '../../utils';
 import { CheckovExecutor } from '../../services';
 import logger from '../../logger';
+import { getCheckovVersion } from '../../config/configUtils';
 
 export class CheckovInstall {
     public static processPathEnv: string;
+    public static checkovVersion: string;
     public static installationType: CHECKOV_INSTALLATION_TYPE;
     private static readonly installations = [
         CheckovInstall.withDocker,
@@ -26,6 +28,7 @@ export class CheckovInstall {
         try {
             StatusBar.progress();
 
+            CheckovInstall.checkovVersion = getCheckovVersion();
             for (const installation of CheckovInstall.installations) {
                 const installationResult = await installation(context);
     
@@ -48,7 +51,7 @@ export class CheckovInstall {
         logger.info('Installing Checkov with Docker');
 
         try {
-            await asyncExec(`docker pull bridgecrew/checkov:${CONFIG.checkov.version}`);
+            await asyncExec(`docker pull bridgecrew/checkov:${CheckovInstall.checkovVersion}`);
 
             const entrypoint = await CheckovInstall.resolveEntrypoint(CHECKOV_INSTALLATION_TYPE.DOCKER);
             CheckovInstall.installationType = CHECKOV_INSTALLATION_TYPE.DOCKER;
@@ -74,7 +77,7 @@ export class CheckovInstall {
                     return false;
                 }
     
-                (await asyncExec(`${pipExe} install --user -U -i https://pypi.org/simple/ checkov`));
+                (await asyncExec(`${pipExe} install --user -U -i https://pypi.org/simple/ checkov${CheckovInstall.checkovVersion === 'latest' ? '' : `==${CheckovInstall.checkovVersion}`}`));
                 if (isWindows()) {
                     CheckovInstall.processPathEnv = (await asyncExec('echo %PATH%')).stdout.trim();
                 } else {

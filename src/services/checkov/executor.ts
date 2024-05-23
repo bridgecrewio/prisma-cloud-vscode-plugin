@@ -13,6 +13,7 @@ import { reRenderViews } from '../../views/interface/utils';
 import { AnalyticsService } from '../analyticsService';
 import { formatWindowsFilePath, isWindows } from '../../utils';
 import logger from '../../logger';
+import { shouldDisableErrorMessage } from '../../config/configUtils';
 
 export class CheckovExecutor {
     private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, typeof DockerExecutor | typeof Pip3Executor>([
@@ -67,7 +68,9 @@ export class CheckovExecutor {
                     AbstractExecutor.isScanInProgress = false;
                     await reRenderViews();
                     StatusBar.reset();
-                    vscode.window.showErrorMessage(`Scanning is stopped due to: ${e.message}`);
+                    if (!shouldDisableErrorMessage()) {
+                        vscode.window.showErrorMessage(`Scanning is stopped due to: ${e.message}`);
+                    }
                     return;
                 }
                 const endTime = new Date();
@@ -92,7 +95,10 @@ export class CheckovExecutor {
         }
 
         ShowSettings.execute();
-        vscode.window.showErrorMessage(`Fill following Prisma Cloud settings: ${emptyPrismaSettings.join(', ')}`);
+        
+        if (!shouldDisableErrorMessage()) {
+            vscode.window.showErrorMessage(`Fill the following Prisma Cloud settings: ${emptyPrismaSettings.join(', ')}`);
+        }
     }
 
     public static stopExecution() {

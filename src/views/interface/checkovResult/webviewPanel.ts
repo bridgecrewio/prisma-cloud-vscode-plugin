@@ -9,6 +9,7 @@ import { AbstractExecutor } from '../../../services/checkov/executors/abstractEx
 import { CategoriesService } from '../../../services';
 import { AnalyticsService } from '../../../services/analyticsService';
 import logger from '../../../logger';
+import { getPrismaApiUrl } from '../../../config/configUtils';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
@@ -219,7 +220,7 @@ export class CheckovResultWebviewPanel {
     }
 
     private static getDescriptionsEndpoint(checkId: string) {
-        return CONFIG.userConfig.prismaURL + `/bridgecrew/api/v1/violations/${checkId}/description`;
+        return getPrismaApiUrl() + `/bridgecrew/api/v1/violations/${checkId}/description`;
     }
 
     private static getDataFlowValue(result: CheckovResult): string {

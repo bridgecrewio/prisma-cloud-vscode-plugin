@@ -8,6 +8,7 @@ import { CheckovInstallation, CheckovOutput } from '../../../types';
 import { getDirSize, isPipInstall, isWindows } from '../../../utils';
 import { ShowSettings } from '../../../commands/checkov';
 import logger from '../../../logger';
+import { getAccessKey, getCertificate, getExternalChecksDir, getFrameworks, getNoCertVerify, getSastMaxSizeLimit, getSecretKey, getToken, shouldUseEnforcmentRules } from '../../../config/configUtils';
 
 
 export abstract class AbstractExecutor {
@@ -30,6 +31,11 @@ export abstract class AbstractExecutor {
     }
 
     protected static async getCheckovCliParams(installation: CheckovInstallation, files?: string[]) {
+        const externalChecksDir = getExternalChecksDir();
+        const noCertVerifyParam = getNoCertVerify();
+        const frameworks = getFrameworks();
+        const secretKey = getSecretKey();
+        const accessKey = getAccessKey();
         const checkovCliParams = [
             '--repo-id', REPO_ID,
             '--quiet',
@@ -37,8 +43,20 @@ export abstract class AbstractExecutor {
             '--output', 'json'
         ];
 
-        if (CONFIG.userConfig.accessKey && CONFIG.userConfig.secretKey) {
-            checkovCliParams.push('--bc-api-key', `${CONFIG.userConfig.accessKey}::${CONFIG.userConfig.secretKey}`);
+        if (accessKey && secretKey) {
+            checkovCliParams.push('--bc-api-key', `${getToken()}`);
+        }
+
+        if (externalChecksDir) {
+            checkovCliParams.push('--external-checks-dir', externalChecksDir);
+        }
+
+        if (noCertVerifyParam) {
+            checkovCliParams.push('--no-cert-verify');
+        }
+
+        if (frameworks) {
+            checkovCliParams.push('--framework', frameworks.join(' '));
         }
 
         if (files) {
@@ -56,15 +74,16 @@ export abstract class AbstractExecutor {
             }
         }
 
-        if (CONFIG.userConfig.certificate) {
+        const cert = getCertificate();
+        if (cert) {
             if (installation.type === CHECKOV_INSTALLATION_TYPE.DOCKER) {
                 checkovCliParams.push('--ca-certificate', `"${CONFIG.checkov.docker.certificateMountPath}"`);
             } else {
-                checkovCliParams.push('--ca-certificate', `"${CONFIG.userConfig.certificate}"`);
+                checkovCliParams.push('--ca-certificate', `"${cert}"`);
             }
         }
 
-        if (CONFIG.userConfig.useEnforcementRules) {
+        if (shouldUseEnforcmentRules()) {
             checkovCliParams.push('--use-enforcement-rules');
         }
 
@@ -109,7 +128,7 @@ export abstract class AbstractExecutor {
         try {
             if (workspaceFolders) {
                 const dirSize = Math.round((await getDirSize(workspaceFolders[0].uri.path)) / 8 / 100000);
-                const mbLimit = Number(CONFIG.userConfig.weaknessesFullScanSizeLimit);
+                const mbLimit = getSastMaxSizeLimit();
                 return dirSize > mbLimit;
             }
     
