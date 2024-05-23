@@ -97,7 +97,7 @@ export class CheckovExecutor {
         ShowSettings.execute();
         
         if (!shouldDisableErrorMessage()) {
-            vscode.window.showErrorMessage(`Fill following Prisma Cloud settings: ${emptyPrismaSettings.join(', ')}`);
+            vscode.window.showErrorMessage(`Fill the following Prisma Cloud settings: ${emptyPrismaSettings.join(', ')}`);
         }
     }
 
