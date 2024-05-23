@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import { CheckovResult } from '../types';
 import { CategoriesService, ResultsService } from '.';
 import { SuppressPackageJsonService } from './suppresServicePackageJson';
+import { isWindows } from '../utils';
 
 export class SuppressService {
     public static async suppress(result: CheckovResult, justification?: string) {
@@ -19,7 +20,13 @@ export class SuppressService {
         if (SuppressService.isFileWithInsertionAfterRiskLine(result)) {
             resultPosition = SuppressService.resolvePositiveResultPosition(result);
         } else if (isPackageFile)  {
-            const suppressPackageJsonService = new SuppressPackageJsonService(resultFileUri.path);
+            let filePath = resultFileUri.path;
+            // in windows the path comes as "/C:/Users/...", 
+            // need to remove the prefix of / in order to be able to read the file
+            if (isWindows()) {
+                filePath = filePath.replace(/^\/+/, '');
+            }
+            const suppressPackageJsonService = new SuppressPackageJsonService(filePath);
             suppressionComment = await suppressPackageJsonService.wrapWithSuppressionCommentsSection(suppressionComment);
             resultPosition = await suppressPackageJsonService.resolveResultPosition();
         }
