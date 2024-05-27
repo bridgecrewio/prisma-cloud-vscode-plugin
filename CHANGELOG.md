@@ -8,10 +8,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 
-- Support new extension configurations.
-- Improve logging of errors.
-- Improve extension configurations management.
+- Implement new extension configurations.
+- Enhance error logging.
+- Enhance management of extension configurations.
 
 ### Fixed
 
-- Suppress SCA vulnerabilities in Windows wasn't working.
+- Suppressing SCA vulnerabilities on Windows was not functioning.
