@@ -4,6 +4,14 @@ All notable changes to the "checkov-vscode-v2" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [1.0.14] - 2024-05-27
 
-- Initial release
+### Added
+
+- Implement new extension configurations.
+- Enhance error logging.
+- Enhance management of extension configurations.
+
+### Fixed
+
+- Suppressing SCA vulnerabilities on Windows was not functioning.
