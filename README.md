@@ -24,23 +24,26 @@ To install the Prisma Cloud VSCode Plugin, follow these steps:
 5. Click the "Install" button.
 
 ## Configuration
+![Menu](./static/images/menu.webp "Menu")
+
 To adjust the Prisma Cloud VSCode Plugin settings, follow these steps:
 
 1. Open Visual Studio Code.
 2. Navigate to the extension settings by clicking on the gear icon in the sidebar or pressing `Ctrl+,`.
 3. Find the 'Prisma Cloud' extension settings.
 4. Update the following fields:
-   - **Access Key (optional)**: Enter your Prisma Cloud access key ID
-   - **Secret Key (optional)**: Enter your Prisma Cloud secret key
-   - **Prisma URL (optional)**: Enter your Prisma Cloud URL e.g. `https://api.prismacloud.io`.
-   - **Checkov version (optional)**: Leave blank to use the latest Checkov version (or enter “latest”), or specify a version like 2.0.123.
-   - **Suppress Error Popups (optional)**: Hide error message popups.
-   - **External checks dir (optional)**: Provide the path to a folder containing custom security checks.
-   - **No certificate verify (optional)**: Bypass SSL certificate verification for troubleshooting purposes in test environments ONLY. This is highly discouraged in production environments as it exposes you to potential security risks, since invalid and falsified certificates will not be detected.
-   - **Frameworks (optional)**: Filter scan to run only on specific frameworks (e.g., 'arm json secrets serverless').  \n Add multiple frameworks using spaces.  \n See [Checkov Frameworks](https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html) for more information.
-   - **CA-Certificate (optional)**: Add the CA certificate as a .pem file format.
-   - **Use Enforcement Rules (optional)**: Enable enforcement of soft-fail thresholds for VS Code scans.
-   - **Sast full scan size limit (optional)**: Define the maximum file size (in MB) for files in a repository. Files exceeding this limit will not be included in a SAST scan
+   - **Access Key**: The Prisma Cloud access key ID
+   - **Secret Key**: The Prisma Cloud secret key
+   - **Prisma URL**: Your Prisma URL e.g. `https://api.prismacloud.io`.
+   - **Checkov version**: Leave blank to use the latest Checkov version (or enter 'latest'), or specify a version like 2.0.123
+   - **Suppress Error Popups**: Hide error message popups
+   - **External checks dir**: Provide the path to a folder containing custom security checks
+   - **Skip SSL Verification**: Bypass SSL certificate verification for troubleshooting purposes in test environments ONLY. This is highly discouraged in production environments as it exposes you to potential security risks, since invalid and falsified certificates will not be detected
+   - **Specific Frameworks**: Scan specific frameworks such as arm json secrets serverless. You can add multiple frameworks using spaces between the values in the command. Refer to [Checkov CLI Command Reference](https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html) for more information
+   - **CA-Certificate**: Add the CA certificate. Format: .pem file
+   - **Use Enforcement Rules**: Enforce soft-fail thresholds set by Enforcement apply for VS Code scans
+   Hard-fail and comment bot are not supported by the IDE. For more information on Enforcement, refer to the [Enforcement documentation](https://docs.prismacloud.io/en/enterprise-edition/content-collections/application-security/risk-management/monitor-and-manage-code-build/enforcement)
+   - **SAST Full Scan Size Limit**: Set a threshold (in MB), above which SAST scans will not run on a repository. This setting is currently available for Beta customers only.
 
 ## Usage
 Once configured, you can start using the Prisma Cloud VSCode Plugin to enhance your development workflow:
