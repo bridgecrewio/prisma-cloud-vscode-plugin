@@ -16,6 +16,8 @@ export enum COMMAND {
     FILTER_HIGH_DISABLE = 'filter.highDisable',
     FILTER_CRITICAL_ENABLE = 'filter.criticalEnable',
     FILTER_CRITICAL_DISABLE = 'filter.criticalDisable',
+    SHOW_WEAKNESSES = 'prisma.showWeaknesses',
+    HIDE_WEAKNESSES = 'prisma.hideWeaknesses',
     OPEN_PRISMA_LOG = 'prisma.open-log',
 };
 
@@ -129,5 +131,6 @@ export enum IDE_PLUGINS {
 
 export enum GLOBAL_CONTEXT {
     JWT_TOKEN = 'jwtToken',
+    CUSTOMER_MODULES = 'customerModules',
     INSTALLATION_ID = 'installationId',
 }
