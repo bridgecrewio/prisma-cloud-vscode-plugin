@@ -11,12 +11,14 @@ import { initializeInstallationId } from './utils';
 import { initiateLogger } from './logger';
 import { initializeAnalyticsService } from './services/analyticsService';
 import { initializeCustomersModulesService } from './services/customersModulesService';
+import { initializeAuthenticationService } from './services/authenticationService';
 
 export async function activate(context: vscode.ExtensionContext) {
 	initiateLogger(context.logUri.fsPath);
 
 	initializeInstallationId(context);
-	await initializeAnalyticsService(context);
+	await initializeAuthenticationService(context);
+	initializeAnalyticsService(context);
 	await initializeCustomersModulesService(context);
 	registerCommands(context);
 	initializeServices(context);

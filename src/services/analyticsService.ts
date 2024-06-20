@@ -1,16 +1,15 @@
 import axios from 'axios';
 import * as vscode from 'vscode';
-import { CONFIG } from "../config";
 import { EVENT_TYPE, GLOBAL_CONTEXT, IDE_PLUGINS } from "../constants";
 import logger from '../logger';
 import { getPrismaApiUrl } from '../config/configUtils';
+import { AuthenticationService } from './authenticationService';
 
-export const initializeAnalyticsService = async (context: vscode.ExtensionContext) => {
+export const initializeAnalyticsService = (context: vscode.ExtensionContext) => {
     AnalyticsService.enabled = !!getPrismaApiUrl();
 
     if (AnalyticsService.enabled) {
         AnalyticsService.applicationContext = context;
-        await AnalyticsService.setAnalyticsJwtToken();
     } 
 };
 
@@ -20,32 +19,11 @@ export class AnalyticsService {
     static applicationContext: vscode.ExtensionContext;
     static enabled: boolean = true;
 
-    static async setAnalyticsJwtToken() {
-        const { secretKey, accessKey } = CONFIG.userConfig;
-        if (secretKey && accessKey) {
-            try {
-                const loginUrl = getPrismaApiUrl() + '/login';
-                const response = await axios.post(loginUrl, {
-                    username: accessKey,
-                    password: secretKey,
-                });
-    
-                if (response.status === 200) {
-                    logger.info('Fetched new JWT token successfully');
-                    await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, response.data.token);
-                }
-            } catch (error: any) {
-                logger.info('Is not possible to fetch new JWT token. Authorization on prisma was failed: ', error.message);
-                await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, undefined);
-            }
-        }
-    }
-
     static async postAnalyticsEvent(eventType: EVENT_TYPE, eventData: Record<string, any>) {
         if (!AnalyticsService.enabled) { return; }
 
         const installationId = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.INSTALLATION_ID);
-        const jwtToken = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
+        const jwtToken = AuthenticationService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
 
         if (installationId && jwtToken) {
             const requestBody = [{
@@ -74,7 +52,7 @@ export class AnalyticsService {
                 if (e.response.status === 403) {
                     logger.info('Got 403 for analytics, refreshing JWT token');
                     AnalyticsService.retryCount++;
-                    await AnalyticsService.setAnalyticsJwtToken();
+                    await AuthenticationService.setAnalyticsJwtToken();
                     await AnalyticsService.postAnalyticsEvent(eventType, eventData);
                     return;
                 }

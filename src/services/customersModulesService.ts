@@ -3,9 +3,9 @@ import * as vscode from 'vscode';
 import { GLOBAL_CONTEXT, IDE_PLUGINS } from "../constants";
 import logger from '../logger';
 import { getPrismaApiUrl } from '../config/configUtils';
-import { AnalyticsService } from './analyticsService';
 import { CustomerModulesResponse } from '../models';
 import { CategoriesService } from './categoriesService';
+import { AuthenticationService } from './authenticationService';
 
 export const initializeCustomersModulesService = async (context: vscode.ExtensionContext) => {
     CustomersModulesService.enabled = !!getPrismaApiUrl();
@@ -13,18 +13,8 @@ export const initializeCustomersModulesService = async (context: vscode.Extensio
     if (CustomersModulesService.enabled) {
         CustomersModulesService.applicationContext = context;
 
-        await CustomersModulesService.getCustomerModules();
-        const customerModules: CustomerModulesResponse | null | undefined = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.CUSTOMER_MODULES);
-        
-        if(customerModules && customerModules.modules.SAST) {
-            logger.info('customer is support SAST');
-            CategoriesService.showWeaknessesView();
-        } else {
-            logger.info('customer is not supporting SAST');
-            CategoriesService.hideWeaknessesView();
-        }
-
-    } 
+        await CustomersModulesService.setViewByModules();
+    }
 };
 
 export class CustomersModulesService {
@@ -34,10 +24,11 @@ export class CustomersModulesService {
     static enabled: boolean = true;
 
 
-    static async getCustomerModules() {
-        const token = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
+    static async updateCustomerModules() {
+        const token = AuthenticationService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
 
         if (!CustomersModulesService.enabled || !token) { 
+            await CustomersModulesService.applicationContext.globalState.update(GLOBAL_CONTEXT.CUSTOMER_MODULES, null);
             logger.error(`CustomersModulesService is not enabled Or token not exists`, {'isEnabled': CustomersModulesService.enabled, token});
             return; 
         }
@@ -55,21 +46,21 @@ export class CustomersModulesService {
             
             if (response.status === 200) {
                 CustomersModulesService.retryCount = 0;
-                await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.CUSTOMER_MODULES, response.data as CustomerModulesResponse);
+                await CustomersModulesService.applicationContext.globalState.update(GLOBAL_CONTEXT.CUSTOMER_MODULES, response.data as CustomerModulesResponse);
             }
 
             return;
         } catch (e: any) {
             if (CustomersModulesService.retryCount === 5) {
-                await AnalyticsService.applicationContext.globalState.update(GLOBAL_CONTEXT.CUSTOMER_MODULES, null);
+                await CustomersModulesService.applicationContext.globalState.update(GLOBAL_CONTEXT.CUSTOMER_MODULES, null);
                 throw new Error('there was an error getting customer modules: ' + e.message);
             }
 
             if (e.response.status === 403) {
                 logger.info('Got 403 for analytics, refreshing JWT token');
                 CustomersModulesService.retryCount++;
-                await AnalyticsService.setAnalyticsJwtToken();
-                await CustomersModulesService.getCustomerModules();
+                await AuthenticationService.setAnalyticsJwtToken();
+                await CustomersModulesService.updateCustomerModules();
                 return;
             }
 
@@ -77,5 +68,24 @@ export class CustomersModulesService {
             return;
         }
 
+    }
+
+    static async setViewByModules() {
+        try {
+            await CustomersModulesService.updateCustomerModules();
+        } catch (err) {
+            logger.info('customer is not supporting SAST');
+            CategoriesService.hideWeaknessesView();
+        }
+        
+        const customerModules: CustomerModulesResponse | null | undefined = CustomersModulesService.applicationContext.globalState.get(GLOBAL_CONTEXT.CUSTOMER_MODULES);
+        
+        if(customerModules && customerModules.modules.SAST) {
+            logger.info('customer is support SAST');
+            CategoriesService.showWeaknessesView();
+        } else {
+            logger.info('customer is not supporting SAST');
+            CategoriesService.hideWeaknessesView();
+        }
     }
 }
