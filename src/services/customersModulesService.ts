@@ -14,7 +14,7 @@ export const initializeCustomersModulesService = async (context: vscode.Extensio
     if (CustomersModulesService.enabled) {
         CustomersModulesService.applicationContext = context;
 
-        await CustomersModulesService.setViewByModules();
+        await CustomersModulesService.fetchAndUpdateViewsByModules();
     }
 };
 
@@ -71,7 +71,7 @@ export class CustomersModulesService {
 
     }
 
-    static async setViewByModules() {
+    static async fetchModules() {
         // Currently SAST is not supported by Windows
         if (isWindows()) {
             return;
@@ -81,9 +81,10 @@ export class CustomersModulesService {
             await CustomersModulesService.updateCustomerModules();
         } catch (err) {
             logger.info('customer is not supporting SAST');
-            CategoriesService.hideWeaknessesView();
         }
-        
+    }
+
+    static updateViews() {
         const customerModules: CustomerModulesResponse | null | undefined = CustomersModulesService.applicationContext.globalState.get(GLOBAL_CONTEXT.CUSTOMER_MODULES);
         
         if(customerModules && customerModules.modules.SAST) {
@@ -93,5 +94,10 @@ export class CustomersModulesService {
             logger.info('customer is not supporting SAST');
             CategoriesService.hideWeaknessesView();
         }
+    }
+
+    static async fetchAndUpdateViewsByModules() {
+        await CustomersModulesService.fetchModules();
+        CustomersModulesService.updateViews();
     }
 }

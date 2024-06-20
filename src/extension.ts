@@ -18,8 +18,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	initializeInstallationId(context);
 	await initializeAuthenticationService(context);
-	initializeAnalyticsService(context);
 	await initializeCustomersModulesService(context);
+	initializeAnalyticsService(context);
 	registerCommands(context);
 	initializeServices(context);
 	registerWindowEvents();

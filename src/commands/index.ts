@@ -20,9 +20,7 @@ const commands = new Map<COMMAND, (context: vscode.ExtensionContext) => void>([
     [COMMAND.FILTER_HIGH_ENABLE, FiltersService.applyHighSeverityFilter],
     [COMMAND.FILTER_HIGH_DISABLE, FiltersService.applyHighSeverityFilter],
     [COMMAND.FILTER_CRITICAL_ENABLE, FiltersService.applyCriticalSeverityFilter],
-    [COMMAND.FILTER_CRITICAL_DISABLE, FiltersService.applyCriticalSeverityFilter],
-    [COMMAND.SHOW_WEAKNESSES, CategoriesService.showWeaknessesView],
-    [COMMAND.HIDE_WEAKNESSES, CategoriesService.hideWeaknessesView],
+    [COMMAND.FILTER_CRITICAL_DISABLE, FiltersService.applyCriticalSeverityFilter]
 ]);
 
 export function registerCommands(context: vscode.ExtensionContext): void {

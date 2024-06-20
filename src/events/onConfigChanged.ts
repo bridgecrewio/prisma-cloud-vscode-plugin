@@ -17,7 +17,7 @@ export class OnConfigChanged {
             }
 
             await AuthenticationService.setAnalyticsJwtToken();
-            await CustomersModulesService.setViewByModules();
+            await CustomersModulesService.fetchAndUpdateViewsByModules();
         }
     }
 };
