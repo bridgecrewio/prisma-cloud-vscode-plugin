@@ -6,6 +6,7 @@ import { getPrismaApiUrl } from '../config/configUtils';
 import { CustomerModulesResponse } from '../models';
 import { CategoriesService } from './categoriesService';
 import { AuthenticationService } from './authenticationService';
+import { isWindows } from '../utils';
 
 export const initializeCustomersModulesService = async (context: vscode.ExtensionContext) => {
     CustomersModulesService.enabled = !!getPrismaApiUrl();
@@ -71,6 +72,11 @@ export class CustomersModulesService {
     }
 
     static async setViewByModules() {
+        // Currently SAST is not supported by Windows
+        if (isWindows()) {
+            return;
+        }
+
         try {
             await CustomersModulesService.updateCustomerModules();
         } catch (err) {
