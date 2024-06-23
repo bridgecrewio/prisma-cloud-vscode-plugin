@@ -9,6 +9,7 @@ export const initializeAuthenticationService = async (context: vscode.ExtensionC
     AuthenticationService.enabled = !!getPrismaApiUrl();
 
     if (AuthenticationService.enabled) {
+        // TODO: don't persisting context object, but get it from general event
         AuthenticationService.applicationContext = context;
         await AuthenticationService.setAnalyticsJwtToken();
     } 

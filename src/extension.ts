@@ -10,13 +10,14 @@ import { registerCustomHighlight, lineClickDisposable } from './services/customP
 import { initializeInstallationId } from './utils';
 import { initiateLogger } from './logger';
 import { initializeAnalyticsService } from './services/analyticsService';
-import { initializeCustomersModulesService } from './services/customersModulesService';
+import { CustomersModulesService, initializeCustomersModulesService } from './services/customersModulesService';
 import { initializeAuthenticationService } from './services/authenticationService';
 
 export async function activate(context: vscode.ExtensionContext) {
 	initiateLogger(context.logUri.fsPath);
 
 	initializeInstallationId(context);
+	CustomersModulesService.loadCachedData(context);
 	await initializeAuthenticationService(context);
 	await initializeCustomersModulesService(context);
 	initializeAnalyticsService(context);

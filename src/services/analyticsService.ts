@@ -9,6 +9,7 @@ export const initializeAnalyticsService = (context: vscode.ExtensionContext) => 
     AnalyticsService.enabled = !!getPrismaApiUrl();
 
     if (AnalyticsService.enabled) {
+        // TODO: don't persisting context object, but get it from general event
         AnalyticsService.applicationContext = context;
     } 
 };

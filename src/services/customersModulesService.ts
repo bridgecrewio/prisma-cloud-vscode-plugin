@@ -12,6 +12,7 @@ export const initializeCustomersModulesService = async (context: vscode.Extensio
     CustomersModulesService.enabled = !!getPrismaApiUrl();
 
     if (CustomersModulesService.enabled) {
+        // TODO: don't persisting context object, but get it from general event
         CustomersModulesService.applicationContext = context;
 
         await CustomersModulesService.fetchAndUpdateViewsByModules();
@@ -84,8 +85,9 @@ export class CustomersModulesService {
         }
     }
 
-    static updateViews() {
-        const customerModules: CustomerModulesResponse | null | undefined = CustomersModulesService.applicationContext.globalState.get(GLOBAL_CONTEXT.CUSTOMER_MODULES);
+    static updateViews(context?: vscode.ExtensionContext) {
+        const activeContext = context ? context : CustomersModulesService.applicationContext;
+        const customerModules: CustomerModulesResponse | null | undefined = activeContext.globalState.get(GLOBAL_CONTEXT.CUSTOMER_MODULES);
         
         if(customerModules && customerModules.modules.SAST) {
             logger.info('customer is support SAST');
@@ -100,4 +102,8 @@ export class CustomersModulesService {
         await CustomersModulesService.fetchModules();
         CustomersModulesService.updateViews();
     }
+
+    static loadCachedData(context: vscode.ExtensionContext) {
+		this.updateViews(context);
+	}
 }
