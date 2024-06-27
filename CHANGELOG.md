@@ -22,3 +22,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Show SAST Weaknesses only in case the customer is supporting this module, and it's running on Mac.
 - Split authentication into it's own service
+
+### Fixed
+
+- Fixing a bug where clicking on some of the found issues doesn't open the detail sections

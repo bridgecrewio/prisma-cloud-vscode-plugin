@@ -75,12 +75,18 @@ export class Pip3Executor extends AbstractExecutor {
         if (Array.isArray(result)) {
             for (const output of result) {
                 for (const failedCheck of output.results?.failed_checks) {
-                    failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
+                    // fixing a cases in windows where the file_abs_path return as "c:/users\\documents"
                     if (isWindows() && isPipInstall()) {
+                        const fsPathLowerFirstLetter = fsPath.charAt(0).toLowerCase() + fsPath.slice(1);
+                        const fsPathUpperFirstLetter = fsPath.charAt(0).toUpperCase() + fsPath.slice(1);
+                        failedCheck.file_abs_path = failedCheck.file_abs_path.replace(/\//g, '\\');
+                        failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPathLowerFirstLetter, '').replace(fsPathUpperFirstLetter, '');
                         failedCheck.original_abs_path = failedCheck.file_abs_path;
                         failedCheck.repo_file_path = formatWindowsFilePath(failedCheck.repo_file_path);
                         failedCheck.file_path = formatWindowsFilePath(failedCheck.file_path);
                         failedCheck.file_abs_path = `/${formatWindowsFilePath(failedCheck.file_abs_path)}`;
+                    } else {
+                        failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
                     }
                 }
             }
