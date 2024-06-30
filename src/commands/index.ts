@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { COMMAND } from '../constants';
 import { CheckovInstall, CheckovExecute, ShowSettings } from './checkov';
-import { CategoriesService, CheckovExecutor, ResultsService } from '../services';
+import { CheckovExecutor, ResultsService } from '../services';
 import { FiltersService } from '../services/filtersService';
 import { LOG_FILE_NAME } from '../logger';
 
@@ -20,7 +20,7 @@ const commands = new Map<COMMAND, (context: vscode.ExtensionContext) => void>([
     [COMMAND.FILTER_HIGH_ENABLE, FiltersService.applyHighSeverityFilter],
     [COMMAND.FILTER_HIGH_DISABLE, FiltersService.applyHighSeverityFilter],
     [COMMAND.FILTER_CRITICAL_ENABLE, FiltersService.applyCriticalSeverityFilter],
-    [COMMAND.FILTER_CRITICAL_DISABLE, FiltersService.applyCriticalSeverityFilter]
+    [COMMAND.FILTER_CRITICAL_DISABLE, FiltersService.applyCriticalSeverityFilter],
 ]);
 
 export function registerCommands(context: vscode.ExtensionContext): void {
