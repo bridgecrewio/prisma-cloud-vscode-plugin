@@ -25,4 +25,5 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Fixed
 
-- Fixing a bug where clicking on some of the found issues doesn't open the detail sections
+- Resolving a problem where clicking on some of the found issues doesn't open the detail sections
+- Resolving a problem where scanning a single file through Windows does not initiate a scan.
