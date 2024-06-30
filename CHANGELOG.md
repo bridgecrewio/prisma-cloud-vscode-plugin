@@ -15,3 +15,15 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Fixed
 
 - Suppressing SCA vulnerabilities on Windows was not functioning.
+
+## [1.0.15] - 2024-06-20
+
+### Added
+
+- Show SAST Weaknesses only in case the customer is supporting this module, and it's running on Mac.
+- Split authentication into it's own service
+
+### Fixed
+
+- Resolving a problem where clicking on some of the found issues doesn't open the detail sections
+- Resolving a problem where scanning a single file through Windows does not initiate a scan.

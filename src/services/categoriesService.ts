@@ -1,4 +1,5 @@
 import { CHECKOV_RESULT_CATEGORY } from "../constants";
+import * as vscode from 'vscode';
 
 export class CategoriesService {
     public static isIaCRisk(checkId: string, checkType: string = ''): boolean {
@@ -38,5 +39,13 @@ export class CategoriesService {
         if (this.isWeaknessesRisk(checkType)) {
             return CHECKOV_RESULT_CATEGORY.WEAKNESSES;
         }
+    }
+
+    public static showWeaknessesView() {
+        vscode.commands.executeCommand('setContext', 'weaknessesViewVisible', true);
+    }
+
+    public static hideWeaknessesView() {
+        vscode.commands.executeCommand('setContext', 'weaknessesViewVisible', false);
     }
 }

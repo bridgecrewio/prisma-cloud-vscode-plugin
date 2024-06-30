@@ -129,5 +129,6 @@ export enum IDE_PLUGINS {
 
 export enum GLOBAL_CONTEXT {
     JWT_TOKEN = 'jwtToken',
+    CUSTOMER_MODULES = 'customerModules',
     INSTALLATION_ID = 'installationId',
 }

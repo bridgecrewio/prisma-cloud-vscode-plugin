@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { SpawnOptionsWithoutStdio, spawn } from 'child_process';
 import * as vscode from 'vscode';
 
 import { CONFIG } from '../../../config';
@@ -34,11 +34,18 @@ export class Pip3Executor extends AbstractExecutor {
             env['PRISMA_API_URL'] = prismaApiUrl;
         }
 
-        const scanProcess = spawn(installation.entrypoint, args, {
+        const options: SpawnOptionsWithoutStdio = {
             shell: true,
-            env,
-            detached: !isWindows(),
-        });
+            env: env,
+            detached: !isWindows()
+        };
+        
+        if (isWindows()) {
+            // on windows the cwd is not the root directory, need to adjust it for supporting Checkov
+            options.cwd = '/';
+        }
+        
+        const scanProcess = spawn(installation.entrypoint, args, options);
 
         Pip3Executor.pid = scanProcess.pid;
         const processOutput = await Pip3Executor.handleProcessOutput(scanProcess);
@@ -75,12 +82,18 @@ export class Pip3Executor extends AbstractExecutor {
         if (Array.isArray(result)) {
             for (const output of result) {
                 for (const failedCheck of output.results?.failed_checks) {
-                    failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
+                    // fixing a cases in windows where the file_abs_path return as "c:/users\\documents"
                     if (isWindows() && isPipInstall()) {
+                        const fsPathLowerFirstLetter = fsPath.charAt(0).toLowerCase() + fsPath.slice(1);
+                        const fsPathUpperFirstLetter = fsPath.charAt(0).toUpperCase() + fsPath.slice(1);
+                        failedCheck.file_abs_path = failedCheck.file_abs_path.replace(/\//g, '\\');
+                        failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPathLowerFirstLetter, '').replace(fsPathUpperFirstLetter, '');
                         failedCheck.original_abs_path = failedCheck.file_abs_path;
                         failedCheck.repo_file_path = formatWindowsFilePath(failedCheck.repo_file_path);
                         failedCheck.file_path = formatWindowsFilePath(failedCheck.file_path);
                         failedCheck.file_abs_path = `/${formatWindowsFilePath(failedCheck.file_abs_path)}`;
+                    } else {
+                        failedCheck.repo_file_path = failedCheck.file_abs_path.replace(fsPath, '');
                     }
                 }
             }

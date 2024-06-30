@@ -10,6 +10,7 @@ import { CategoriesService } from '../../../services';
 import { AnalyticsService } from '../../../services/analyticsService';
 import logger from '../../../logger';
 import { getPrismaApiUrl } from '../../../config/configUtils';
+import { AuthenticationService } from '../../../services/authenticationService';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
@@ -166,7 +167,7 @@ export class CheckovResultWebviewPanel {
     }
 
     public static async fetchDescription(checkId: string, retryCount = 0): Promise<string | undefined> {
-        const jwtToken = AnalyticsService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
+        const jwtToken = AuthenticationService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
 
         try {
             const response = await axios.get(CheckovResultWebviewPanel.getDescriptionsEndpoint(checkId), { headers: {
@@ -181,7 +182,7 @@ export class CheckovResultWebviewPanel {
             }
 
             if (e.response.status === 403) {
-                await AnalyticsService.setAnalyticsJwtToken();
+                await AuthenticationService.setAnalyticsJwtToken();
                 return await CheckovResultWebviewPanel.fetchDescription(checkId, retryCount + 1);
             }
 
