@@ -38,6 +38,7 @@ export class Pip3Executor extends AbstractExecutor {
             shell: true,
             env,
             detached: !isWindows(),
+            cwd: '/' // Set to the root directory
         });
 
         Pip3Executor.pid = scanProcess.pid;
