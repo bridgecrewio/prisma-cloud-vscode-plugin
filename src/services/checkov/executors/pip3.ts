@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { SpawnOptionsWithoutStdio, spawn } from 'child_process';
 import * as vscode from 'vscode';
 
 import { CONFIG } from '../../../config';
@@ -34,12 +34,18 @@ export class Pip3Executor extends AbstractExecutor {
             env['PRISMA_API_URL'] = prismaApiUrl;
         }
 
-        const scanProcess = spawn(installation.entrypoint, args, {
+        const options: SpawnOptionsWithoutStdio = {
             shell: true,
-            env,
-            detached: !isWindows(),
-            cwd: '/' // Set to the root directory
-        });
+            env: env,
+            detached: !isWindows()
+        };
+        
+        if (isWindows()) {
+            // on windows the cwd is not the root directory, need to adjust it for supporting Checkov
+            options.cwd = '/';
+        }
+        
+        const scanProcess = spawn(installation.entrypoint, args, options);
 
         Pip3Executor.pid = scanProcess.pid;
         const processOutput = await Pip3Executor.handleProcessOutput(scanProcess);
