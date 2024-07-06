@@ -7,7 +7,7 @@ import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
 import { reRenderViews } from '../../../views/interface/utils';
 import logger from '../../../logger';
-import { getCertificate, getPrismaApiUrl } from '../../../config/configUtils';
+import { getCertificate, getPrismaApiUrl, getProxyConfigurations } from '../../../config/configUtils';
 import { CheckovInstall } from '../../../commands/checkov';
 
 export class DockerExecutor extends AbstractExecutor {
@@ -67,6 +67,7 @@ export class DockerExecutor extends AbstractExecutor {
     }
 
     private static getEnvs() {
+        const proxyConfigurations = getProxyConfigurations();
         const envs = [
             '--env', 'BC_SOURCE=vscode',
             '--env', `BC_SOURCE_VERSION=${vscode.extensions.getExtension(CONFIG.extensionId)?.packageJSON.version}` 
@@ -74,6 +75,13 @@ export class DockerExecutor extends AbstractExecutor {
 
         if (getPrismaApiUrl()) {
             envs.push('--env', `PRISMA_API_URL=${getPrismaApiUrl()}`);
+        }
+
+        if (proxyConfigurations) {
+            envs.push('--env', `https_proxy=${proxyConfigurations}`);
+            envs.push('--env', `http_proxy=${proxyConfigurations}`);
+            envs.push('--env', `HTTPS_PROXY=${proxyConfigurations}`);
+            envs.push('--env', `HTTP_PROXY=${proxyConfigurations}`);
         }
 
         return envs;

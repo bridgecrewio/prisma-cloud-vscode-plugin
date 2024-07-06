@@ -2,6 +2,7 @@ import * as semver from 'semver';
 import logger from '../logger';
 import { CONFIG } from '.';
 import { USER_CONFIGURATION_PARAM } from '../constants';
+import { PROXY_SUPPORT } from '../models/proxySettings';
 
 const minCheckovVersion = '2.0.0';
 
@@ -88,4 +89,45 @@ export const getCheckovVersion = (): string => {
 
         return clean;
     }
+};
+
+export const getProxyConfigurations = (): string | unknown | null => {
+    const proxySupport: PROXY_SUPPORT | unknown = CONFIG.userWorkspaceConfig.get('http.proxySupport');
+    const proxyUrl = CONFIG.userWorkspaceConfig.get('http.proxy');
+    let proxySettings = null;
+
+    if (!proxySupport) {
+        return null;
+    }
+
+    switch (proxySupport) {
+        case PROXY_SUPPORT.ON:
+        case PROXY_SUPPORT.OVERRIDE:
+            proxySettings = proxyUrl;
+            break;
+        
+        case PROXY_SUPPORT.FALLBACK:
+            if (proxyUrl) {
+                proxySettings = proxyUrl;
+            }
+            else if (process.env['https_proxy']) {
+                proxySettings = process.env['https_proxy'];
+            }
+            else if (process.env['HTTPS_PROXY']) {
+                proxySettings = process.env['HTTPS_PROXY'];
+            }
+            else {
+                proxySettings = null;
+            }
+            break;
+        case PROXY_SUPPORT.OFF:
+            proxySettings = null;
+            break;
+
+        default:
+            proxySettings = null;
+    }
+
+    logger.info(`proxy settings: ${JSON.stringify(proxySettings)}`);
+    return proxySettings;
 };
