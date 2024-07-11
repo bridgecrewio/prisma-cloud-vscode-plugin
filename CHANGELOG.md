@@ -27,3 +27,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Resolving a problem where clicking on some of the found issues doesn't open the detail sections
 - Resolving a problem where scanning a single file through Windows does not initiate a scan.
+
+## [1.0.16] - 2024-07-11
+
+### Added
+
+- Add support for proxy configuration is VScode
+
+### Fixed
+
+- Resolving a problem where missing an opening slash on Windows on Docker scan.

@@ -9,6 +9,7 @@ import { reRenderViews } from '../../../views/interface/utils';
 import logger from '../../../logger';
 import { getCertificate, getPrismaApiUrl, getProxyConfigurations } from '../../../config/configUtils';
 import { CheckovInstall } from '../../../commands/checkov';
+import { isWindows } from '../../../utils';
 
 export class DockerExecutor extends AbstractExecutor {
     private static containerName: string;
@@ -50,7 +51,7 @@ export class DockerExecutor extends AbstractExecutor {
                 if (process.stderr) {
                     process.stderr.on('data', (data) => logger.info('error' + data.toString()));
                 }
-            } catch(e) {
+            } catch (e) {
                 logger.info(e);
             }
         }
@@ -62,7 +63,7 @@ export class DockerExecutor extends AbstractExecutor {
 
     private static getConainerName() {
         const containerName = `vscode-checkov-${Date.now()}`;
-        
+
         return ['--name', containerName];
     }
 
@@ -70,7 +71,7 @@ export class DockerExecutor extends AbstractExecutor {
         const proxyConfigurations = getProxyConfigurations();
         const envs = [
             '--env', 'BC_SOURCE=vscode',
-            '--env', `BC_SOURCE_VERSION=${vscode.extensions.getExtension(CONFIG.extensionId)?.packageJSON.version}` 
+            '--env', `BC_SOURCE_VERSION=${vscode.extensions.getExtension(CONFIG.extensionId)?.packageJSON.version}`
         ];
 
         if (getPrismaApiUrl()) {
@@ -88,8 +89,13 @@ export class DockerExecutor extends AbstractExecutor {
     }
 
     private static getVolumeMounts() {
+        let volume = `${DockerExecutor.projectPath}:${DockerExecutor.projectPath}`;
+        if (isWindows()){
+            // on windows the volume should start with double slash, so adding extra slash
+            volume = volume.replace(`"`,`"/`);
+        }
         const volumeMounts = [
-            '--volume', `${DockerExecutor.projectPath}:${DockerExecutor.projectPath}`,
+            '--volume', volume
         ];
 
         const cert = getCertificate();
