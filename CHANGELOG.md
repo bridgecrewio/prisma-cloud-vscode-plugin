@@ -32,7 +32,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 
-- Add support for proxy configuration is VScode
+- Add support for proxy configuration on VScode
 
 ### Fixed
 
