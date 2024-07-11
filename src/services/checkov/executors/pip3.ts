@@ -8,7 +8,7 @@ import { reRenderViews } from '../../../views/interface/utils';
 import { CheckovInstall } from '../../../commands/checkov';
 import { formatWindowsFilePath, isPipInstall, isWindows } from '../../../utils';
 import logger from '../../../logger';
-import { getPrismaApiUrl } from '../../../config/configUtils';
+import { getPrismaApiUrl, getProxyConfigurations } from '../../../config/configUtils';
 
 export class Pip3Executor extends AbstractExecutor {
     private static pid: any;
@@ -16,6 +16,7 @@ export class Pip3Executor extends AbstractExecutor {
     public static async execute(installation: CheckovInstallation, files?: string[]) {
         AbstractExecutor.isScanInProgress = true;
         const prismaApiUrl = getPrismaApiUrl();
+        const proxySettings = getProxyConfigurations();
         await reRenderViews();
         const args = [
             ...(await Pip3Executor.getCheckovCliParams(installation, files)),
@@ -32,6 +33,12 @@ export class Pip3Executor extends AbstractExecutor {
 
         if (prismaApiUrl) {
             env['PRISMA_API_URL'] = prismaApiUrl;
+        }
+        if (proxySettings) {
+            env['https_proxy'] = proxySettings;
+            env['http_proxy'] = proxySettings;
+            env['HTTPS_PROXY'] = proxySettings;
+            env['HTTP_PROXY'] = proxySettings;
         }
 
         const options: SpawnOptionsWithoutStdio = {

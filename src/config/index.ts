@@ -6,6 +6,9 @@ export const CONFIG = Object.freeze({
     get userConfig(): WorkspaceConfiguration & UserConfiguration {
         return workspace.getConfiguration(CONFIG.userConfigurationKey) as WorkspaceConfiguration & UserConfiguration;
     },
+    get userWorkspaceConfig(): WorkspaceConfiguration {
+        return workspace.getConfiguration();
+    },
     extensionId: 'prismacloud.prisma-cloud',
     userConfigurationKey: 'prismaCloud',
     requirenments: {

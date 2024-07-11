@@ -7,8 +7,9 @@ import { AbstractExecutor } from './abstractExecutor';
 import { CheckovInstallation } from '../../../types';
 import { reRenderViews } from '../../../views/interface/utils';
 import logger from '../../../logger';
-import { getCertificate, getPrismaApiUrl } from '../../../config/configUtils';
+import { getCertificate, getPrismaApiUrl, getProxyConfigurations } from '../../../config/configUtils';
 import { CheckovInstall } from '../../../commands/checkov';
+import { isWindows } from '../../../utils';
 
 export class DockerExecutor extends AbstractExecutor {
     private static containerName: string;
@@ -50,7 +51,7 @@ export class DockerExecutor extends AbstractExecutor {
                 if (process.stderr) {
                     process.stderr.on('data', (data) => logger.info('error' + data.toString()));
                 }
-            } catch(e) {
+            } catch (e) {
                 logger.info(e);
             }
         }
@@ -62,26 +63,39 @@ export class DockerExecutor extends AbstractExecutor {
 
     private static getConainerName() {
         const containerName = `vscode-checkov-${Date.now()}`;
-        
+
         return ['--name', containerName];
     }
 
     private static getEnvs() {
+        const proxyConfigurations = getProxyConfigurations();
         const envs = [
             '--env', 'BC_SOURCE=vscode',
-            '--env', `BC_SOURCE_VERSION=${vscode.extensions.getExtension(CONFIG.extensionId)?.packageJSON.version}` 
+            '--env', `BC_SOURCE_VERSION=${vscode.extensions.getExtension(CONFIG.extensionId)?.packageJSON.version}`
         ];
 
         if (getPrismaApiUrl()) {
             envs.push('--env', `PRISMA_API_URL=${getPrismaApiUrl()}`);
         }
 
+        if (proxyConfigurations) {
+            envs.push('--env', `https_proxy=${proxyConfigurations}`);
+            envs.push('--env', `http_proxy=${proxyConfigurations}`);
+            envs.push('--env', `HTTPS_PROXY=${proxyConfigurations}`);
+            envs.push('--env', `HTTP_PROXY=${proxyConfigurations}`);
+        }
+
         return envs;
     }
 
     private static getVolumeMounts() {
+        let volume = `${DockerExecutor.projectPath}:${DockerExecutor.projectPath}`;
+        if (isWindows()){
+            // on windows the volume should start with double slash, so adding extra slash
+            volume = volume.replace(`"`,`"/`);
+        }
         const volumeMounts = [
-            '--volume', `${DockerExecutor.projectPath}:${DockerExecutor.projectPath}`,
+            '--volume', volume
         ];
 
         const cert = getCertificate();
