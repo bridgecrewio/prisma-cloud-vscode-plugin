@@ -21,6 +21,7 @@ export class DockerExecutor extends AbstractExecutor {
         const containerName = DockerExecutor.getConainerName();
         DockerExecutor.containerName = containerName[1];
 
+
         const args = [
             'run',
             ...DockerExecutor.getDockerParams(),
@@ -29,7 +30,7 @@ export class DockerExecutor extends AbstractExecutor {
             ...DockerExecutor.getVolumeMounts(),
             ...DockerExecutor.getWorkdir(),
             ...DockerExecutor.getImage(),
-            ...(await DockerExecutor.getCheckovCliParams(installation, files)),
+            ...(await DockerExecutor.getCheckovCliParams(installation, DockerExecutor.fixFilePaths(files))),
         ];
 
         logger.info(`${installation.entrypoint} ${args.join(' ').replace(/[^:\s]*::[^:\s]*/, '')}`);
@@ -90,10 +91,6 @@ export class DockerExecutor extends AbstractExecutor {
 
     private static getVolumeMounts() {
         let volume = `${DockerExecutor.projectPath}:${DockerExecutor.projectPath}`;
-        if (isWindows()){
-            // on windows the volume should start with double slash, so adding extra slash
-            volume = volume.replace(`"`,`"/`);
-        }
         const volumeMounts = [
             '--volume', volume
         ];
@@ -112,6 +109,13 @@ export class DockerExecutor extends AbstractExecutor {
 
     private static getImage() {
         return [`bridgecrew/checkov:${CheckovInstall.checkovVersion}`];
+    }
+
+    private static fixFilePaths(files?: string[]): string[] | undefined {
+        if (isWindows() && files) {
+            return files.map(file => `/${file}`);
+        }
+        return files;
     }
 };
 

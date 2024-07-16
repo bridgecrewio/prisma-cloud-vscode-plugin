@@ -25,6 +25,9 @@ export abstract class AbstractExecutor {
             if (isPipInstall()) {
                 return `"${workspaceFolders[0].uri.fsPath.replace(/\\/g, '/')}"`;
             }
+            else {
+                return `"/${workspaceFolders[0].uri.path.replace(':', '')}"`;
+            }
         }
 
         return `"${workspaceFolders[0].uri.path.replace(':', '')}"`;
