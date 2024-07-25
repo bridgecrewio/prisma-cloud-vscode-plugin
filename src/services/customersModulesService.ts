@@ -89,7 +89,7 @@ export class CustomersModulesService {
         const activeContext = context ? context : CustomersModulesService.applicationContext;
         const customerModules: CustomerModulesResponse | null | undefined = activeContext.globalState.get(GLOBAL_CONTEXT.CUSTOMER_MODULES);
         
-        if(customerModules && customerModules.modules.SAST) {
+        if(customerModules && customerModules.modules && customerModules.modules.SAST) {
             logger.info('customer is support SAST');
             CategoriesService.showWeaknessesView();
         } else {

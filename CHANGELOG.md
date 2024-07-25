@@ -37,3 +37,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Fixed
 
 - Resolving a problem where missing an opening slash on Windows on Docker scan.
+
+## [1.0.18] - 2024-07-25
+
+### Added
+
+- Add validation for backend response
