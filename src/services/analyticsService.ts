@@ -1,9 +1,12 @@
 import axios from 'axios';
 import * as vscode from 'vscode';
+import { CONFIG } from '../config';
+import { getPrismaApiUrl } from '../config/configUtils';
 import { EVENT_TYPE, GLOBAL_CONTEXT, IDE_PLUGINS } from "../constants";
 import logger from '../logger';
-import { getPrismaApiUrl } from '../config/configUtils';
+import { getOsNameAndVersion } from '../utils';
 import { AuthenticationService } from './authenticationService';
+import { CheckovExecutor } from './checkov';
 
 export const initializeAnalyticsService = (context: vscode.ExtensionContext) => {
     AnalyticsService.enabled = !!getPrismaApiUrl();
@@ -32,6 +35,10 @@ export class AnalyticsService {
                 pluginName: IDE_PLUGINS.VSCODE,
                 eventTime: new Date(),
                 eventType,
+                pluginVersion: vscode.extensions.getExtension(CONFIG.extensionId)?.packageJSON.version,
+                ideVersion: vscode.version,
+                operatingSystem: await getOsNameAndVersion(),
+                checkovVersion: CheckovExecutor.checkovVersion,
                 eventData,
             }];
     

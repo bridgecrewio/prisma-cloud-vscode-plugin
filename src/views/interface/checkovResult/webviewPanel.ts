@@ -1,16 +1,15 @@
-import * as vscode from 'vscode';
 import axios from 'axios';
+import * as vscode from 'vscode';
 
 import { CONFIG } from '../../../config';
+import { getPrismaApiUrl } from '../../../config/configUtils';
+import { CHECKOV_RESULT_CATEGORY, GLOBAL_CONTEXT } from '../../../constants';
+import logger from '../../../logger';
+import { CategoriesService } from '../../../services';
+import { AuthenticationService } from '../../../services/authenticationService';
+import { AbstractExecutor } from '../../../services/checkov/executors/abstractExecutor';
 import { CheckovResult, DataFlow } from '../../../types';
 import { MessageHandlersFactory } from './messages';
-import { CHECKOV_RESULT_CATEGORY, GLOBAL_CONTEXT } from '../../../constants';
-import { AbstractExecutor } from '../../../services/checkov/executors/abstractExecutor';
-import { CategoriesService } from '../../../services';
-import { AnalyticsService } from '../../../services/analyticsService';
-import logger from '../../../logger';
-import { getPrismaApiUrl } from '../../../config/configUtils';
-import { AuthenticationService } from '../../../services/authenticationService';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
@@ -170,12 +169,18 @@ export class CheckovResultWebviewPanel {
         const jwtToken = AuthenticationService.applicationContext.globalState.get(GLOBAL_CONTEXT.JWT_TOKEN) as string;
 
         try {
-            const response = await axios.get(CheckovResultWebviewPanel.getDescriptionsEndpoint(checkId), { headers: {
-                'Authorization': jwtToken } });
-            
-                if (response.status === 200) {
-                    return response.data.description;
+            const response = await axios.get(
+                CheckovResultWebviewPanel.getDescriptionsEndpoint(checkId),
+                {
+                    headers: {
+                        'Authorization': jwtToken
+                    }
                 }
+            );
+            
+            if (response.status === 200) {
+                return response.data.description;
+            }
         } catch (e: any) {
             if (retryCount === 3) {
                 throw new Error('Unable to fetch description: ' + e.message);
@@ -186,7 +191,7 @@ export class CheckovResultWebviewPanel {
                 return await CheckovResultWebviewPanel.fetchDescription(checkId, retryCount + 1);
             }
 
-            logger.info('Error: ' + e.message, e);
+            logger.info(`Failed to get description for ${checkId}: ${e.message}`);
             return;
         }
     }

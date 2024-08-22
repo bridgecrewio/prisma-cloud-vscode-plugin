@@ -1,18 +1,18 @@
 import { mkdir } from 'fs/promises';
-import { join, dirname } from 'path';
 import { EOL } from 'os';
+import { dirname, join } from 'path';
 
-import * as semver from 'semver';
 import * as path from 'path';
+import * as semver from 'semver';
 import * as vscode from 'vscode';
 
 import { CONFIG } from '../../config';
-import { CHECKOV_INSTALLATION_TYPE } from '../../constants';
-import { StatusBar } from '../../views';
-import { asyncExec, isWindows, formatError } from '../../utils';
-import { CheckovExecutor } from '../../services';
-import logger from '../../logger';
 import { getCheckovVersion } from '../../config/configUtils';
+import { CHECKOV_INSTALLATION_TYPE } from '../../constants';
+import logger from '../../logger';
+import { CheckovExecutor } from '../../services';
+import { asyncExec, formatError, isWindows } from '../../utils';
+import { StatusBar } from '../../views';
 
 export class CheckovInstall {
     public static processPathEnv: string;
@@ -33,13 +33,13 @@ export class CheckovInstall {
                 const installationResult = await installation(context);
     
                 if (installationResult) {
-                    CheckovExecutor.initialize(installationResult);
-                    logger.info('Checkov installation was succeed', installationResult);
+                    await CheckovExecutor.initialize(installationResult);
+                    logger.info(`Successfully installed Checkov using ${installationResult.type}`, installationResult);
                     return;
                 }
             }
 
-            throw new Error('The Checkov can not be installed');
+            throw new Error("Checkov couldn't be installed using docker, pip or pipenv");
         } catch (error) {
             throw error;
         } finally {
@@ -77,7 +77,7 @@ export class CheckovInstall {
                     return false;
                 }
     
-                (await asyncExec(`${pipExe} install --user -U -i https://pypi.org/simple/ checkov${CheckovInstall.checkovVersion === 'latest' ? '' : `==${CheckovInstall.checkovVersion}`}`));
+                (await asyncExec(`${pipExe} install --user -U -i https://pypi.org/simple/ checkov${CheckovInstall.checkovVersion === 'latest' ? '' : `==${CheckovInstall.checkovVersion}`}`, {env: {PIP_BREAK_SYSTEM_PACKAGES: '1'}}));
                 if (isWindows()) {
                     CheckovInstall.processPathEnv = (await asyncExec('echo %PATH%')).stdout.trim();
                 } else {
@@ -90,7 +90,7 @@ export class CheckovInstall {
     
                 return { type: CHECKOV_INSTALLATION_TYPE.PIP3, entrypoint };
             } catch (error) {
-                logger.error(`The Checkov installation with ${pythonExe} was failed`, { error: formatError(error as Error) });
+                logger.error(`Failed to install Checkov using ${pythonExe}`, { error: formatError(error as Error) });
                 if (firstTry) {
                     logger.info('Retrying using `python` and `pip`');
                     pythonExe = 'python';
@@ -107,15 +107,15 @@ export class CheckovInstall {
         logger.info('Installing Checkov with Pipenv');
 
         try {
-            const isPythonVersionSuitable = await CheckovInstall.isPythonVersionSuitable('pipenv run python --version');
+            const installationDir = vscode.Uri.joinPath(context.globalStorageUri, 'checkov').fsPath;
+
+            await mkdir(installationDir, { recursive: true });
+
+            const isPythonVersionSuitable = await CheckovInstall.isPythonVersionSuitable('pipenv run python --version', installationDir);
 
             if (!isPythonVersionSuitable) {
                 return false;
             }
-
-            const installationDir = vscode.Uri.joinPath(context.globalStorageUri, 'checkov').fsPath;
-
-            await mkdir(installationDir, { recursive: true });
 
             await asyncExec('pipenv --python 3 install checkov~=2.0.0', { cwd: installationDir });
 
@@ -123,20 +123,20 @@ export class CheckovInstall {
 
             return { type: CHECKOV_INSTALLATION_TYPE.PIPENV, entrypoint };
         } catch (error) {
-            logger.error('The Checkov installation with Pipenv was failed', { error: formatError(error as Error) });
+            logger.error('Failed to install Checkov with Pipenv', { error: formatError(error as Error) });
             return false;
         }
     }
 
-    private static async isPythonVersionSuitable(extractionCommand: string) {
+    private static async isPythonVersionSuitable(extractionCommand: string, dir?: string) {
         logger.info('Checking the Python version');
 
         try {
-            const pythonVersion = (await asyncExec(extractionCommand)).stdout.split(' ')[1];
+            const pythonVersion = (await asyncExec(extractionCommand, dir ? { cwd: dir } : {})).stdout.split(' ')[1];
             
             return !semver.lt(pythonVersion, CONFIG.requirenments.minPythonVersion);
         } catch (error) {
-            throw new Error(`Checking the Python version was failed due: ${(error as Error).message}`);
+            throw new Error(`Failed checking the Python version: ${(error as Error).message}`);
         }
     }
 

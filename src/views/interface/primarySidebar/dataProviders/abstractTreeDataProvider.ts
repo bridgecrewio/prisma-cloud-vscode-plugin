@@ -1,13 +1,11 @@
 import * as vscode from 'vscode';
 
-import { TreeService } from '../services/treeService';
-import { CheckovResult } from '../../../../types';
+import { getPrismaApiUrl } from '../../../../config/configUtils';
 import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
 import { CategoriesService, FilesService } from '../../../../services';
+import { CheckovResult } from '../../../../types';
 import { CheckovResultWebviewPanel } from '../../checkovResult';
-import logger from '../../../../logger';
-import { CONFIG } from '../../../../config';
-import { getPrismaApiUrl } from '../../../../config/configUtils';
+import { TreeService } from '../services/treeService';
 
 export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   abstract readonly category: CHECKOV_RESULT_CATEGORY;
@@ -57,8 +55,6 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
     if (!result) {
         return;
     }
-
-    logger.info(result);
 
     const isIaC = CategoriesService.isIaCRisk(result.check_id, result.check_type);
 
