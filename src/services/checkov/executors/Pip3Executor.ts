@@ -1,16 +1,16 @@
 import { SpawnOptionsWithoutStdio, spawn } from 'child_process';
 import * as vscode from 'vscode';
 
-import { CONFIG } from '../../../config';
-import { AbstractExecutor } from './abstractExecutor';
-import { CheckovInstallation, CheckovOutput } from '../../../types';
-import { reRenderViews } from '../../../views/interface/utils';
 import { CheckovInstall } from '../../../commands/checkov';
-import { formatWindowsFilePath, isPipInstall, isWindows } from '../../../utils';
-import logger from '../../../logger';
 import { getPrismaApiUrl, getProxyConfigurations } from '../../../config/configUtils';
+import logger from '../../../logger';
+import { CheckovInstallation, CheckovOutput } from '../../../types';
+import { asyncExec, formatWindowsFilePath, isPipInstall, isWindows } from '../../../utils';
+import { reRenderViews } from '../../../views/interface/utils';
+import { AbstractExecutor } from './abstractExecutor';
 
 export class Pip3Executor extends AbstractExecutor {
+    
     private static pid: any;
 
     public static async execute(installation: CheckovInstallation, files?: string[]) {
@@ -117,5 +117,10 @@ export class Pip3Executor extends AbstractExecutor {
                 }
             }
         }
+    }
+
+    public static async getCheckovVersion(installation: CheckovInstallation): Promise<string> {
+        const {stdout} = await asyncExec(`${installation.entrypoint} -v`, {env: {PATH: CheckovInstall.processPathEnv}});
+        return stdout.trim();
     }
 };

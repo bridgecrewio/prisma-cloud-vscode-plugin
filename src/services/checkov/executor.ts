@@ -1,19 +1,20 @@
-import * as vscode from 'vscode';
 import { v4 as uuidv4 } from 'uuid';
+import * as vscode from 'vscode';
 
-import { CHECKOV_INSTALLATION_TYPE, SEVERITY, USER_CONFIGURATION_PARAM } from '../../constants';
-import { CheckovInstallation, CheckovOutput, CheckovResult } from '../../types';
-import { DockerExecutor, Pip3Executor } from './executors';
-import { ResultsService } from '../resultsService';
-import { StatusBar } from '../../views';
+import { CheckovInstall, ShowSettings } from '../../commands/checkov';
 import { CONFIG } from '../../config';
-import { ShowSettings, CheckovInstall } from '../../commands/checkov';
-import { AbstractExecutor } from './executors/abstractExecutor';
+import { shouldDisableErrorMessage } from '../../config/configUtils';
+import { CHECKOV_INSTALLATION_TYPE, SEVERITY } from '../../constants';
+import logger from '../../logger';
+import { CheckovInstallation, CheckovOutput, CheckovResult } from '../../types';
+import { formatWindowsFilePath, isWindows } from '../../utils';
+import { StatusBar } from '../../views';
 import { reRenderViews } from '../../views/interface/utils';
 import { AnalyticsService } from '../analyticsService';
-import { formatWindowsFilePath, isWindows } from '../../utils';
-import logger from '../../logger';
-import { shouldDisableErrorMessage } from '../../config/configUtils';
+import { ResultsService } from '../resultsService';
+import { AbstractExecutor } from './executors/abstractExecutor';
+import { DockerExecutor } from './executors/DockerExecutor';
+import { Pip3Executor } from './executors/Pip3Executor';
 
 export class CheckovExecutor {
     private static readonly executors = new Map<CHECKOV_INSTALLATION_TYPE, typeof DockerExecutor | typeof Pip3Executor>([
@@ -22,9 +23,14 @@ export class CheckovExecutor {
     ]);
 
     private static installation: CheckovInstallation;
+    private static actualCheckovVersion?: string;
 
-    public static initialize(installation: CheckovInstallation) {
+    public static async initialize(installation: CheckovInstallation) {
         CheckovExecutor.installation = installation;
+        const executor = CheckovExecutor.executors.get(installation.type);
+        executor ?
+            CheckovExecutor.actualCheckovVersion = await CheckovExecutor.executors.get(installation.type)?.getCheckovVersion(installation) :
+            logger.error(`No executor found for ${installation.type}, can't determine Checkov version`);
     }
 
     public static getExecutor() {
@@ -46,7 +52,13 @@ export class CheckovExecutor {
             });
         } 
 
-        if (!executor || AbstractExecutor.isScanInProgress) {
+        if (!executor) {
+            logger.error(`No executor found for ${installation.type}, aborting scan operation`);
+            return;
+        }
+
+        if (AbstractExecutor.isScanInProgress) {
+            logger.info('Existing scan already in progress, will not run a new one');
             return;
         }
 
@@ -152,5 +164,9 @@ export class CheckovExecutor {
         }
 
         return emptyParams;
+    }
+
+    public static get checkovVersion() {
+        return CheckovExecutor.actualCheckovVersion;
     }
 };

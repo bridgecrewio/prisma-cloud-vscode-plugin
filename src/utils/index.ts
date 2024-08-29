@@ -1,10 +1,11 @@
 import { exec, ExecOptions } from 'child_process';
-import { v4 as uuidv4 } from 'uuid';
-import { join } from 'path';
 import { readdir, stat } from 'fs/promises';
+import * as os from "os";
+import { join } from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import * as vscode from 'vscode';
-import { CHECKOV_INSTALLATION_TYPE, GLOBAL_CONTEXT } from '../constants';
 import { CheckovInstall } from '../commands/checkov';
+import { CHECKOV_INSTALLATION_TYPE, GLOBAL_CONTEXT } from '../constants';
 
 export interface DiagnosticReferenceCode {
     target: vscode.Uri;
@@ -21,6 +22,15 @@ export const isWindows = (): boolean => {
 
 export const formatWindowsFilePath = (path: string): string => {
     return path.replace(':', '').replace(/\\/g, '/');
+};
+
+export const getOsNameAndVersion = async () => {
+    const operatingSystem = os.type();
+    if ("Darwin" === operatingSystem) {
+        const {stdout} = await asyncExec("system_profiler SPSoftwareDataType  | grep 'System Version'");
+        return stdout.substring(stdout.indexOf(':') + 1, stdout.indexOf('(') || stdout.length).trim();
+    }
+    return `${operatingSystem} ${os.release()}`;
 };
 
 export const asyncExec = async (command: string, options: ExecOptions = {}): Promise<{ stdout: string, stderr: string }> => {

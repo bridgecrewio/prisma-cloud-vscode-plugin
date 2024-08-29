@@ -1,17 +1,18 @@
-import { ChildProcessWithoutNullStreams, spawn, exec } from 'child_process';
+import { ChildProcessWithoutNullStreams, exec, spawn } from 'child_process';
 
 import * as vscode from 'vscode';
 
-import { CONFIG } from '../../../config';
-import { AbstractExecutor } from './abstractExecutor';
-import { CheckovInstallation } from '../../../types';
-import { reRenderViews } from '../../../views/interface/utils';
-import logger from '../../../logger';
-import { getCertificate, getPrismaApiUrl, getProxyConfigurations } from '../../../config/configUtils';
 import { CheckovInstall } from '../../../commands/checkov';
-import { isWindows } from '../../../utils';
+import { CONFIG } from '../../../config';
+import { getCertificate, getPrismaApiUrl, getProxyConfigurations } from '../../../config/configUtils';
+import logger from '../../../logger';
+import { CheckovInstallation } from '../../../types';
+import { asyncExec, isWindows } from '../../../utils';
+import { reRenderViews } from '../../../views/interface/utils';
+import { AbstractExecutor } from './abstractExecutor';
 
 export class DockerExecutor extends AbstractExecutor {
+    
     private static containerName: string;
     private static activeProcess: ChildProcessWithoutNullStreams;
 
@@ -116,6 +117,16 @@ export class DockerExecutor extends AbstractExecutor {
             return files.map(file => `/${file}`);
         }
         return files;
+    }
+
+    public static async getCheckovVersion(installation: CheckovInstallation): Promise<string> {
+        const args = [
+            'run',
+            ...DockerExecutor.getImage(),
+            '-v'
+        ];
+        const {stdout} = await asyncExec(`${installation.entrypoint} ${args.join(' ')}`);
+        return stdout.trim();
     }
 };
 

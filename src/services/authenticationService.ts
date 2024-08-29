@@ -1,9 +1,9 @@
 import axios from 'axios';
 import * as vscode from 'vscode';
 import { CONFIG } from "../config";
+import { getPrismaApiUrl } from '../config/configUtils';
 import { GLOBAL_CONTEXT } from "../constants";
 import logger from '../logger';
-import { getPrismaApiUrl } from '../config/configUtils';
 
 export const initializeAuthenticationService = async (context: vscode.ExtensionContext) => {
     AuthenticationService.enabled = !!getPrismaApiUrl();
@@ -34,7 +34,7 @@ export class AuthenticationService {
                     await AuthenticationService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, response.data.token);
                 }
             } catch (error: any) {
-                logger.error('Is not possible to fetch new JWT token. Authorization on prisma was failed: ', error.message);
+                logger.error(`Failed fetching a new JWT token, authorization on prisma failed: ${error.message}`);
                 await AuthenticationService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, undefined);
             }
         }

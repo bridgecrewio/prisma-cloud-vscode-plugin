@@ -1,20 +1,30 @@
 # Change Log
 
-All notable changes to the "checkov-vscode-v2" extension will be documented in this file.
-
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [1.0.14] - 2024-05-27
+## [1.0.19] - 2024-08-29
 
 ### Added
 
-- Implement new extension configurations.
-- Enhance error logging.
-- Enhance management of extension configurations.
+- Added the following data to Prisma Cloid analytics
+
+    - Extension version
+    - VS Code version
+    - Operating system
+    - Checkov version
 
 ### Fixed
 
-- Suppressing SCA vulnerabilities on Windows was not functioning.
+- Fixed installation issues with pip when using externally managed python installation
+- Fixed various crashes
+
+## [1.0.16] - 2024-07-11
+
+### Added
+
+- Add support for proxy configuration on VScode
+
+### Fixed
+
+- Resolving a problem where missing an opening slash on Windows on Docker scan.
 
 ## [1.0.15] - 2024-06-20
 
@@ -28,12 +38,15 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Resolving a problem where clicking on some of the found issues doesn't open the detail sections
 - Resolving a problem where scanning a single file through Windows does not initiate a scan.
 
-## [1.0.16] - 2024-07-11
+
+## [1.0.14] - 2024-05-27
 
 ### Added
 
-- Add support for proxy configuration on VScode
+- Implement new extension configurations.
+- Enhance error logging.
+- Enhance management of extension configurations.
 
 ### Fixed
 
-- Resolving a problem where missing an opening slash on Windows on Docker scan.
+- Suppressing SCA vulnerabilities on Windows was not functioning.
