@@ -3,10 +3,10 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../config';
 import { CHECKOV_RESULT_CATEGORY } from '../constants';
 import { CheckovResult } from '../types';
+import { isPipInstall, isWindows } from '../utils';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 import { CategoriesService } from './categoriesService';
 import { CustomPopupService } from './customPopupService';
-import { isPipInstall, isWindows } from '../utils';
 
 type Filter = {
     filterName: keyof CheckovResult;
@@ -70,17 +70,11 @@ export class ResultsService {
 
     public static getByFilePath(filePath: string) {
         const results = ResultsService.get();
-
-        if (vscode.workspace.workspaceFolders) {
-            filePath = filePath.replace(vscode.workspace.workspaceFolders[0].uri.path, '');
-        }
-
         return results.filter(result => {
             if (isWindows()) {
                 return result.file_abs_path === `/${filePath}`;
             }
-
-            return result.repo_file_path === filePath;
+            return result.file_abs_path === filePath;
         });
     }
 
@@ -155,4 +149,4 @@ export class ResultsService {
         TreeDataProvidersContainer.refresh();
         CustomPopupService.highlightLines();
     }
-};
+}

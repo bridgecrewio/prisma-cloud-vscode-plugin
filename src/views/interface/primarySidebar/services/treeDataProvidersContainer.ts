@@ -1,53 +1,60 @@
-import { IaCTreeDataProvider } from '../dataProviders/iacTreeDataProvider';
-import { SecretsTreeDataProvider } from '../dataProviders/secretsTreeDataProvider';
-import { WeaknessesTreeDataProvider } from '../dataProviders/weaknessesTreeDataProvider';
-import { VulnerabilitiesTreeDataProvider } from '../dataProviders/vulnerabilitiesTreeDataProvider';
-import { LicensesTreeDataProvider } from '../dataProviders/licensesTreeDataProvider';
-import { PrimarySidebar } from '../../primarySidebar';
-import { CategoriesService } from '../../../../services';
-import { TreeDataProvider } from '../dataProviders/abstractTreeDataProvider';
+import * as vscode from "vscode";
 import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
 import logger from '../../../../logger';
+import { CategoriesService, ResultsService } from '../../../../services';
+import { ResultTreeDataProvider, ResultTreeItem } from '../dataProviders/resultTreeDataProvider';
+
+interface TreeViewContext {
+    key: string;
+    provider: ResultTreeDataProvider;
+    view?: vscode.TreeView<ResultTreeItem>;
+}
 
 export class TreeDataProvidersContainer {
-    public static iacTreeDataProvider: IaCTreeDataProvider;
-    public static secretsTreeDataProvicer: SecretsTreeDataProvider;
-    public static vulnerabilitiesTreeDataProvider: VulnerabilitiesTreeDataProvider;
-    public static licensesTreeDataProvider: LicensesTreeDataProvider;
-    public static weaknessesTreeDataProvider: WeaknessesTreeDataProvider;
 
-    static {
-        TreeDataProvidersContainer.iacTreeDataProvider = new IaCTreeDataProvider();
-        TreeDataProvidersContainer.secretsTreeDataProvicer = new SecretsTreeDataProvider();
-        TreeDataProvidersContainer.vulnerabilitiesTreeDataProvider = new VulnerabilitiesTreeDataProvider();
-        TreeDataProvidersContainer.licensesTreeDataProvider = new LicensesTreeDataProvider();
-        TreeDataProvidersContainer.weaknessesTreeDataProvider = new WeaknessesTreeDataProvider();
+    public static treeViews: Record<CHECKOV_RESULT_CATEGORY, TreeViewContext> = {
+        [CHECKOV_RESULT_CATEGORY.IAC]: {
+            key: 'iac-misconfiguration',
+            provider: new ResultTreeDataProvider(CHECKOV_RESULT_CATEGORY.IAC)
+        },
+        [CHECKOV_RESULT_CATEGORY.SCA]: {
+            key: 'vulnerabilities',
+            provider: new ResultTreeDataProvider(CHECKOV_RESULT_CATEGORY.SCA)
+        },
+        [CHECKOV_RESULT_CATEGORY.SECRETS]: {
+            key: 'secrets',
+            provider: new ResultTreeDataProvider(CHECKOV_RESULT_CATEGORY.SECRETS)
+        },
+        [CHECKOV_RESULT_CATEGORY.LICENSES]: {
+            key: 'licenses',
+            provider: new ResultTreeDataProvider(CHECKOV_RESULT_CATEGORY.LICENSES)
+        },
+        [CHECKOV_RESULT_CATEGORY.WEAKNESSES]: {
+            key: 'weaknesses',
+            provider: new ResultTreeDataProvider(CHECKOV_RESULT_CATEGORY.WEAKNESSES)
+        }
+    };
+
+    public static registerTreeProviders() {
+        Object.values(this.treeViews).forEach(treeViewContext => {
+            treeViewContext.view = vscode.window.createTreeView(treeViewContext.key, {
+                treeDataProvider: treeViewContext.provider,
+            });
+        });
     }
 
     public static refresh() {
-        TreeDataProvidersContainer.iacTreeDataProvider.refresh();
-        TreeDataProvidersContainer.secretsTreeDataProvicer.refresh();
-        TreeDataProvidersContainer.vulnerabilitiesTreeDataProvider.refresh();
-        TreeDataProvidersContainer.licensesTreeDataProvider.refresh();
-        TreeDataProvidersContainer.weaknessesTreeDataProvider.refresh();
-        PrimarySidebar.refreshBadgeCount();
+        Object.values(this.treeViews).forEach(treeViewContext => {
+            treeViewContext.provider.refresh();
+            treeViewContext.view!.badge = { value: ResultsService.getCount(), tooltip: '' };
+        });
     }
 
-    public static getTreeDataProviderByCategory(category: CHECKOV_RESULT_CATEGORY): TreeDataProvider | undefined {
-        switch(category) {
-            case CHECKOV_RESULT_CATEGORY.IAC:
-                return TreeDataProvidersContainer.iacTreeDataProvider;
-            case CHECKOV_RESULT_CATEGORY.LICENSES:
-                return TreeDataProvidersContainer.licensesTreeDataProvider;
-            case CHECKOV_RESULT_CATEGORY.SCA:
-                return TreeDataProvidersContainer.vulnerabilitiesTreeDataProvider;
-            case CHECKOV_RESULT_CATEGORY.SECRETS:
-                return TreeDataProvidersContainer.secretsTreeDataProvicer;
-            case CHECKOV_RESULT_CATEGORY.WEAKNESSES:
-                return TreeDataProvidersContainer.weaknessesTreeDataProvider;
-            default:
-                logger.info(`No such tree data provider for the category: ${category}`);
+    public static getTreeDataProviderByCategory(category: CHECKOV_RESULT_CATEGORY): ResultTreeDataProvider | undefined {
+        if (this.treeViews[category]) {
+            return this.treeViews[category].provider;
         }
+        logger.info(`No such tree data provider for the category: ${category}`);
     }
 
     public static getTreeItem({ checkId, id, checkType }: { checkId: string, id: string, checkType: string }) {
@@ -59,4 +66,4 @@ export class TreeDataProvidersContainer {
             logger.error(`Can not specify category for the risk. checkId: ${checkId} id: ${id}`);
         }
     }
-};
+}

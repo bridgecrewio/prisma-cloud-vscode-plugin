@@ -2,35 +2,46 @@ import { ChildProcessWithoutNullStreams } from 'child_process';
 
 import * as vscode from 'vscode';
 
-import { CONFIG } from '../../../config';
-import { CHECKOV_INSTALLATION_TYPE, REPO_ID } from '../../../constants';
-import { CheckovInstallation, CheckovOutput } from '../../../types';
-import { getDirSize, isPipInstall, isWindows } from '../../../utils';
 import { ShowSettings } from '../../../commands/checkov';
-import logger from '../../../logger';
+import { CONFIG } from '../../../config';
 import { getAccessKey, getCertificate, getExternalChecksDir, getFrameworks, getNoCertVerify, getSastMaxSizeLimit, getSecretKey, getToken, shouldUseEnforcmentRules } from '../../../config/configUtils';
-
+import { CHECKOV_INSTALLATION_TYPE, REPO_ID } from '../../../constants';
+import logger from '../../../logger';
+import { CheckovInstallation, CheckovOutput } from '../../../types';
+import { getDirSize } from '../../../utils';
+import { getContainingFolderPath, parseUri } from '../../../utils/fileUtils';
 
 export abstract class AbstractExecutor {
     public static isScanInProgress: boolean = false;
 
-    protected static get projectPath() {
+    /**
+     * There are 3 possible situations when scanning operation starts:
+     * 1. The IDE has standalone files opened that are not a part of any workspace
+     * 2. The IDE has an opened workspace
+     * 3. The IDE has an opened workspace and some standalone files outside of it that are also opened
+     * @returns An array of directories containing all possible locations of files that should be scanned.
+     */
+    protected static get projectPaths(): string[] {
+        const uris: vscode.Uri[] = [];
         const workspaceFolders = vscode.workspace.workspaceFolders;
-
-        if (!workspaceFolders) {
-            return null;
+        if (workspaceFolders) {
+            uris.push(workspaceFolders[0].uri);
         }
-
-        if (isWindows()) {
-            if (isPipInstall()) {
-                return `"${workspaceFolders[0].uri.fsPath.replace(/\\/g, '/')}"`;
-            }
-            else {
-                return `"/${workspaceFolders[0].uri.path.replace(':', '')}"`;
-            }
-        }
-
-        return `"${workspaceFolders[0].uri.path.replace(':', '')}"`;
+        vscode.window.tabGroups.all.forEach(tabGroup => 
+            tabGroup.tabs.forEach(tab => {
+                if (tab.input instanceof vscode.TabInputText) {
+                    const document: vscode.TabInputText = tab.input;
+                    if (workspaceFolders) {
+                        if (!workspaceFolders.some(folder => document.uri.fsPath.startsWith(folder.name))) {
+                            uris.push(getContainingFolderPath(document.uri));
+                        }
+                    } else {
+                        uris.push(getContainingFolderPath(document.uri));
+                    }
+                }
+            })
+        );
+        return uris.map(uri => parseUri(uri));
     }
 
     protected static async getCheckovCliParams(installation: CheckovInstallation, files?: string[]) {
@@ -64,17 +75,28 @@ export abstract class AbstractExecutor {
 
         if (files) {
             files.forEach((file) => checkovCliParams.push('--file', `"${file}"`));
-        } else {
-            checkovCliParams.push('--directory', AbstractExecutor.projectPath!);
-
+        } else if (vscode.workspace.workspaceFolders) {
+            const directory = parseUri(vscode.workspace.workspaceFolders![0].uri);
+            checkovCliParams.push('--directory', directory);
+            const excludedPaths = AbstractExecutor.projectPaths.filter(path => !path.startsWith(directory));
+            if (excludedPaths.length) {
+                logger.warn(`There are files opened from outside the workspace that won't be scanned in these directories: ${excludedPaths}`);
+                vscode.window.showWarningMessage('You have opened files from outside your workspace. Those files will not be scanned as part of a full scan');
+            }
             const shouldSkipSast = await AbstractExecutor.shouldSkipSast();
-
             if (shouldSkipSast) {
                 checkovCliParams.push('--skip-framework', 'sast');
                 vscode.window.showInformationMessage('SAST didn\'t run due to the size of the repository. Adjust this limit in the settings', 'Prisma Cloud Settings').then(() => {
                     ShowSettings.execute();
                 });
             }
+        } else {
+            // If there are no files and no workspace, scan all opened files in the editor
+            vscode.window.tabGroups.all.forEach(tabGroup => 
+                tabGroup.tabs.forEach(tab => 
+                    tab.input instanceof vscode.TabInputText && checkovCliParams.push('--file', parseUri(tab.input.uri))
+                )
+            );
         }
 
         const cert = getCertificate();
@@ -141,4 +163,4 @@ export abstract class AbstractExecutor {
             return true;
         }
     }
-};
+}

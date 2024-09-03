@@ -1,8 +1,8 @@
 import * as path from 'path';
-import { TreeItem } from '../dataProviders/abstractTreeDataProvider';
-import { IconsService } from './iconsService';
-import { CheckovResult } from '../../../../types';
 import { CHECKOV_RESULT_CATEGORY, PATH_TYPE, SEVERITY, dockerfileName, severityPriorityMap } from '../../../../constants';
+import { CheckovResult } from '../../../../types';
+import { ResultTreeItem } from '../dataProviders/resultTreeDataProvider';
+import { IconsService } from './iconsService';
 
 export type FormattedCheck = {
     originalFilePath: string;
@@ -26,18 +26,18 @@ export class TreeService {
         this.iconService = new IconsService();
     }
 
-    public getTreeData(category: CHECKOV_RESULT_CATEGORY, checkovOutput: CheckovResult[]): TreeItem[] {
+    public getTreeData(category: CHECKOV_RESULT_CATEGORY, checkovOutput: CheckovResult[]): ResultTreeItem[] {
         const formattedData = this.formatCheckData(category, checkovOutput);
-        const treeData = this.formTreeData(formattedData);
+        const treeData = this.formTreeData(category, formattedData);
         this.setParentLinks(treeData);
         if (treeData.length === 1) {
             return treeData;
         }
-        this.sortTreeData({children: treeData} as TreeItem);
+        this.sortTreeData({children: treeData} as ResultTreeItem);
         return treeData;
     }
 
-    private setParentLinks(formedData: TreeItem[]) {
+    private setParentLinks(formedData: ResultTreeItem[]) {
         for (const treeItem of formedData) {
             if (treeItem.children) {
                 for (const childTreeItem of treeItem.children) {
@@ -48,7 +48,7 @@ export class TreeService {
         }
     }
 
-    private sortTreeData(treeData: TreeItem) {
+    private sortTreeData(treeData: ResultTreeItem) {
         if (treeData.children) {
             if (treeData.children[0].result) {
                 treeData.children.sort((a, b) => {
@@ -72,7 +72,7 @@ export class TreeService {
         }
     }
 
-    private formTreeData(formattedData: Array<FormattedCheck>): TreeItem[] {
+    private formTreeData(category: CHECKOV_RESULT_CATEGORY, formattedData: Array<FormattedCheck>): ResultTreeItem[] {
         let formedTreeData: any = [];
         let level: any = { formedTreeData };
         let counter: number = 0;
@@ -81,18 +81,18 @@ export class TreeService {
             formattedCheck.filePath.reduce((r, { path, pathType, severity }, i, a) => {
               const iconPath = this.iconService.getIconPath(pathType, severity);
               if (i === a.length - 1) {
-                r.formedTreeData.push(new TreeItem({ label: path, iconPath, result: formattedCheck.result }));
+                r.formedTreeData.push(new ResultTreeItem({ label: path, iconPath, result: formattedCheck.result, category }));
                 counter++;
               } else if(!r[path]) {
                 r[path] = {formedTreeData: []};
-                r.formedTreeData.push(new TreeItem({ label: path, iconPath }, r[path].formedTreeData));
+                r.formedTreeData.push(new ResultTreeItem({ label: path, iconPath, category }, r[path].formedTreeData));
               }
 
               return r[path];
             }, level);
         });
 
-        formedTreeData.unshift(new TreeItem({ label: `Found issues: ${counter}`, isCounter: true }));
+        formedTreeData.unshift(new ResultTreeItem({ label: `Found issues: ${counter}`, isCounter: true, category }));
 
         return formedTreeData;
     }
@@ -178,6 +178,6 @@ export class TreeService {
     }
 
     private escapeRedundantChars(filePath: string): string {
-        return filePath.replace(/\/\//g, '/').replace(/^\//, '');;
+        return filePath.replace(/\/\//g, '/').replace(/^\//, '');
     }
 }

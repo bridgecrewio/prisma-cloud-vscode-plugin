@@ -13,7 +13,6 @@ import { MessageHandlersFactory } from './messages';
 
 export class CheckovResultWebviewPanel {
     private static context: vscode.ExtensionContext;
-    private static retryCount: number = 0;
     public static currentCategory: CHECKOV_RESULT_CATEGORY;
     public static webviewPanel?: vscode.WebviewPanel;
     public static checkovResult?: CheckovResult;
@@ -24,8 +23,8 @@ export class CheckovResultWebviewPanel {
     }
 
     public static async show(category: CHECKOV_RESULT_CATEGORY, result: CheckovResult, activeEditor: typeof vscode.window.activeTextEditor) {
-        CheckovResultWebviewPanel.fileEditorMap.set(result.file_abs_path, activeEditor);     
-        CheckovResultWebviewPanel.currentCategory = category;   
+        CheckovResultWebviewPanel.fileEditorMap.set(result.file_abs_path, activeEditor);
+        CheckovResultWebviewPanel.currentCategory = category;
         const html = await CheckovResultWebviewPanel.getHtmlTemplate(category);
 
         CheckovResultWebviewPanel.checkovResult = result;
@@ -81,13 +80,9 @@ export class CheckovResultWebviewPanel {
             return Boolean(vulnerability_details?.id) || Boolean(check_id);
         }
 
-        if (CategoriesService.isLicensesRisk(check_id) 
-            || CategoriesService.isSecretsRisk(check_id) 
-            || CategoriesService.isWeaknessesRisk(check_type)) {
-            return false;
-        }
-
-        return true;
+        return !(CategoriesService.isLicensesRisk(check_id)
+            || CategoriesService.isSecretsRisk(check_id)
+            || CategoriesService.isWeaknessesRisk(check_type));
     }
 
     private static restrictScaForFile(result: CheckovResult): boolean {
@@ -314,7 +309,7 @@ export class CheckovResultWebviewPanel {
     private static getDataFlowItemString(dataFlow: DataFlow, result: CheckovResult): string {
         const splitPath = dataFlow.path.split('/');
         return `<div class="details">
-                    <a target="_blank" onclick="onSastStepClick('${result.repo_file_path}', ${dataFlow.start.row})">${splitPath[splitPath.length - 1]}: ${dataFlow.start.row}</a><span>${dataFlow.code_block}</span>
+                    <a target="_blank" onclick="onSastStepClick('${result.file_abs_path}', ${dataFlow.start.row})">${splitPath[splitPath.length - 1]}: ${dataFlow.start.row}</a><span>${dataFlow.code_block}</span>
                 </div>`;
     }
 
@@ -327,4 +322,4 @@ export class CheckovResultWebviewPanel {
 
         return `${file_line_range[0]} - ${file_line_range[1]}`;
     }
-};
+}
