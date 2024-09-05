@@ -70,4 +70,4 @@ export class IconsService {
             light: path.join(__dirname, '..', '..', '..', '..', '..', 'static', 'icons', 'svg', `severities/${severity.toLowerCase()}.svg`),
         };
     }
-};
+}

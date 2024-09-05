@@ -8,8 +8,10 @@ import { getCertificate, getPrismaApiUrl, getProxyConfigurations } from '../../.
 import logger from '../../../logger';
 import { CheckovInstallation } from '../../../types';
 import { asyncExec, isWindows } from '../../../utils';
+import { parseUri } from '../../../utils/fileUtils';
 import { reRenderViews } from '../../../views/interface/utils';
 import { AbstractExecutor } from './abstractExecutor';
+import * as path from 'path';
 
 export class DockerExecutor extends AbstractExecutor {
     
@@ -28,7 +30,7 @@ export class DockerExecutor extends AbstractExecutor {
             ...DockerExecutor.getDockerParams(),
             ...containerName,
             ...DockerExecutor.getEnvs(),
-            ...DockerExecutor.getVolumeMounts(),
+            ...DockerExecutor.getVolumeMounts(files),
             ...DockerExecutor.getWorkdir(),
             ...DockerExecutor.getImage(),
             ...(await DockerExecutor.getCheckovCliParams(installation, DockerExecutor.fixFilePaths(files))),
@@ -90,12 +92,19 @@ export class DockerExecutor extends AbstractExecutor {
         return envs;
     }
 
-    private static getVolumeMounts() {
-        let volume = `${DockerExecutor.projectPath}:${DockerExecutor.projectPath}`;
-        const volumeMounts = [
-            '--volume', volume
-        ];
-
+    private static getVolumeMounts(files?: string[]) {
+        const volumeMounts = [];
+        if (files) {
+            files.forEach(file => {
+                const dir = path.dirname(file);
+                volumeMounts.push('--volume', `"${dir}":"${dir}"`);
+            });
+        } else if (vscode.workspace.workspaceFolders) {
+            const dir = parseUri(vscode.workspace.workspaceFolders[0].uri);
+            volumeMounts.push('--volume', `${dir}:${dir}`);
+        } else {
+            AbstractExecutor.projectPaths.forEach(path => volumeMounts.push('--volume', `${path}:${path}`));
+        }
         const cert = getCertificate();
         if (cert) {
             volumeMounts.push('--volume', `${cert}:${CONFIG.checkov.docker.certificateMountPath}`);
@@ -105,7 +114,10 @@ export class DockerExecutor extends AbstractExecutor {
     }
 
     private static getWorkdir() {
-        return ['--workdir', DockerExecutor.projectPath!];
+        if (vscode.workspace.workspaceFolders) {
+            return ['--workdir', parseUri(vscode.workspace.workspaceFolders[0].uri)];
+        }
+        return [];
     }
 
     private static getImage() {
@@ -128,5 +140,5 @@ export class DockerExecutor extends AbstractExecutor {
         const {stdout} = await asyncExec(`${installation.entrypoint} ${args.join(' ')}`);
         return stdout.trim();
     }
-};
+}
 

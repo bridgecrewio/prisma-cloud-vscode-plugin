@@ -1,10 +1,17 @@
 # Change Log
 
+## [1.0.20] - 2024-09-05
+
+### Fixed
+
+- Fixed an issue where standalone files couldn't be scanned
+- Fixed an issue where opening issues from the Prisma Cloud side panel didn't work
+
 ## [1.0.19] - 2024-08-29
 
 ### Added
 
-- Added the following data to Prisma Cloid analytics
+- Added the following data to Prisma Cloud analytics
 
     - Extension version
     - VS Code version

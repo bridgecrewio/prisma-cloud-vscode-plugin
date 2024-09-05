@@ -178,4 +178,4 @@ export class CheckovInstall {
                 return `"${join(dirname(envPath), 'checkov')}"`;
         }
     }
-};
+}

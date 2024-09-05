@@ -2,40 +2,39 @@ import * as vscode from 'vscode';
 
 import { getPrismaApiUrl } from '../../../../config/configUtils';
 import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
-import { CategoriesService, FilesService } from '../../../../services';
+import logger from '../../../../logger';
+import { CategoriesService, FilesService, ResultsService } from '../../../../services';
 import { CheckovResult } from '../../../../types';
 import { CheckovResultWebviewPanel } from '../../checkovResult';
 import { TreeService } from '../services/treeService';
 
-export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
-  abstract readonly category: CHECKOV_RESULT_CATEGORY;
+export class ResultTreeDataProvider implements vscode.TreeDataProvider<ResultTreeItem> {
 
-  private readonly _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
-  public readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+  readonly category: CHECKOV_RESULT_CATEGORY;
 
-  private data: TreeItem[] = [];
+  private data: ResultTreeItem[] = [];
   private treeService: TreeService;
 
-  constructor() {
+  constructor(category: CHECKOV_RESULT_CATEGORY) {
+    this.category = category;
     this.treeService = new TreeService();
   }
 
-  abstract getCheckovResults(): CheckovResult[];
+  public getCheckovResults() {
+    return ResultsService.getByCategory(this.category);
+  };
 
   public refresh() {
     const checkovResults = this.getCheckovResults();
-
     this.data = this.treeService.getTreeData(this.category, checkovResults);
-    this._onDidChangeTreeData.fire();
   }
 
-  public getTreeItem(element: TreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
+  public getTreeItem(element: ResultTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
     return element;
   }
 
-  public getChildren(element?: TreeItem): vscode.ProviderResult<TreeItem[]> {
+  public getChildren(element?: ResultTreeItem): vscode.ProviderResult<ResultTreeItem[]> {
     if (element === undefined) {
-      const a = vscode.ThemeIcon.Folder;
       return this.data;
     }
     return element.children;
@@ -45,40 +44,34 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
     return this.data.length;
   }
 
-  public getParent(element: TreeItem): vscode.ProviderResult<TreeItem> {
+  public getParent(element: ResultTreeItem): vscode.ProviderResult<ResultTreeItem> {
     return element.parent;
   }
 
-  public async onDidChangeSelection(event: vscode.TreeViewSelectionChangeEvent<TreeItem>) {
-    const result = event.selection[0]?.result;
-
+  public async showResult(result?: CheckovResult | null) {
     if (!result) {
         return;
     }
-
     const isIaC = CategoriesService.isIaCRisk(result.check_id, result.check_type);
-
     if (isIaC) {
       let fetchedDescription;
-
       if (getPrismaApiUrl()) {
+        logger.info(`Fetching description for ${result.bc_check_id}`);
         fetchedDescription = await CheckovResultWebviewPanel.fetchDescription(result.bc_check_id);
       }
-
       if (!result.description && fetchedDescription) {
         result.description = fetchedDescription;
       }
     }
-
-    const openedTextEditor = await FilesService.openFile(result.repo_file_path, result.file_line_range[0]);
+    const openedTextEditor = await FilesService.openFile(result.file_abs_path, result.file_line_range[0]);
     await CheckovResultWebviewPanel.show(this.category, result, openedTextEditor);
-  } 
-
-  public getTreeItemByIds(id: string) {
-    return this.traverseAndFind(id, { children: this.data } as TreeItem);
   }
 
-  private traverseAndFind(id: string, treeItem: TreeItem): TreeItem | undefined {
+  public getTreeItemByIds(id: string) {
+    return this.traverseAndFind(id, { children: this.data } as ResultTreeItem);
+  }
+
+  private traverseAndFind(id: string, treeItem: ResultTreeItem): ResultTreeItem | undefined {
       if (treeItem?.result?.id === id) {
         return treeItem;
       } 
@@ -91,30 +84,39 @@ export abstract class TreeDataProvider implements vscode.TreeDataProvider<TreeIt
         }
       }
   }
-};
+}
 
-export class TreeItem extends vscode.TreeItem {
-  public readonly children: TreeItem[] | undefined;
+export class ResultTreeItem extends vscode.TreeItem {
+
+  public readonly children: ResultTreeItem[] | undefined;
   public readonly result: CheckovResult | null;
   public readonly isCounter?: boolean;
-  public parent?: TreeItem;
+  public readonly category: CHECKOV_RESULT_CATEGORY;
+  public parent?: ResultTreeItem;
 
   constructor(options: { 
     label: string, 
     iconPath?: vscode.ThemeIcon | { light: string, dark: string }, 
-    result?: CheckovResult, 
+    result?: CheckovResult,
     isCounter?: boolean,
-  }, children?: TreeItem[]) {
-    const { label, iconPath, result, isCounter } = options;
+    category: CHECKOV_RESULT_CATEGORY
+  }, children?: ResultTreeItem[]) {
+    const { label, iconPath, result, isCounter, category } = options;
 
     super(
         label,
         children === undefined ? vscode.TreeItemCollapsibleState.None :
                                  vscode.TreeItemCollapsibleState.Collapsed
-                                 );
+    );
     this.children = children;
     this.iconPath = iconPath;
     this.result = result ?? null;
     this.isCounter = isCounter;
+    this.category = category;
+    this.command = {
+      command: 'treeView.click',
+      title: 'Show description',
+      arguments: [result, category]
+    };
   }
-};
+}

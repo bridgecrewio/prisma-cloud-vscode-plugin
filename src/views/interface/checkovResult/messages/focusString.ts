@@ -1,10 +1,9 @@
-import * as vscode from 'vscode';
 import { FilesService } from '../../../../services';
 
 export class FocusString {
-    public static async handle({ repoFilePath, row }: { repoFilePath: string, row: number }) {
-        if (repoFilePath && row) {
-            await  FilesService.openFile(repoFilePath, row);
+    public static async handle({ fileAbsPath, row }: { fileAbsPath: string, row: number }) {
+        if (fileAbsPath && row) {
+            await  FilesService.openFile(fileAbsPath, row);
             return;
         }
 

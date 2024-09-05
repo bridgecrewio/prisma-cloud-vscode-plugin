@@ -30,7 +30,7 @@ export class CheckovExecutor {
         const executor = CheckovExecutor.executors.get(installation.type);
         executor ?
             CheckovExecutor.actualCheckovVersion = await CheckovExecutor.executors.get(installation.type)?.getCheckovVersion(installation) :
-            logger.error(`No executor found for ${installation.type}, can't determine Checkov version`);
+            logger.error(`No executor found for ${installation?.type}, can't determine Checkov version`);
     }
 
     public static getExecutor() {
@@ -53,12 +53,17 @@ export class CheckovExecutor {
         } 
 
         if (!executor) {
-            logger.error(`No executor found for ${installation.type}, aborting scan operation`);
+            logger.error(`No executor found for ${installation?.type}, aborting scan operation`);
             return;
         }
 
         if (AbstractExecutor.isScanInProgress) {
             logger.info('Existing scan already in progress, will not run a new one');
+            return;
+        }
+
+        if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 1 && !targetFiles) {
+            vscode.window.showWarningMessage('Full scan is only supported when working with a single VS Code workspace');
             return;
         }
 
@@ -76,12 +81,12 @@ export class CheckovExecutor {
                 try {
                     checkovOutput = await executor.execute(installation, targetFiles);
                 } catch (e: any) {
-                    logger.info(`The Checkov execution was failed due to: ${e.message}`);
+                    logger.info(`Checkov execution failed due to: ${e.message}`);
                     AbstractExecutor.isScanInProgress = false;
                     await reRenderViews();
                     StatusBar.reset();
                     if (!shouldDisableErrorMessage()) {
-                        vscode.window.showErrorMessage(`Scanning is stopped due to: ${e.message}`);
+                        vscode.window.showErrorMessage(`Scanning stopped due to: ${e.message}`);
                     }
                     return;
                 }
@@ -124,18 +129,16 @@ export class CheckovExecutor {
 
     private static processOutput(output: CheckovOutput) {
         if (Array.isArray(output)) {
-            const failedChecks = output.reduce((acc: CheckovResult[], checkType) => {
+            return  output.reduce((acc: CheckovResult[], checkType) => {
                 if (checkType) {
                     for (const check of checkType.results.failed_checks) {
                         check.check_type = checkType.check_type;
                         check.id = uuidv4();
                         check.severity = check.severity || SEVERITY.INFO;
-                    };
+                    }
                 }
                 return acc.concat(checkType?.results.failed_checks ?? []);
             }, []);
-
-            return failedChecks;
         }
 
         // response from checkov with EmptyCheckovOutput type
@@ -169,4 +172,4 @@ export class CheckovExecutor {
     public static get checkovVersion() {
         return CheckovExecutor.actualCheckovVersion;
     }
-};
+}
