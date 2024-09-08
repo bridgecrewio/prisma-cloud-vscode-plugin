@@ -1,9 +1,10 @@
 import { FilesService } from '../../../../services';
+import { CheckovResult } from '../../../../types';
 
 export class FocusString {
-    public static async handle({ fileAbsPath, row }: { fileAbsPath: string, row: number }) {
-        if (fileAbsPath && row) {
-            await  FilesService.openFile(fileAbsPath, row);
+    public static async handle({ result, row }: { result: CheckovResult, row: number }) {
+        if (result && row) {
+            await  FilesService.openResult(result, row);
             return;
         }
 

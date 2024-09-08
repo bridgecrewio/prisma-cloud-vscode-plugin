@@ -127,8 +127,8 @@
     function onDocumentationClick(url) {
         vscode.postMessage({ type: 'documentationClick', url: url });
     }
-    function onSastStepClick(fileAbsPath, row) {
-        vscode.postMessage({ type: 'sastStepClick', fileAbsPath, row });
+    function onSastStepClick(result, row) {
+        vscode.postMessage({ type: 'sastStepClick', result, row });
     }
   </script>
 </body>

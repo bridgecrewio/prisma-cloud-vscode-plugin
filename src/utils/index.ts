@@ -24,6 +24,12 @@ export const formatWindowsFilePath = (path: string): string => {
     return path.replace(':', '').replace(/\\/g, '/');
 };
 
+export const formatWindowsAbsoluteFilePath = (path: string): string => {
+    const splitPath = path.replace(/\\/g, '/').replace(/^\/+/g, '').split('/');
+    splitPath[0] = splitPath[0].toLocaleUpperCase() + ':';
+    return splitPath.join('/');
+};
+
 export const getOsNameAndVersion = async () => {
     const operatingSystem = os.type();
     if ("Darwin" === operatingSystem) {

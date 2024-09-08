@@ -12,6 +12,9 @@ export class ResultTreeDataProvider implements vscode.TreeDataProvider<ResultTre
 
   readonly category: CHECKOV_RESULT_CATEGORY;
 
+  private _onDidChangeTreeData: vscode.EventEmitter<ResultTreeItem | void> = new vscode.EventEmitter<ResultTreeItem | void>();
+  readonly onDidChangeTreeData: vscode.Event<ResultTreeItem | void> = this._onDidChangeTreeData.event;
+
   private data: ResultTreeItem[] = [];
   private treeService: TreeService;
 
@@ -27,6 +30,7 @@ export class ResultTreeDataProvider implements vscode.TreeDataProvider<ResultTre
   public refresh() {
     const checkovResults = this.getCheckovResults();
     this.data = this.treeService.getTreeData(this.category, checkovResults);
+    this._onDidChangeTreeData.fire();
   }
 
   public getTreeItem(element: ResultTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
@@ -63,7 +67,7 @@ export class ResultTreeDataProvider implements vscode.TreeDataProvider<ResultTre
         result.description = fetchedDescription;
       }
     }
-    const openedTextEditor = await FilesService.openFile(result.file_abs_path, result.file_line_range[0]);
+    const openedTextEditor = await FilesService.openResult(result, result.file_line_range[0]);
     await CheckovResultWebviewPanel.show(this.category, result, openedTextEditor);
   }
 
