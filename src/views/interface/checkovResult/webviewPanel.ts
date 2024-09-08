@@ -309,7 +309,7 @@ export class CheckovResultWebviewPanel {
     private static getDataFlowItemString(dataFlow: DataFlow, result: CheckovResult): string {
         const splitPath = dataFlow.path.split('/');
         return `<div class="details">
-                    <a target="_blank" onclick="onSastStepClick('${result.file_abs_path}', ${dataFlow.start.row})">${splitPath[splitPath.length - 1]}: ${dataFlow.start.row}</a><span>${dataFlow.code_block}</span>
+                    <a target="_blank" onclick="onSastStepClick('${result}', ${dataFlow.start.row})">${splitPath[splitPath.length - 1]}: ${dataFlow.start.row}</a><span>${dataFlow.code_block}</span>
                 </div>`;
     }
 
