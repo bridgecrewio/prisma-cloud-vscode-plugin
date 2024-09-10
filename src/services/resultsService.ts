@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { CONFIG } from '../config';
 import { CHECKOV_RESULT_CATEGORY } from '../constants';
 import { CheckovResult } from '../types';
-import { isPipInstall, isWindows } from '../utils';
+import { formatWindowsAbsoluteFilePath, isWindows } from '../utils';
 import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 import { CategoriesService } from './categoriesService';
 import { CustomPopupService } from './customPopupService';
@@ -72,7 +72,7 @@ export class ResultsService {
         const results = ResultsService.get();
         return results.filter(result => {
             if (isWindows()) {
-                return result.file_abs_path === `/${filePath}`;
+                return formatWindowsAbsoluteFilePath(result.file_abs_path) === formatWindowsAbsoluteFilePath(filePath);
             }
             return result.file_abs_path === filePath;
         });
@@ -87,8 +87,8 @@ export class ResultsService {
         const storedResults = ResultsService.get();
         const updatedResults = [
             ...storedResults.filter((result) => {
-                if (isWindows() && isPipInstall()) {
-                    return !files.includes(result.original_abs_path);
+                if (isWindows()) {
+                    return !files.some(file => formatWindowsAbsoluteFilePath(file) === formatWindowsAbsoluteFilePath(result.file_abs_path));
                 }
                 return !files.includes(result.file_abs_path);
             }),

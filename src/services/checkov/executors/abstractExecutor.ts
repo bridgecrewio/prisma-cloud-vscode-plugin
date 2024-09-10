@@ -78,7 +78,7 @@ export abstract class AbstractExecutor {
         } else if (vscode.workspace.workspaceFolders) {
             const directory = parseUri(vscode.workspace.workspaceFolders![0].uri);
             checkovCliParams.push('--directory', directory);
-            const excludedPaths = AbstractExecutor.projectPaths.filter(path => !path.startsWith(directory));
+            const excludedPaths = AbstractExecutor.projectPaths.filter(path => !path.replace(/"/g, '').startsWith(directory.replace(/"/g, '')));
             if (excludedPaths.length) {
                 logger.warn(`There are files opened from outside the workspace that won't be scanned in these directories: ${excludedPaths}`);
                 vscode.window.showWarningMessage('You have opened files from outside your workspace. Those files will not be scanned as part of a full scan');
