@@ -1,6 +1,14 @@
 # Change Log
 
-## [1.0.20] - 2024-09-05
+## [1.0.21] - 2024-09-10
+
+### Fixed
+
+- Fixed an issue where the excluded files warning notification appeared incorrectly
+- Fixed an issue where findings were duplicated when running Checkov using Docker on Windows
+- Fixed an issue where findings didn't appear inline when running Checkov using Docker on Windows
+
+## [1.0.20] - 2024-09-08
 
 ### Fixed
 
