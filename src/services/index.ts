@@ -6,7 +6,7 @@ export function initializeServices(context: vscode.ExtensionContext) {
     DiagnosticsService.initialize(context);
     ResultsService.initialize(context);
     FilesService.initialize(context);
-};
+}
 
 export * from './checkov';
 export * from './categoriesService';

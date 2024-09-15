@@ -17,23 +17,25 @@ export enum COMMAND {
     FILTER_CRITICAL_ENABLE = 'filter.criticalEnable',
     FILTER_CRITICAL_DISABLE = 'filter.criticalDisable',
     OPEN_PRISMA_LOG = 'prisma.open-log',
-};
+    CLICK_RESULT = 'resultTreeView.clickResult',
+    TEST_CONNECTION = 'connection.test'
+}
 
 export enum WORKSPACE_EVENTS {
     SAVE_FILE = 'onDidSaveTextDocument',
     OPEN_FILE = 'onDidOpenTextDocument',
     CONFIGURATION_CHANGED = 'onDidChangeConfiguration'
-};
+}
 
 export enum WINDOW_EVENTS {
     CHANGE_ACTIVE_TEXT_EDITOR = 'onDidChangeActiveTextEditor',
-};
+}
 
 export enum CHECKOV_INSTALLATION_TYPE {
     DOCKER = 'docker',
     PIP3 = 'pip3',
     PIPENV = 'pipenv',
-};
+}
 
 export enum USER_CONFIGURATION_PARAM {
     ACCESS_KEY = 'accessKey',
@@ -47,7 +49,7 @@ export enum USER_CONFIGURATION_PARAM {
     CHECKOV_VERSION = 'checkovVersion',
     DISABLE_ERROR_MESSAGE_POPUP = 'disableErrorMessagePopups',
     EXTERNAL_CHECK_DIR = 'externalChecksDirectory'
-};
+}
 
 export enum PATH_TYPE {
     FOLDER = 'FOLDER',
@@ -76,14 +78,14 @@ export enum CHECKOV_RESULT_CATEGORY {
     SECRETS = 'secrets', 
     LICENSES = 'licenses',
     WEAKNESSES = 'weaknesses',
-};
+}
 
 export enum CHECKOV_RESULT_VIEW_MESSAGE_TYPE {
     SUPPRESS = 'suppress',
     FIX = 'fix',
     DOCUMENTATION_CLICK = 'documentationClick',
     ON_STEP_CLICK = 'sastStepClick',
-};
+}
 
 export const severityPriorityMap: Record<SEVERITY, number> = {
     [SEVERITY.UNKNOWN]: 0,

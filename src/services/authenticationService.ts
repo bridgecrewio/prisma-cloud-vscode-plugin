@@ -1,8 +1,8 @@
 import axios from 'axios';
 import * as vscode from 'vscode';
-import { CONFIG } from "../config";
-import { getPrismaApiUrl } from '../config/configUtils';
-import { GLOBAL_CONTEXT } from "../constants";
+import {CONFIG} from "../config";
+import {getPrismaApiUrl} from '../config/configUtils';
+import {GLOBAL_CONTEXT} from "../constants";
 import logger from '../logger';
 
 export const initializeAuthenticationService = async (context: vscode.ExtensionContext) => {
@@ -20,23 +20,28 @@ export class AuthenticationService {
     static enabled: boolean = true;
 
     static async setAnalyticsJwtToken() {
-        const { secretKey, accessKey } = CONFIG.userConfig;
-        if (secretKey && accessKey) {
-            try {
+        const response = await this.login();
+        if (response?.status === 200) {
+            logger.info('Fetched new JWT token successfully');
+            await AuthenticationService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, response.data.token);
+        } else {
+            logger.error(`Failed fetching a new JWT token, authorization on prisma failed: ${response}`);
+            await AuthenticationService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, undefined);
+        }
+    }
+
+    static async login() {
+        try {
+            const { secretKey, accessKey } = CONFIG.userConfig;
+            if (secretKey && accessKey) {
                 const loginUrl = getPrismaApiUrl() + '/login';
-                const response = await axios.post(loginUrl, {
+                return await axios.post(loginUrl, {
                     username: accessKey,
                     password: secretKey,
                 });
-    
-                if (response.status === 200) {
-                    logger.info('Fetched new JWT token successfully');
-                    await AuthenticationService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, response.data.token);
-                }
-            } catch (error: any) {
-                logger.error(`Failed fetching a new JWT token, authorization on prisma failed: ${error.message}`);
-                await AuthenticationService.applicationContext.globalState.update(GLOBAL_CONTEXT.JWT_TOKEN, undefined);
             }
+        } catch (error: any) {
+            return error.message;
         }
     }
 }

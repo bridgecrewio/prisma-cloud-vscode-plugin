@@ -1,19 +1,20 @@
 import * as vscode from 'vscode';
 
-import { CHECKOV_RESULT_CATEGORY } from '../../../constants';
+import {CHECKOV_RESULT_CATEGORY} from '../../../constants';
 import logger from '../../../logger';
-import { CategoriesService } from '../../../services';
-import { CheckovResult } from '../../../types';
-import { ResultTreeItem } from './dataProviders/resultTreeDataProvider';
-import { TreeDataProvidersContainer } from './services/treeDataProvidersContainer';
+import {CategoriesService} from '../../../services';
+import {CheckovResult} from '../../../types';
+import {ResultTreeItem} from './dataProviders/resultTreeDataProvider';
+import {TreeDataProvidersContainer} from './services/treeDataProvidersContainer';
 
 export class PrimarySidebar {
 
-    public static initialize(context: vscode.ExtensionContext) {
+    public static initialize() {
         TreeDataProvidersContainer.registerTreeProviders();
-        context.subscriptions.push(vscode.commands.registerCommand('treeView.click', (result: CheckovResult, category: CHECKOV_RESULT_CATEGORY) => {
-            TreeDataProvidersContainer.treeViews[category].provider.showResult(result);
-        }));
+    }
+
+    public static showTreeResult(result: CheckovResult, category: CHECKOV_RESULT_CATEGORY) {
+        TreeDataProvidersContainer.treeViews[category].provider.showResult(result).catch(e => logger.error(e));
     }
 
     public static getTreeView(checkId: string, checkType: string) {
@@ -33,7 +34,7 @@ export class PrimarySidebar {
     }
 }
 
-export function registerSidebar(context: vscode.ExtensionContext) {
-    PrimarySidebar.initialize(context);
+export function registerSidebar() {
+    PrimarySidebar.initialize();
     TreeDataProvidersContainer.refresh();
 }
