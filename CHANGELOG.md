@@ -1,6 +1,11 @@
 # Change Log
 
-## [1.0.21] - 2024-09-10
+## [1.0.21] - 2024-09-15
+
+### Added
+
+- Added validations to user input in the configuration screen
+- Added a `Run full scan` and `Test connection` buttons in the extension sidebar
 
 ### Fixed
 

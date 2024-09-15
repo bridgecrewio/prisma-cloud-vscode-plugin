@@ -4,6 +4,7 @@ import { CONFIG } from '../../../config';
 import { COMMAND } from '../../../constants';
 
 export class StatusBar {
+
     private static instance: vscode.StatusBarItem;
 
     static {
@@ -28,4 +29,4 @@ export class StatusBar {
     protected static getText(text = 'Prisma Cloud', icon?: string) {
         return `${ icon ? `$(${icon}) ` : '' }${text}`;
     }
-};
+}

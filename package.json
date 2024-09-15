@@ -30,6 +30,10 @@
     "views": {
       "prisma-cloud": [
         {
+          "id": "general",
+          "name": "General Actions"
+        },
+        {
           "id": "iac-misconfiguration",
           "name": "IaC Misconfiguration"
         },
@@ -52,6 +56,12 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "general",
+        "contents": "[Run full scan](command:checkov.execute)\n[Test Connection](command:connection.test)"
+      }
+    ],
     "commands": [
       {
         "command": "checkov.install",
@@ -112,11 +122,12 @@
         {
           "command": "checkov.execute",
           "group": "navigation",
-          "when": "view == iac-misconfiguration || view == secrets || view == vulnerabilities || view == licenses || view == weaknesses"
+          "when": "view == general"
         },
         {
           "submenu": "filters",
-          "group": "navigation"
+          "group": "navigation",
+          "when": "view != general"
         }
       ],
       "filters": [
@@ -185,7 +196,9 @@
         "prismaCloud.accessKey": {
           "order": 0,
           "markdownDescription": "Required to access all Prisma Cloud scan types. Without it, access is limited to open source scan capabilities",
-          "type": "string"
+          "type": "string",
+          "pattern": "^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$",
+          "errorMessage": "Access Key must be a valid UUID."
         },
         "prismaCloud.secretKey": {
           "order": 1,
@@ -195,7 +208,9 @@
         "prismaCloud.prismaURL": {
           "order": 2,
           "markdownDescription": "Required if access key and secret key are provided",
-          "type": "string"
+          "type": "string",
+          "pattern": "^https://api[a-zA-Z0-9.-]+(:[0-9]+)?(/.*)?$",
+          "errorMessage": "Prisma URL must be a valid URL starting with 'https://api'."
         },
         "prismaCloud.checkovVersion": {
           "order": 3,
