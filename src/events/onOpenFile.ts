@@ -4,6 +4,7 @@ import { AnalyticsService } from '../services/analyticsService';
 import { AbstractExecutor } from '../services/checkov/executors/abstractExecutor';
 
 export class OnOpenFile {
+
     public static async handle(document: vscode.TextDocument) {
         if (document && document.uri.scheme === 'file' && !AbstractExecutor.isScanInProgress) {
             const startTime = new Date();
@@ -14,4 +15,4 @@ export class OnOpenFile {
             }
         }
     }
-};
+}

@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
 
-import {getPrismaApiUrl} from '../../../../config/configUtils';
-import {CHECKOV_RESULT_CATEGORY} from '../../../../constants';
+import { getPrismaApiUrl } from '../../../../config/configUtils';
+import { CHECKOV_RESULT_CATEGORY } from '../../../../constants';
 import logger from '../../../../logger';
-import {CategoriesService, FilesService, ResultsService} from '../../../../services';
-import {CheckovResult} from '../../../../types';
-import {CheckovResultWebviewPanel} from '../../checkovResult';
-import {TreeService} from '../services/treeService';
+import { CategoriesService, ResultsService } from '../../../../services';
+import { FilesService } from '../../../../services/filesService';
+import { CheckovResult } from '../../../../types';
+import { CheckovResultWebviewPanel } from '../../checkovResult';
+import { TreeService } from '../services/treeService';
 
 export class ResultTreeDataProvider implements vscode.TreeDataProvider<ResultTreeItem> {
 
