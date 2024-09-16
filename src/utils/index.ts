@@ -25,7 +25,7 @@ export const formatWindowsFilePath = (path: string): string => {
 };
 
 export const formatWindowsAbsoluteFilePath = (path: string): string => {
-    const splitPath = path.replace(/\\/g, '/').replace(/^\/+/g, '').split('/');
+    const splitPath = path.replace(/\\/g, '/').replace(/\/+/g, '/').replace(/^\/+/g, '').split('/');
     splitPath[0] = splitPath[0].toLocaleUpperCase() + (splitPath[0].endsWith(':') ? '' : ':');
     return splitPath.join('/');
 };

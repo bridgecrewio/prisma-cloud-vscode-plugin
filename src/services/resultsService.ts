@@ -70,12 +70,7 @@ export class ResultsService {
 
     public static getByFilePath(filePath: string) {
         const results = ResultsService.get();
-        return results.filter(result => {
-            if (isWindows()) {
-                return formatWindowsAbsoluteFilePath(result.file_abs_path) === formatWindowsAbsoluteFilePath(filePath);
-            }
-            return result.file_abs_path === filePath;
-        });
+        return results.filter(result => this.isSameFilePath(filePath, result));
     }
 
     public static store(results: CheckovResult[]) {
@@ -86,16 +81,21 @@ export class ResultsService {
     public static storeByFiles(files: string[], results: CheckovResult[]) {
         const storedResults = ResultsService.get();
         const updatedResults = [
-            ...storedResults.filter((result) => {
-                if (isWindows()) {
-                    return !files.some(file => formatWindowsAbsoluteFilePath(file) === formatWindowsAbsoluteFilePath(result.file_abs_path));
-                }
-                return !files.includes(result.file_abs_path);
-            }),
+            ...storedResults.filter((result) => !files.some(file => this.isSameFilePath(file, result))),
             ...results,
         ];
 
         return ResultsService.store(updatedResults);
+    }
+
+    private static isSameFilePath(filePath: string, result: CheckovResult) {
+        // There's a bug in Checkov that returns file_abs_path as a relative path instead of absolute path on full scans
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (isWindows()) {
+            return formatWindowsAbsoluteFilePath(result.file_abs_path) === formatWindowsAbsoluteFilePath(filePath) ||
+                formatWindowsAbsoluteFilePath(workspaceFolder + result.file_abs_path) === formatWindowsAbsoluteFilePath(filePath);
+        }
+        return result.file_abs_path === filePath || workspaceFolder + result.file_abs_path === filePath;
     }
 
     public static clear() {
