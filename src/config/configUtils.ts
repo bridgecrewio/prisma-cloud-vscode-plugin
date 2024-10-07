@@ -27,7 +27,10 @@ export const getToken = (): string | undefined => {
 };
 
 export const getPrismaApiUrl = (): string | undefined => {
-    const prismaURL = CONFIG.userConfig[USER_CONFIGURATION_PARAM.PRISMA_URL];
+    let prismaURL: string = CONFIG.userConfig[USER_CONFIGURATION_PARAM.PRISMA_URL];
+    if (prismaURL?.endsWith('/')) {
+        prismaURL = prismaURL.substring(0, prismaURL.length - 1);
+    }
     return prismaURL;
 };
 
