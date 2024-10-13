@@ -1,4 +1,6 @@
 .idea/
+dev
+prod
 out
 dist
 node_modules
