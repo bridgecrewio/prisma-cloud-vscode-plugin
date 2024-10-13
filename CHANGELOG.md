@@ -6,6 +6,7 @@
 
 - Fixed an issue where an error log wasn't triggered on extension activation failure
 - Fixed an issue where trailing slashes on Prisma URl configuration caused scan issues
+- Fixed an issue where clicking fix on an SCA finding showed the wrong message
 
 ## [1.0.21] - 2024-09-15
 
