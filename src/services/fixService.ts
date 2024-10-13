@@ -4,12 +4,12 @@ import * as vscode from 'vscode';
 
 import { CONFIG } from '../config';
 import { CHECKOV_RESULT_CATEGORY } from '../constants';
+import { CategoriesService, CheckovExecutor } from '../services';
 import { CheckovResult } from '../types';
-import { CategoriesService, CheckovExecutor, ResultsService } from '../services';
-import { CheckovResultWebviewPanel } from '../views/interface/checkovResult';
-import { CustomPopupService } from './customPopupService';
-import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
 import { isPipInstall, isWindows } from '../utils';
+import { CheckovResultWebviewPanel } from '../views/interface/checkovResult';
+import { TreeDataProvidersContainer } from '../views/interface/primarySidebar/services/treeDataProvidersContainer';
+import { CustomPopupService } from './customPopupService';
 
 export class FixService {
     public static async fix(result: CheckovResult) {
@@ -28,15 +28,14 @@ export class FixService {
     }
 
     private static async applyScaFix({ vulnerability_details }: CheckovResult) {
-        const command = vulnerability_details.fix_command.cmds.join(EOL).replace(/`/g, '');
-        const message = `${vulnerability_details.fix_command.msg}:${EOL}${command}`;
-
-        if (vulnerability_details.fix_command.manualCodeFix) {
-            const { msg, cmds } = vulnerability_details.fix_command;
-            vscode.window.showInformationMessage(`${msg}: ${cmds.length > 1 ? cmds.join(', ') : cmds[0]}`);
-            return;
+        const { msg, cmds, manualCodeFix } = vulnerability_details.fix_command;
+        const command = (cmds.length > 1 ? cmds.join(EOL) : cmds[0]).replace(/`/g, '');
+        let message;
+        if (manualCodeFix) {
+            message = `To bump to the fixed version please manually change the version to ${vulnerability_details.lowest_fixed_version} and run the following command:${EOL}${command}`;
+        } else {
+            message = `${msg}:${EOL}${command}`;
         }
-
         const action = await vscode.window.showInformationMessage(
             CONFIG.userInterface.extensionTitle,
             {
@@ -47,7 +46,6 @@ export class FixService {
                 title: 'Copy Command',
             },
         );
-        
         if (action) {
             if (action.title === 'Copy Command') {
                 vscode.env.clipboard.writeText(command);   

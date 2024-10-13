@@ -25,6 +25,7 @@ export type CheckovResult = {
         package_name: string;
         package_version: string;
         license: string;
+        lowest_fixed_version: string;
         fix_command: {
             cmds: string[];
             manualCodeFix: boolean;
