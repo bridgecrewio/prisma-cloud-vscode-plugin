@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.0.22] - 2024-10-13
+
+### Fixed
+
+- Fixed an issue where an error log wasn't triggered on extension activation failure
+- Fixed an issue where trailing slashes on Prisma URl configuration caused scan issues
+
 ## [1.0.21] - 2024-09-15
 
 ### Added
