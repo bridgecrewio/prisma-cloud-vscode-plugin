@@ -6,7 +6,7 @@
   "repository": "https://github.com/bridgecrewio/prisma-cloud-vscode-plugin",
   "icon": "static/icons/prisma.png",
   "description": "a static code analysis tool to scan code for Infrastructure-as-Code (IaC) misconfigurations, Software Composition Analysis (SCA) issues and Secrets vulnerabilities.",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "engines": {
     "vscode": "^1.79.0"
   },
@@ -31,7 +31,9 @@
       "prisma-cloud": [
         {
           "id": "general",
-          "name": "General Actions"
+          "name": "General Actions",
+          "visibility": "collapsed",
+          "initialSize": 1
         },
         {
           "id": "iac-misconfiguration",
