@@ -1,3 +1,10 @@
+# Archival Notice
+This development of the Prisma Cloud VS Code IDE extension moved to an internal repository of Palo Alto Networks.
+
+If you encounter any issues with the extension, please open issues [here](https://github.com/bridgecrewio/prisma-cloud-ide-issues/issues/new/choose)
+
+<hr>
+
 # Prisma Cloud VSCode Plugin
 
 ## Overview
